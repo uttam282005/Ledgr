@@ -46,14 +46,29 @@ func generateGroundedAnswerWithNIM(ctx context.Context, question string, sql str
 You are given a user question, the exact read-only SQL executed, and the exact database result rows.
 Rules:
 1. Answer strictly from the provided result rows. Never hallucinate or invent numbers.
-2. Present monetary amounts clearly in Indian Rupees (e.g., divide paise values by 100).
-3. Be concise, direct, and professional (2-4 sentences max).
-4. Do not speculate or extrapolate beyond the provided data.`
+2. All monetary amounts have been accurately pre-converted to Indian Rupees in the '*_inr' fields (e.g. 'total_exposure_inr': '₹3,53,818.75'). ALWAYS quote these pre-calculated strings in your answer. Never attempt manual mental math or division on paise values.
+3. When the results explain reasons, discrepancies, or failure causes (containing 'reason' columns), explain the underlying financial/operational reasons for each category (e.g., missing bank credit statements, fee delta exceeding 2.5%, duplicate candidates, or unlinked gateway records) along with counts and exposure amounts.
+4. Be concise, direct, and structured. Bullet points are encouraged when listing multiple reasons or breakdown categories.
+5. Do not speculate or extrapolate beyond the provided data.`
+
+	// Enrich rows with pre-calculated formatted Indian Rupee strings
+	enrichedRows := make([]map[string]interface{}, len(rows))
+	for i, r := range rows {
+		er := make(map[string]interface{})
+		for k, v := range r {
+			er[k] = v
+			if strings.Contains(k, "paise") || strings.Contains(k, "amount") {
+				inrKey := strings.TrimSuffix(k, "_paise") + "_inr"
+				er[inrKey] = formatPaise(v)
+			}
+		}
+		enrichedRows[i] = er
+	}
 
 	payload := map[string]interface{}{
 		"question": question,
 		"sql":      sql,
-		"rows":     rows,
+		"rows":     enrichedRows,
 	}
 	payloadBytes, err := json.Marshal(payload)
 	if err != nil {
@@ -120,26 +135,127 @@ func generateGroundedAnswerOffline(question string, rows []map[string]interface{
 
 	firstRow := rows[0]
 
-	// Case 1: Specific record inspection (record_id, category, reason)
+	// Case 1: Specific record inspection or multi-record exception list (record_id, category, reason)
 	if recordID, ok := firstRow["record_id"].(string); ok {
-		cat, _ := firstRow["category"].(string)
-		hop, _ := firstRow["hop"].(string)
-		reason, _ := firstRow["reason"].(string)
-		exposure := formatPaise(firstRow["exposure_paise"])
-		summary, _ := firstRow["ai_summary"].(string)
-		action, _ := firstRow["ai_action"].(string)
+		if len(rows) == 1 {
+			cat, _ := firstRow["category"].(string)
+			hop, _ := firstRow["hop"].(string)
+			reason, _ := firstRow["reason"].(string)
+			exposure := formatPaise(firstRow["exposure_paise"])
+			summary, _ := firstRow["ai_summary"].(string)
+			action, _ := firstRow["ai_action"].(string)
 
-		ans := fmt.Sprintf("Record %s was classified as %s (%s). Reason: %s. Unresolved cash exposure: %s.",
-			recordID, cat, hop, reason, exposure)
-		if action != "" {
-			ans += fmt.Sprintf(" Recommended action: %s", action)
-		} else if summary != "" {
-			ans += fmt.Sprintf(" Details: %s", summary)
+			ans := fmt.Sprintf("Record %s was classified as %s (%s). Reason: %s. Exposure: %s.",
+				recordID, cat, hop, reason, exposure)
+			if summary != "" {
+				ans += fmt.Sprintf(" AI Diagnosis: %s", summary)
+			}
+			if action != "" {
+				ans += fmt.Sprintf(" Recommended action: %s", action)
+			}
+			return ans
 		}
-		return ans
+
+		// Multiple exception records (e.g. pending settlements for a merchant)
+		cat, _ := firstRow["category"].(string)
+		var totalExp int64
+		var ids []string
+		for _, r := range rows {
+			if idStr, ok := r["record_id"].(string); ok {
+				ids = append(ids, idStr)
+			}
+			if exp, ok := r["exposure_paise"].(int64); ok {
+				totalExp += exp
+			} else if expF, ok := r["exposure_paise"].(float64); ok {
+				totalExp += int64(expF)
+			}
+		}
+
+		label := cat
+		if cat == "SETTLED_NOT_BANKED" {
+			label = "pending settlement(s) (settled but not banked)"
+		} else if cat != "" {
+			label = fmt.Sprintf("%s record(s)", cat)
+		} else {
+			label = "exception record(s)"
+		}
+
+		idList := strings.Join(ids, ", ")
+		if len(ids) > 6 {
+			idList = fmt.Sprintf("%s, and %d more", strings.Join(ids[:6], ", "), len(ids)-6)
+		}
+
+		return fmt.Sprintf("Found %d %s totaling %s in unresolved cash exposure. Impacted records: %s.",
+			len(rows), label, formatPaise(totalExp), idList)
 	}
 
-	// Case 2: Merchant aggregation
+	// Case 2: Reconciliation status counts (FULL, PARTIAL, UNMATCHED)
+	if _, ok := firstRow["reconciliation_status"]; ok {
+		var parts []string
+		for _, r := range rows {
+			st := r["reconciliation_status"]
+			cnt := r["count"]
+			if cnt == nil {
+				cnt = r["full_chain_count"]
+			}
+			parts = append(parts, fmt.Sprintf("%v: %v records", st, cnt))
+		}
+		return fmt.Sprintf("Full-chain reconciliation breakdown: %s.", strings.Join(parts, ", "))
+	}
+
+	// Case 3: AI investigation status counts
+	if _, ok := firstRow["ai_status"]; ok {
+		var parts []string
+		for _, r := range rows {
+			st := r["ai_status"]
+			cnt := r["count"]
+			parts = append(parts, fmt.Sprintf("%v: %v", st, cnt))
+		}
+		return fmt.Sprintf("AI investigation status across exceptions: %s.", strings.Join(parts, ", "))
+	}
+
+	// Case 4: Category and Reason breakdown
+	if _, ok := firstRow["category"]; ok {
+		if _, hasReason := firstRow["reason"]; hasReason {
+			var parts []string
+			for i, r := range rows {
+				if i >= 6 {
+					parts = append(parts, fmt.Sprintf("...and %d more reasons", len(rows)-6))
+					break
+				}
+				c := r["category"]
+				cnt := r["count"]
+				rsn, _ := r["reason"].(string)
+				expStr := ""
+				if r["total_exposure_paise"] != nil {
+					expStr = fmt.Sprintf(" (%s)", formatPaise(r["total_exposure_paise"]))
+				} else if r["exposure_paise"] != nil {
+					expStr = fmt.Sprintf(" (%s)", formatPaise(r["exposure_paise"]))
+				}
+				if cnt != nil {
+					parts = append(parts, fmt.Sprintf("%v [%v records]: %s%s", c, cnt, rsn, expStr))
+				} else {
+					parts = append(parts, fmt.Sprintf("%v: %s%s", c, rsn, expStr))
+				}
+			}
+			return fmt.Sprintf("Primary reasons for settlement exceptions: %s.", strings.Join(parts, "; "))
+		}
+
+		var parts []string
+		for _, r := range rows {
+			c := r["category"]
+			cnt := r["count"]
+			if r["total_exposure_paise"] != nil {
+				exp := formatPaise(r["total_exposure_paise"])
+				parts = append(parts, fmt.Sprintf("%v: %v records (%s)", c, cnt, exp))
+			} else {
+				parts = append(parts, fmt.Sprintf("%v: %v records", c, cnt))
+			}
+		}
+		return fmt.Sprintf("Exception breakdown by category: %s.", strings.Join(parts, "; "))
+	}
+
+	// Case 5: Merchant aggregation
 	if merchantID, ok := firstRow["merchant_id"].(string); ok {
 		var b strings.Builder
 		countVal, hasCount := firstRow["exception_count"]
@@ -172,7 +288,7 @@ func generateGroundedAnswerOffline(question string, rows []map[string]interface{
 		return b.String()
 	}
 
-	// Case 3: Reconciliation run totals (unresolved_amount_paise, exception_count, full_chain_count)
+	// Case 6: Reconciliation run totals (unresolved_amount_paise, exception_count, full_chain_count)
 	if unres, ok := firstRow["unresolved_amount_paise"]; ok {
 		exCount := firstRow["exception_count"]
 		fullCount := firstRow["full_chain_count"]
@@ -180,15 +296,7 @@ func generateGroundedAnswerOffline(question string, rows []map[string]interface{
 			formatPaise(unres), exCount, fullCount)
 	}
 
-	// Case 4: Status or category breakdown
-	if cat, ok := firstRow["category"].(string); ok {
-		cnt := firstRow["count"]
-		exposure := formatPaise(firstRow["total_exposure_paise"])
-		return fmt.Sprintf("Top exception category is %s with %v record(s) and %s in unresolved cash exposure.",
-			cat, cnt, exposure)
-	}
-
-	// Case 5: Single count / sum result
+	// Case 7: Single count / sum result
 	var parts []string
 	for k, v := range firstRow {
 		if strings.Contains(k, "paise") || strings.Contains(k, "amount") {

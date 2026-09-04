@@ -42,8 +42,11 @@ type QAResponse struct {
 func (s *QAService) Ask(ctx context.Context, runID string, question string) (*QAResponse, error) {
 	startTime := time.Now()
 
-	// 1. Generate SQL
-	genResult, err := GenerateSQL(ctx, question, runID, s.apiKey, s.baseURL, s.model)
+	// 1. Fetch DB metadata context (active merchants & schema metadata for this run)
+	meta := FetchDBMetadataContext(ctx, s.readOnlyDB, runID)
+
+	// 2. Generate SQL
+	genResult, err := GenerateSQL(ctx, question, runID, meta, s.apiKey, s.baseURL, s.model)
 	if err != nil {
 		return &QAResponse{
 			Question:     question,
@@ -63,11 +66,11 @@ func (s *QAService) Ask(ctx context.Context, runID string, question string) (*QA
 		}, nil
 	}
 
-	// 2. AST Validation & Security Checks
+	// 3. AST Validation & Security Checks
 	valResult, err := ValidateSQL(genResult.SQL)
 	if (err != nil || !valResult.Valid) && s.apiKey != "" {
 		// Fallback to offline SQL generator if LLM generated an invalid/unapproved query
-		offlineResult, offlineErr := generateSQLOffline(question, runID)
+		offlineResult, offlineErr := generateSQLOffline(question, runID, meta)
 		if offlineErr == nil && !offlineResult.Unsupported {
 			if offVal, offErr := ValidateSQL(offlineResult.SQL); offErr == nil && offVal.Valid {
 				genResult = offlineResult
@@ -95,11 +98,11 @@ func (s *QAService) Ask(ctx context.Context, runID string, question string) (*QA
 		}, nil
 	}
 
-	// 3. Execute query on read-only database role
+	// 4. Execute query on read-only database role
 	execResult, err := ExecuteReadOnly(ctx, s.readOnlyDB, valResult.SanitizedQuery)
 	if err != nil && s.apiKey != "" {
 		// Fallback to offline SQL generator if LLM query failed DB execution
-		offlineResult, offlineErr := generateSQLOffline(question, runID)
+		offlineResult, offlineErr := generateSQLOffline(question, runID, meta)
 		if offlineErr == nil && !offlineResult.Unsupported {
 			if offVal, offErr := ValidateSQL(offlineResult.SQL); offErr == nil && offVal.Valid {
 				if offExec, offExecErr := ExecuteReadOnly(ctx, s.readOnlyDB, offVal.SanitizedQuery); offExecErr == nil {

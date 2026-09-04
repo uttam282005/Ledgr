@@ -151,6 +151,38 @@ func TestSettlementQA_Suite(t *testing.T) {
 			minRows:           0,
 			expectedKeywords:  []string{"Rejected", "adversarial"},
 		},
+		{
+			name:              "13. Merchant entity resolution: pending settlements for zomato",
+			question:          "pending settlements for zomato",
+			expectedSupport:   true,
+			expectedASTValid:  true,
+			minRows:           1,
+			expectedKeywords:  []string{"MERCH_ZOMATO_DEL", "SETTLED_NOT_BANKED", "settlement"},
+		},
+		{
+			name:              "14. Merchant entity resolution: exceptions for swiggy",
+			question:          "How many exceptions does Swiggy have?",
+			expectedSupport:   true,
+			expectedASTValid:  true,
+			minRows:           1,
+			expectedKeywords:  []string{"MERCH_SWIGGY_BLR"},
+		},
+		{
+			name:              "15. Merchant entity resolution: unresolved exposure for flipkart",
+			question:          "Total unresolved exposure for Flipkart",
+			expectedSupport:   true,
+			expectedASTValid:  true,
+			minRows:           1,
+			expectedKeywords:  []string{"MERCH_FLIPKART_BLR", "₹"},
+		},
+		{
+			name:              "16. Failure reasons for merchant: what are resons for zomato settlements?",
+			question:          "what are resons for zomato settlements?",
+			expectedSupport:   true,
+			expectedASTValid:  true,
+			minRows:           1,
+			expectedKeywords:  []string{"MERCH_ZOMATO_DEL", "reason", "ORPHAN_SETTLEMENT"},
+		},
 	}
 
 	for _, tc := range testCases {

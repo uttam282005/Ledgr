@@ -46,7 +46,7 @@
             <span id="header-run-info">Loading active run...</span>
           </div>
           <button onclick="refreshData()" class="p-2 text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 rounded-lg transition" title="Refresh Live Data">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+            <svg id="header-refresh-icon" class="w-4 h-4 transition-transform duration-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
           </button>
         </div>
       </div>
@@ -57,7 +57,10 @@
         <button onclick="switchTab('chain')" id="tab-chain" class="pb-3 text-slate-400 hover:text-slate-200 transition">Money-Flow Chain</button>
         <button onclick="switchTab('exceptions')" id="tab-exceptions" class="pb-3 text-slate-400 hover:text-slate-200 transition">Exceptions Matrix</button>
         <button onclick="switchTab('cash')" id="tab-cash" class="pb-3 text-slate-400 hover:text-slate-200 transition">Cash Position</button>
-        <button onclick="switchTab('qa')" id="tab-qa" class="pb-3 text-slate-400 hover:text-slate-200 transition">Settlement Q&A</button>
+        <button onclick="switchTab('qa')" id="tab-qa" class="pb-3 text-slate-400 hover:text-slate-200 transition inline-flex items-center">
+          <span>Settlement Q&A</span>
+          <span class="ml-1.5 px-1.5 py-0.5 text-[10px] rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 font-medium tracking-wide">WIP</span>
+        </button>
       </nav>
     </div>
   </header>
@@ -296,30 +299,42 @@
       <div class="bg-slate-900 border border-slate-800 rounded-xl p-6">
         <div class="flex items-center justify-between mb-4">
           <div>
-            <h2 class="text-base font-semibold text-white">Settlement Q&A · Natural-Language Financial Interface</h2>
+            <div class="flex items-center space-x-2.5">
+              <h2 class="text-base font-semibold text-white">Settlement Q&A · Natural-Language Financial Interface</h2>
+              <span class="text-[11px] px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 font-mono font-medium">Work in Progress (Beta)</span>
+            </div>
             <p class="text-xs text-slate-400 mt-1">Queries are converted to read-only SQL, validated via native AST parser against schema allowlists, executed on PostgreSQL role <code class="text-indigo-400 bg-slate-950 px-1 py-0.5 rounded">qa_readonly</code>, and strictly grounded in database truth.</p>
           </div>
           <span class="text-xs px-2.5 py-1 rounded bg-indigo-950 border border-indigo-800 text-indigo-300 font-mono">AST Protected · 3s Timeout · Max 50 Rows</span>
         </div>
 
+        <!-- Work in Progress Notice Banner -->
+        <div class="mb-5 p-3.5 bg-amber-950/30 border border-amber-800/60 rounded-lg flex items-start space-x-3 text-xs text-amber-200/90">
+          <svg class="w-4 h-4 text-amber-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+          <div>
+            <span class="font-semibold text-amber-300">Feature Under Active Tuning (Work in Progress):</span>
+            <span> Natural-language query translation and entity context mapping are currently undergoing refinement. While the native AST validator and dual-role database security guarantees are strictly enforced, complex ad-hoc queries may yield approximate results. The deterministic Money-Flow Chain and Exceptions Matrix remain the authoritative source of financial truth.</span>
+          </div>
+        </div>
+
         <!-- Sample Questions Quick Bar -->
         <div class="space-y-2 mb-6">
           <span class="text-xs text-slate-400 font-medium">Suggested Controller Questions:</span>
-          <div class="flex flex-wrap gap-2">
-            <button type="button" onclick="askPreset('Which merchant has the most unresolved exceptions?')" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg border border-slate-700 transition">Which merchant has the most unresolved exceptions?</button>
-            <button type="button" onclick="askPreset('Which merchant has the largest unresolved cash exposure?')" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg border border-slate-700 transition">Which merchant has the largest unresolved cash exposure?</button>
-            <button type="button" onclick="askPreset('What is the total unresolved amount?')" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg border border-slate-700 transition">What is the total unresolved amount?</button>
-            <button type="button" onclick="askPreset('How many settlements are settled but not banked?')" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg border border-slate-700 transition">How many settlements are settled but not banked?</button>
-            <button type="button" onclick="askPreset('What is the reconciliation status breakdown for full chain?')" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg border border-slate-700 transition">Full-chain reconciliation breakdown</button>
-            <button type="button" onclick="askPreset('Why did INT0013 fail?')" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg border border-slate-700 transition">Why did INT0013 fail?</button>
+          <div id="qa-presets" class="flex flex-wrap gap-2">
+            <button type="button" onclick="askPreset(this, 'Which merchant has the most unresolved exceptions?')" class="qa-preset-btn text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg border border-slate-700 transition disabled:opacity-50 disabled:cursor-not-allowed">Which merchant has the most unresolved exceptions?</button>
+            <button type="button" onclick="askPreset(this, 'Which merchant has the largest unresolved cash exposure?')" class="qa-preset-btn text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg border border-slate-700 transition disabled:opacity-50 disabled:cursor-not-allowed">Which merchant has the largest unresolved cash exposure?</button>
+            <button type="button" onclick="askPreset(this, 'What is the total unresolved amount?')" class="qa-preset-btn text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg border border-slate-700 transition disabled:opacity-50 disabled:cursor-not-allowed">What is the total unresolved amount?</button>
+            <button type="button" onclick="askPreset(this, 'How many settlements are settled but not banked?')" class="qa-preset-btn text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg border border-slate-700 transition disabled:opacity-50 disabled:cursor-not-allowed">How many settlements are settled but not banked?</button>
+            <button type="button" onclick="askPreset(this, 'What is the reconciliation status breakdown for full chain?')" class="qa-preset-btn text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg border border-slate-700 transition disabled:opacity-50 disabled:cursor-not-allowed">Full-chain reconciliation breakdown</button>
+            <button type="button" onclick="askPreset(this, 'Why did INT0013 fail?')" class="qa-preset-btn text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg border border-slate-700 transition disabled:opacity-50 disabled:cursor-not-allowed">Why did INT0013 fail?</button>
           </div>
         </div>
 
         <!-- Question Input Box -->
         <form id="qa-form" onsubmit="submitQA(event)" class="flex gap-3">
           <input id="qa-input" type="text" placeholder="Ask any financial reconciliation question (e.g., Which merchant has the highest exposure?)..." 
-                 class="flex-1 bg-slate-950 border border-slate-700 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-indigo-500 placeholder-slate-500">
-          <button id="qa-submit-btn" type="submit" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-sm font-semibold transition flex items-center space-x-2">
+                 class="flex-1 bg-slate-950 border border-slate-700 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-indigo-500 placeholder-slate-500 transition">
+          <button id="qa-submit-btn" type="submit" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-sm font-semibold transition flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none shadow-md shadow-indigo-600/20 cursor-pointer">
             <span>Ask</span>
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
           </button>
@@ -660,19 +675,58 @@
       document.getElementById('audit-modal').classList.add('hidden');
     }
 
-    function askPreset(q) {
-      document.getElementById('qa-input').value = q;
+    function askPreset(btn, q) {
+      document.querySelectorAll('.qa-preset-btn').forEach(b => {
+        b.classList.remove('bg-indigo-600', 'text-white', 'border-indigo-500', 'shadow-sm');
+        b.classList.add('bg-slate-800', 'text-slate-300', 'border-slate-700');
+      });
+      if (btn) {
+        btn.classList.remove('bg-slate-800', 'text-slate-300', 'border-slate-700');
+        btn.classList.add('bg-indigo-600', 'text-white', 'border-indigo-500', 'shadow-sm');
+      }
+
+      const input = document.getElementById('qa-input');
+      input.value = q;
       submitQA(new Event('submit'));
     }
 
     async function submitQA(e) {
       if (e) e.preventDefault();
-      const q = document.getElementById('qa-input').value.trim();
-      if (!q || !activeRunID) return;
+      const input = document.getElementById('qa-input');
+      const q = input.value.trim();
+      if (!q) {
+        input.classList.add('border-rose-500', 'ring-2', 'ring-rose-500/30');
+        input.focus();
+        setTimeout(() => {
+          input.classList.remove('border-rose-500', 'ring-2', 'ring-rose-500/30');
+        }, 800);
+        return;
+      }
+      if (!activeRunID) return;
 
       const btn = document.getElementById('qa-submit-btn');
+      const presetBtns = document.querySelectorAll('.qa-preset-btn');
+      
       btn.disabled = true;
-      btn.innerHTML = `<span>Thinking...</span>`;
+      presetBtns.forEach(b => b.disabled = true);
+      btn.innerHTML = `
+        <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        <span>Thinking...</span>`;
+
+      const resultsContainer = document.getElementById('qa-results');
+      resultsContainer.classList.remove('hidden');
+      document.getElementById('qa-answer-text').innerHTML = `
+        <div class="animate-pulse flex space-x-3 items-center text-slate-400 py-1">
+          <div class="h-2 bg-indigo-500/50 rounded w-24"></div>
+          <div class="h-2 bg-slate-700 rounded w-48"></div>
+          <span class="text-xs text-indigo-400 font-mono">AST-validating & executing query against qa_readonly...</span>
+        </div>`;
+      document.getElementById('qa-duration').innerText = 'Processing...';
+      document.getElementById('qa-sql-box').innerText = '-- Synthesizing and validating read-only SQL...';
+      document.getElementById('qa-table-container').classList.add('hidden');
 
       try {
         const res = await fetch(`/api/runs/${activeRunID}/qa`, {
@@ -682,7 +736,6 @@
         });
         const d = await res.json();
         
-        document.getElementById('qa-results').classList.remove('hidden');
         document.getElementById('qa-answer-text').innerText = d.answer || "No response received.";
         document.getElementById('qa-duration').innerText = `Duration: ${d.duration_ms || 0}ms · Rows: ${d.row_count || 0}`;
         document.getElementById('qa-sql-box').innerText = d.sql || "N/A (Rejected / Unsupported before execution)";
@@ -726,9 +779,10 @@
           tableContainer.classList.add('hidden');
         }
       } catch (err) {
-        alert("Error executing Q&A: " + err.message);
+        document.getElementById('qa-answer-text').innerHTML = `<span class="text-rose-400">Error executing Q&A: ${err.message}</span>`;
       } finally {
         btn.disabled = false;
+        presetBtns.forEach(b => b.disabled = false);
         btn.innerHTML = `<span>Ask</span><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>`;
       }
     }
@@ -748,8 +802,16 @@
       else if (tab === 'cash') loadCashPosition();
     }
 
-    function refreshData() {
-      init();
+    async function refreshData() {
+      const icon = document.getElementById('header-refresh-icon');
+      if (icon) icon.classList.add('animate-spin');
+      try {
+        await init();
+      } finally {
+        setTimeout(() => {
+          if (icon) icon.classList.remove('animate-spin');
+        }, 500);
+      }
     }
 
     window.addEventListener('keydown', (e) => {
