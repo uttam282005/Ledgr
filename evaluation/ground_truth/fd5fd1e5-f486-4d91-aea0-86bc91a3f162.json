@@ -1,0 +1,5884 @@
+{
+  "run_id": "fd5fd1e5-f486-4d91-aea0-86bc91a3f162",
+  "seed": 42,
+  "dataset_version": "v1.0.0",
+  "generated_at": "2026-09-04T17:40:53.713315717Z",
+  "cases": [
+    {
+      "case_id": "CASE-0001",
+      "internal_id": "INT0001",
+      "expected_settlement_ids": [
+        "SET00001",
+        "SET00002"
+      ],
+      "expected_bank_statement_id": null,
+      "expected_hop1": "EXCEPTION",
+      "expected_hop2": "N/A",
+      "expected_final_status": "UNMATCHED",
+      "expected_exception": "DUPLICATE_SETTLEMENT"
+    },
+    {
+      "case_id": "CASE-0002",
+      "internal_id": "INT0002",
+      "expected_settlement_ids": [
+        "SET00003"
+      ],
+      "expected_bank_statement_id": "BNK0002",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0003",
+      "internal_id": "INT0003",
+      "expected_settlement_ids": [
+        "SET00004"
+      ],
+      "expected_bank_statement_id": "BNK0003",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0004",
+      "internal_id": "INT0004",
+      "expected_settlement_ids": [
+        "SET00005"
+      ],
+      "expected_bank_statement_id": "BNK0004",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0005",
+      "internal_id": "INT0005",
+      "expected_settlement_ids": [
+        "SET00006"
+      ],
+      "expected_bank_statement_id": "BNK0005",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0006",
+      "internal_id": "INT0006",
+      "expected_settlement_ids": [
+        "SET00007"
+      ],
+      "expected_bank_statement_id": "BNK0006",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0007",
+      "internal_id": "INT0007",
+      "expected_settlement_ids": [
+        "SET00008"
+      ],
+      "expected_bank_statement_id": "BNK0007",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0008",
+      "internal_id": "INT0008",
+      "expected_settlement_ids": null,
+      "expected_bank_statement_id": null,
+      "expected_hop1": "EXCEPTION",
+      "expected_hop2": "N/A",
+      "expected_final_status": "UNMATCHED",
+      "expected_exception": "NO_COUNTERPART"
+    },
+    {
+      "case_id": "CASE-0009",
+      "internal_id": "INT0009",
+      "expected_settlement_ids": [
+        "SET00009",
+        "SET00010"
+      ],
+      "expected_bank_statement_id": null,
+      "expected_hop1": "EXCEPTION",
+      "expected_hop2": "N/A",
+      "expected_final_status": "UNMATCHED",
+      "expected_exception": "DUPLICATE_SETTLEMENT"
+    },
+    {
+      "case_id": "CASE-0010",
+      "internal_id": "INT0010",
+      "expected_settlement_ids": [
+        "SET00011"
+      ],
+      "expected_bank_statement_id": "BNK0010",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0011",
+      "internal_id": "INT0011",
+      "expected_settlement_ids": [
+        "SET00012"
+      ],
+      "expected_bank_statement_id": "BNK0011",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0012",
+      "internal_id": "INT0012",
+      "expected_settlement_ids": [
+        "SET00013"
+      ],
+      "expected_bank_statement_id": "BNK0012",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0013",
+      "internal_id": "INT0013",
+      "expected_settlement_ids": [
+        "SET00014",
+        "SET00015"
+      ],
+      "expected_bank_statement_id": null,
+      "expected_hop1": "EXCEPTION",
+      "expected_hop2": "N/A",
+      "expected_final_status": "UNMATCHED",
+      "expected_exception": "DUPLICATE_SETTLEMENT"
+    },
+    {
+      "case_id": "CASE-0014",
+      "internal_id": "INT0014",
+      "expected_settlement_ids": [
+        "SET00016"
+      ],
+      "expected_bank_statement_id": "BNK0014",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0015",
+      "internal_id": "INT0015",
+      "expected_settlement_ids": [
+        "SET00017"
+      ],
+      "expected_bank_statement_id": "BNK0015",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0016",
+      "internal_id": "INT0016",
+      "expected_settlement_ids": [
+        "SET00018"
+      ],
+      "expected_bank_statement_id": "BNK0016",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0017",
+      "internal_id": "INT0017",
+      "expected_settlement_ids": [
+        "SET00019"
+      ],
+      "expected_bank_statement_id": "BNK0017",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0018",
+      "internal_id": "INT0018",
+      "expected_settlement_ids": [
+        "SET00020",
+        "SET00021"
+      ],
+      "expected_bank_statement_id": null,
+      "expected_hop1": "EXCEPTION",
+      "expected_hop2": "N/A",
+      "expected_final_status": "UNMATCHED",
+      "expected_exception": "DUPLICATE_SETTLEMENT"
+    },
+    {
+      "case_id": "CASE-0019",
+      "internal_id": "INT0019",
+      "expected_settlement_ids": [
+        "SET00022"
+      ],
+      "expected_bank_statement_id": "BNK0019",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0020",
+      "internal_id": "INT0020",
+      "expected_settlement_ids": [
+        "SET00023"
+      ],
+      "expected_bank_statement_id": "BNK0020",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0021",
+      "internal_id": "INT0021",
+      "expected_settlement_ids": [
+        "SET00024"
+      ],
+      "expected_bank_statement_id": "BNK0021",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0022",
+      "internal_id": "INT0022",
+      "expected_settlement_ids": [
+        "SET00025"
+      ],
+      "expected_bank_statement_id": "BNK0022",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0023",
+      "internal_id": "INT0023",
+      "expected_settlement_ids": [
+        "SET00026"
+      ],
+      "expected_bank_statement_id": "BNK0023",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0024",
+      "internal_id": "INT0024",
+      "expected_settlement_ids": [
+        "SET00027"
+      ],
+      "expected_bank_statement_id": "BNK0024",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0025",
+      "internal_id": "INT0025",
+      "expected_settlement_ids": [
+        "SET00028"
+      ],
+      "expected_bank_statement_id": null,
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "EXCEPTION",
+      "expected_final_status": "PARTIAL",
+      "expected_exception": "SETTLED_NOT_BANKED"
+    },
+    {
+      "case_id": "CASE-0026",
+      "internal_id": "INT0026",
+      "expected_settlement_ids": [
+        "SET00029"
+      ],
+      "expected_bank_statement_id": null,
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "EXCEPTION",
+      "expected_final_status": "PARTIAL",
+      "expected_exception": "SETTLED_NOT_BANKED"
+    },
+    {
+      "case_id": "CASE-0027",
+      "internal_id": "INT0027",
+      "expected_settlement_ids": [
+        "SET00030"
+      ],
+      "expected_bank_statement_id": null,
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "EXCEPTION",
+      "expected_final_status": "PARTIAL",
+      "expected_exception": "SETTLED_NOT_BANKED"
+    },
+    {
+      "case_id": "CASE-0028",
+      "internal_id": "INT0028",
+      "expected_settlement_ids": null,
+      "expected_bank_statement_id": null,
+      "expected_hop1": "EXCEPTION",
+      "expected_hop2": "N/A",
+      "expected_final_status": "UNMATCHED",
+      "expected_exception": "NO_COUNTERPART"
+    },
+    {
+      "case_id": "CASE-0029",
+      "internal_id": "INT0029",
+      "expected_settlement_ids": [
+        "SET00031"
+      ],
+      "expected_bank_statement_id": "BNK0029",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "EXCEPTION",
+      "expected_final_status": "PARTIAL",
+      "expected_exception": "PARTIAL_CREDIT"
+    },
+    {
+      "case_id": "CASE-0030",
+      "internal_id": "INT0030",
+      "expected_settlement_ids": null,
+      "expected_bank_statement_id": null,
+      "expected_hop1": "EXCEPTION",
+      "expected_hop2": "N/A",
+      "expected_final_status": "UNMATCHED",
+      "expected_exception": "AMOUNT_MISMATCH"
+    },
+    {
+      "case_id": "CASE-0031",
+      "internal_id": "INT0031",
+      "expected_settlement_ids": [
+        "SET00033"
+      ],
+      "expected_bank_statement_id": "BNK0001",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0032",
+      "internal_id": "INT0032",
+      "expected_settlement_ids": [
+        "SET00034"
+      ],
+      "expected_bank_statement_id": "BNK0002",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0033",
+      "internal_id": "INT0033",
+      "expected_settlement_ids": [
+        "SET00035"
+      ],
+      "expected_bank_statement_id": "BNK0003",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0034",
+      "internal_id": "INT0034",
+      "expected_settlement_ids": [
+        "SET00036"
+      ],
+      "expected_bank_statement_id": "BNK0004",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0035",
+      "internal_id": "INT0035",
+      "expected_settlement_ids": [
+        "SET00037"
+      ],
+      "expected_bank_statement_id": "BNK0005",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0036",
+      "internal_id": "INT0036",
+      "expected_settlement_ids": [
+        "SET00038"
+      ],
+      "expected_bank_statement_id": "BNK0006",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0037",
+      "internal_id": "INT0037",
+      "expected_settlement_ids": [
+        "SET00039"
+      ],
+      "expected_bank_statement_id": "BNK0007",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0038",
+      "internal_id": "INT0038",
+      "expected_settlement_ids": [
+        "SET00040"
+      ],
+      "expected_bank_statement_id": "BNK0008",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0039",
+      "internal_id": "INT0039",
+      "expected_settlement_ids": [
+        "SET00041"
+      ],
+      "expected_bank_statement_id": "BNK0009",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0040",
+      "internal_id": "INT0040",
+      "expected_settlement_ids": null,
+      "expected_bank_statement_id": null,
+      "expected_hop1": "EXCEPTION",
+      "expected_hop2": "N/A",
+      "expected_final_status": "UNMATCHED",
+      "expected_exception": "AMOUNT_MISMATCH"
+    },
+    {
+      "case_id": "CASE-0041",
+      "internal_id": "INT0041",
+      "expected_settlement_ids": [
+        "SET00043"
+      ],
+      "expected_bank_statement_id": "BNK0011",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0042",
+      "internal_id": "INT0042",
+      "expected_settlement_ids": [
+        "SET00044"
+      ],
+      "expected_bank_statement_id": "BNK0012",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0043",
+      "internal_id": "INT0043",
+      "expected_settlement_ids": [
+        "SET00045"
+      ],
+      "expected_bank_statement_id": "BNK0013",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0044",
+      "internal_id": "INT0044",
+      "expected_settlement_ids": [
+        "SET00046"
+      ],
+      "expected_bank_statement_id": "BNK0014",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0045",
+      "internal_id": "INT0045",
+      "expected_settlement_ids": [
+        "SET00047",
+        "SET00048"
+      ],
+      "expected_bank_statement_id": null,
+      "expected_hop1": "EXCEPTION",
+      "expected_hop2": "N/A",
+      "expected_final_status": "UNMATCHED",
+      "expected_exception": "DUPLICATE_SETTLEMENT"
+    },
+    {
+      "case_id": "CASE-0046",
+      "internal_id": "INT0046",
+      "expected_settlement_ids": [
+        "SET00049"
+      ],
+      "expected_bank_statement_id": "BNK0016",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0047",
+      "internal_id": "INT0047",
+      "expected_settlement_ids": [
+        "SET00050"
+      ],
+      "expected_bank_statement_id": "BNK0017",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0048",
+      "internal_id": "INT0048",
+      "expected_settlement_ids": [
+        "SET00051"
+      ],
+      "expected_bank_statement_id": "BNK0018",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0049",
+      "internal_id": "INT0049",
+      "expected_settlement_ids": [
+        "SET00052"
+      ],
+      "expected_bank_statement_id": "BNK0019",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0050",
+      "internal_id": "INT0050",
+      "expected_settlement_ids": [
+        "SET00053"
+      ],
+      "expected_bank_statement_id": "BNK0020",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0051",
+      "internal_id": "INT0051",
+      "expected_settlement_ids": [
+        "SET00054"
+      ],
+      "expected_bank_statement_id": "BNK0021",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0052",
+      "internal_id": "INT0052",
+      "expected_settlement_ids": null,
+      "expected_bank_statement_id": null,
+      "expected_hop1": "EXCEPTION",
+      "expected_hop2": "N/A",
+      "expected_final_status": "UNMATCHED",
+      "expected_exception": "NO_COUNTERPART"
+    },
+    {
+      "case_id": "CASE-0053",
+      "internal_id": "INT0053",
+      "expected_settlement_ids": [
+        "SET00055"
+      ],
+      "expected_bank_statement_id": "BNK0023",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0054",
+      "internal_id": "INT0054",
+      "expected_settlement_ids": [
+        "SET00056"
+      ],
+      "expected_bank_statement_id": "BNK0024",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0055",
+      "internal_id": "INT0055",
+      "expected_settlement_ids": [
+        "SET00057"
+      ],
+      "expected_bank_statement_id": null,
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "EXCEPTION",
+      "expected_final_status": "PARTIAL",
+      "expected_exception": "SETTLED_NOT_BANKED"
+    },
+    {
+      "case_id": "CASE-0056",
+      "internal_id": "INT0056",
+      "expected_settlement_ids": [
+        "SET00058"
+      ],
+      "expected_bank_statement_id": null,
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "EXCEPTION",
+      "expected_final_status": "PARTIAL",
+      "expected_exception": "SETTLED_NOT_BANKED"
+    },
+    {
+      "case_id": "CASE-0057",
+      "internal_id": "INT0057",
+      "expected_settlement_ids": [
+        "SET00059"
+      ],
+      "expected_bank_statement_id": null,
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "EXCEPTION",
+      "expected_final_status": "PARTIAL",
+      "expected_exception": "SETTLED_NOT_BANKED"
+    },
+    {
+      "case_id": "CASE-0058",
+      "internal_id": "INT0058",
+      "expected_settlement_ids": [
+        "SET00060"
+      ],
+      "expected_bank_statement_id": "BNK0028",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "EXCEPTION",
+      "expected_final_status": "PARTIAL",
+      "expected_exception": "PARTIAL_CREDIT"
+    },
+    {
+      "case_id": "CASE-0059",
+      "internal_id": "INT0059",
+      "expected_settlement_ids": [
+        "SET00061"
+      ],
+      "expected_bank_statement_id": "BNK0029",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "EXCEPTION",
+      "expected_final_status": "PARTIAL",
+      "expected_exception": "PARTIAL_CREDIT"
+    },
+    {
+      "case_id": "CASE-0060",
+      "internal_id": "INT0060",
+      "expected_settlement_ids": [
+        "SET00062"
+      ],
+      "expected_bank_statement_id": "BNK0030",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "EXCEPTION",
+      "expected_final_status": "PARTIAL",
+      "expected_exception": "PARTIAL_CREDIT"
+    },
+    {
+      "case_id": "CASE-0061",
+      "internal_id": "INT0061",
+      "expected_settlement_ids": [
+        "SET00063"
+      ],
+      "expected_bank_statement_id": "BNK0001",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0062",
+      "internal_id": "INT0062",
+      "expected_settlement_ids": null,
+      "expected_bank_statement_id": null,
+      "expected_hop1": "EXCEPTION",
+      "expected_hop2": "N/A",
+      "expected_final_status": "UNMATCHED",
+      "expected_exception": "AMOUNT_MISMATCH"
+    },
+    {
+      "case_id": "CASE-0063",
+      "internal_id": "INT0063",
+      "expected_settlement_ids": [
+        "SET00065"
+      ],
+      "expected_bank_statement_id": "BNK0003",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0064",
+      "internal_id": "INT0064",
+      "expected_settlement_ids": [
+        "SET00066"
+      ],
+      "expected_bank_statement_id": "BNK0004",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0065",
+      "internal_id": "INT0065",
+      "expected_settlement_ids": null,
+      "expected_bank_statement_id": null,
+      "expected_hop1": "EXCEPTION",
+      "expected_hop2": "N/A",
+      "expected_final_status": "UNMATCHED",
+      "expected_exception": "AMOUNT_MISMATCH"
+    },
+    {
+      "case_id": "CASE-0066",
+      "internal_id": "INT0066",
+      "expected_settlement_ids": [
+        "SET00068"
+      ],
+      "expected_bank_statement_id": "BNK0006",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0067",
+      "internal_id": "INT0067",
+      "expected_settlement_ids": [
+        "SET00069"
+      ],
+      "expected_bank_statement_id": "BNK0007",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0068",
+      "internal_id": "INT0068",
+      "expected_settlement_ids": [
+        "SET00070"
+      ],
+      "expected_bank_statement_id": "BNK0008",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0069",
+      "internal_id": "INT0069",
+      "expected_settlement_ids": null,
+      "expected_bank_statement_id": null,
+      "expected_hop1": "EXCEPTION",
+      "expected_hop2": "N/A",
+      "expected_final_status": "UNMATCHED",
+      "expected_exception": "NO_COUNTERPART"
+    },
+    {
+      "case_id": "CASE-0070",
+      "internal_id": "INT0070",
+      "expected_settlement_ids": null,
+      "expected_bank_statement_id": null,
+      "expected_hop1": "EXCEPTION",
+      "expected_hop2": "N/A",
+      "expected_final_status": "UNMATCHED",
+      "expected_exception": "AMOUNT_MISMATCH"
+    },
+    {
+      "case_id": "CASE-0071",
+      "internal_id": "INT0071",
+      "expected_settlement_ids": null,
+      "expected_bank_statement_id": null,
+      "expected_hop1": "EXCEPTION",
+      "expected_hop2": "N/A",
+      "expected_final_status": "UNMATCHED",
+      "expected_exception": "AMOUNT_MISMATCH"
+    },
+    {
+      "case_id": "CASE-0072",
+      "internal_id": "INT0072",
+      "expected_settlement_ids": [
+        "SET00073"
+      ],
+      "expected_bank_statement_id": "BNK0012",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0073",
+      "internal_id": "INT0073",
+      "expected_settlement_ids": [
+        "SET00074"
+      ],
+      "expected_bank_statement_id": "BNK0013",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0074",
+      "internal_id": "INT0074",
+      "expected_settlement_ids": null,
+      "expected_bank_statement_id": null,
+      "expected_hop1": "EXCEPTION",
+      "expected_hop2": "N/A",
+      "expected_final_status": "UNMATCHED",
+      "expected_exception": "NO_COUNTERPART"
+    },
+    {
+      "case_id": "CASE-0075",
+      "internal_id": "INT0075",
+      "expected_settlement_ids": [
+        "SET00075"
+      ],
+      "expected_bank_statement_id": "BNK0015",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0076",
+      "internal_id": "INT0076",
+      "expected_settlement_ids": [
+        "SET00076"
+      ],
+      "expected_bank_statement_id": "BNK0016",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0077",
+      "internal_id": "INT0077",
+      "expected_settlement_ids": [
+        "SET00077"
+      ],
+      "expected_bank_statement_id": "BNK0017",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0078",
+      "internal_id": "INT0078",
+      "expected_settlement_ids": [
+        "SET00078"
+      ],
+      "expected_bank_statement_id": "BNK0018",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0079",
+      "internal_id": "INT0079",
+      "expected_settlement_ids": null,
+      "expected_bank_statement_id": null,
+      "expected_hop1": "EXCEPTION",
+      "expected_hop2": "N/A",
+      "expected_final_status": "UNMATCHED",
+      "expected_exception": "NO_COUNTERPART"
+    },
+    {
+      "case_id": "CASE-0080",
+      "internal_id": "INT0080",
+      "expected_settlement_ids": [
+        "SET00079"
+      ],
+      "expected_bank_statement_id": "BNK0020",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0081",
+      "internal_id": "INT0081",
+      "expected_settlement_ids": [
+        "SET00080"
+      ],
+      "expected_bank_statement_id": "BNK0021",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0082",
+      "internal_id": "INT0082",
+      "expected_settlement_ids": [
+        "SET00081"
+      ],
+      "expected_bank_statement_id": "BNK0022",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0083",
+      "internal_id": "INT0083",
+      "expected_settlement_ids": [
+        "SET00082"
+      ],
+      "expected_bank_statement_id": "BNK0023",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0084",
+      "internal_id": "INT0084",
+      "expected_settlement_ids": [
+        "SET00083"
+      ],
+      "expected_bank_statement_id": "BNK0024",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0085",
+      "internal_id": "INT0085",
+      "expected_settlement_ids": [
+        "SET00084"
+      ],
+      "expected_bank_statement_id": null,
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "EXCEPTION",
+      "expected_final_status": "PARTIAL",
+      "expected_exception": "SETTLED_NOT_BANKED"
+    },
+    {
+      "case_id": "CASE-0086",
+      "internal_id": "INT0086",
+      "expected_settlement_ids": [
+        "SET00085"
+      ],
+      "expected_bank_statement_id": null,
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "EXCEPTION",
+      "expected_final_status": "PARTIAL",
+      "expected_exception": "SETTLED_NOT_BANKED"
+    },
+    {
+      "case_id": "CASE-0087",
+      "internal_id": "INT0087",
+      "expected_settlement_ids": null,
+      "expected_bank_statement_id": null,
+      "expected_hop1": "EXCEPTION",
+      "expected_hop2": "N/A",
+      "expected_final_status": "UNMATCHED",
+      "expected_exception": "AMOUNT_MISMATCH"
+    },
+    {
+      "case_id": "CASE-0088",
+      "internal_id": "INT0088",
+      "expected_settlement_ids": [
+        "SET00087"
+      ],
+      "expected_bank_statement_id": "BNK0028",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "EXCEPTION",
+      "expected_final_status": "PARTIAL",
+      "expected_exception": "PARTIAL_CREDIT"
+    },
+    {
+      "case_id": "CASE-0089",
+      "internal_id": "INT0089",
+      "expected_settlement_ids": [
+        "SET00088"
+      ],
+      "expected_bank_statement_id": "BNK0029",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "EXCEPTION",
+      "expected_final_status": "PARTIAL",
+      "expected_exception": "PARTIAL_CREDIT"
+    },
+    {
+      "case_id": "CASE-0090",
+      "internal_id": "INT0090",
+      "expected_settlement_ids": [
+        "SET00089"
+      ],
+      "expected_bank_statement_id": "BNK0030",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "EXCEPTION",
+      "expected_final_status": "PARTIAL",
+      "expected_exception": "PARTIAL_CREDIT"
+    },
+    {
+      "case_id": "CASE-0091",
+      "internal_id": "INT0091",
+      "expected_settlement_ids": [
+        "SET00090"
+      ],
+      "expected_bank_statement_id": "BNK0001",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0092",
+      "internal_id": "INT0092",
+      "expected_settlement_ids": [
+        "SET00091"
+      ],
+      "expected_bank_statement_id": "BNK0002",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0093",
+      "internal_id": "INT0093",
+      "expected_settlement_ids": [
+        "SET00092",
+        "SET00093"
+      ],
+      "expected_bank_statement_id": null,
+      "expected_hop1": "EXCEPTION",
+      "expected_hop2": "N/A",
+      "expected_final_status": "UNMATCHED",
+      "expected_exception": "DUPLICATE_SETTLEMENT"
+    },
+    {
+      "case_id": "CASE-0094",
+      "internal_id": "INT0094",
+      "expected_settlement_ids": null,
+      "expected_bank_statement_id": null,
+      "expected_hop1": "EXCEPTION",
+      "expected_hop2": "N/A",
+      "expected_final_status": "UNMATCHED",
+      "expected_exception": "NO_COUNTERPART"
+    },
+    {
+      "case_id": "CASE-0095",
+      "internal_id": "INT0095",
+      "expected_settlement_ids": [
+        "SET00094"
+      ],
+      "expected_bank_statement_id": "BNK0005",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0096",
+      "internal_id": "INT0096",
+      "expected_settlement_ids": [
+        "SET00095"
+      ],
+      "expected_bank_statement_id": "BNK0006",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0097",
+      "internal_id": "INT0097",
+      "expected_settlement_ids": [
+        "SET00096"
+      ],
+      "expected_bank_statement_id": "BNK0007",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0098",
+      "internal_id": "INT0098",
+      "expected_settlement_ids": [
+        "SET00097"
+      ],
+      "expected_bank_statement_id": "BNK0008",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0099",
+      "internal_id": "INT0099",
+      "expected_settlement_ids": [
+        "SET00098"
+      ],
+      "expected_bank_statement_id": "BNK0009",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0100",
+      "internal_id": "INT0100",
+      "expected_settlement_ids": null,
+      "expected_bank_statement_id": null,
+      "expected_hop1": "EXCEPTION",
+      "expected_hop2": "N/A",
+      "expected_final_status": "UNMATCHED",
+      "expected_exception": "AMOUNT_MISMATCH"
+    },
+    {
+      "case_id": "CASE-0101",
+      "internal_id": "INT0101",
+      "expected_settlement_ids": [
+        "SET00100"
+      ],
+      "expected_bank_statement_id": "BNK0011",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0102",
+      "internal_id": "INT0102",
+      "expected_settlement_ids": [
+        "SET00101"
+      ],
+      "expected_bank_statement_id": "BNK0012",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0103",
+      "internal_id": "INT0103",
+      "expected_settlement_ids": [
+        "SET00102"
+      ],
+      "expected_bank_statement_id": "BNK0013",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0104",
+      "internal_id": "INT0104",
+      "expected_settlement_ids": null,
+      "expected_bank_statement_id": null,
+      "expected_hop1": "EXCEPTION",
+      "expected_hop2": "N/A",
+      "expected_final_status": "UNMATCHED",
+      "expected_exception": "AMOUNT_MISMATCH"
+    },
+    {
+      "case_id": "CASE-0105",
+      "internal_id": "INT0105",
+      "expected_settlement_ids": [
+        "SET00104"
+      ],
+      "expected_bank_statement_id": "BNK0015",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0106",
+      "internal_id": "INT0106",
+      "expected_settlement_ids": [
+        "SET00105"
+      ],
+      "expected_bank_statement_id": "BNK0016",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0107",
+      "internal_id": "INT0107",
+      "expected_settlement_ids": [
+        "SET00106"
+      ],
+      "expected_bank_statement_id": "BNK0017",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0108",
+      "internal_id": "INT0108",
+      "expected_settlement_ids": null,
+      "expected_bank_statement_id": null,
+      "expected_hop1": "EXCEPTION",
+      "expected_hop2": "N/A",
+      "expected_final_status": "UNMATCHED",
+      "expected_exception": "AMOUNT_MISMATCH"
+    },
+    {
+      "case_id": "CASE-0109",
+      "internal_id": "INT0109",
+      "expected_settlement_ids": [
+        "SET00108"
+      ],
+      "expected_bank_statement_id": "BNK0019",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0110",
+      "internal_id": "INT0110",
+      "expected_settlement_ids": [
+        "SET00109"
+      ],
+      "expected_bank_statement_id": "BNK0020",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0111",
+      "internal_id": "INT0111",
+      "expected_settlement_ids": [
+        "SET00110"
+      ],
+      "expected_bank_statement_id": "BNK0021",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0112",
+      "internal_id": "INT0112",
+      "expected_settlement_ids": null,
+      "expected_bank_statement_id": null,
+      "expected_hop1": "EXCEPTION",
+      "expected_hop2": "N/A",
+      "expected_final_status": "UNMATCHED",
+      "expected_exception": "AMOUNT_MISMATCH"
+    },
+    {
+      "case_id": "CASE-0113",
+      "internal_id": "INT0113",
+      "expected_settlement_ids": [
+        "SET00112",
+        "SET00113"
+      ],
+      "expected_bank_statement_id": null,
+      "expected_hop1": "EXCEPTION",
+      "expected_hop2": "N/A",
+      "expected_final_status": "UNMATCHED",
+      "expected_exception": "DUPLICATE_SETTLEMENT"
+    },
+    {
+      "case_id": "CASE-0114",
+      "internal_id": "INT0114",
+      "expected_settlement_ids": null,
+      "expected_bank_statement_id": null,
+      "expected_hop1": "EXCEPTION",
+      "expected_hop2": "N/A",
+      "expected_final_status": "UNMATCHED",
+      "expected_exception": "AMOUNT_MISMATCH"
+    },
+    {
+      "case_id": "CASE-0115",
+      "internal_id": "INT0115",
+      "expected_settlement_ids": [
+        "SET00115"
+      ],
+      "expected_bank_statement_id": null,
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "EXCEPTION",
+      "expected_final_status": "PARTIAL",
+      "expected_exception": "SETTLED_NOT_BANKED"
+    },
+    {
+      "case_id": "CASE-0116",
+      "internal_id": "INT0116",
+      "expected_settlement_ids": [
+        "SET00116"
+      ],
+      "expected_bank_statement_id": null,
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "EXCEPTION",
+      "expected_final_status": "PARTIAL",
+      "expected_exception": "SETTLED_NOT_BANKED"
+    },
+    {
+      "case_id": "CASE-0117",
+      "internal_id": "INT0117",
+      "expected_settlement_ids": [
+        "SET00117"
+      ],
+      "expected_bank_statement_id": null,
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "EXCEPTION",
+      "expected_final_status": "PARTIAL",
+      "expected_exception": "SETTLED_NOT_BANKED"
+    },
+    {
+      "case_id": "CASE-0118",
+      "internal_id": "INT0118",
+      "expected_settlement_ids": [
+        "SET00118",
+        "SET00119"
+      ],
+      "expected_bank_statement_id": null,
+      "expected_hop1": "EXCEPTION",
+      "expected_hop2": "N/A",
+      "expected_final_status": "UNMATCHED",
+      "expected_exception": "DUPLICATE_SETTLEMENT"
+    },
+    {
+      "case_id": "CASE-0119",
+      "internal_id": "INT0119",
+      "expected_settlement_ids": [
+        "SET00120"
+      ],
+      "expected_bank_statement_id": "BNK0029",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "EXCEPTION",
+      "expected_final_status": "PARTIAL",
+      "expected_exception": "PARTIAL_CREDIT"
+    },
+    {
+      "case_id": "CASE-0120",
+      "internal_id": "INT0120",
+      "expected_settlement_ids": null,
+      "expected_bank_statement_id": null,
+      "expected_hop1": "EXCEPTION",
+      "expected_hop2": "N/A",
+      "expected_final_status": "UNMATCHED",
+      "expected_exception": "AMOUNT_MISMATCH"
+    },
+    {
+      "case_id": "CASE-0121",
+      "internal_id": "INT0121",
+      "expected_settlement_ids": [
+        "SET00122"
+      ],
+      "expected_bank_statement_id": "BNK0001",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0122",
+      "internal_id": "INT0122",
+      "expected_settlement_ids": [
+        "SET00123"
+      ],
+      "expected_bank_statement_id": "BNK0002",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0123",
+      "internal_id": "INT0123",
+      "expected_settlement_ids": [
+        "SET00124"
+      ],
+      "expected_bank_statement_id": "BNK0003",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0124",
+      "internal_id": "INT0124",
+      "expected_settlement_ids": [
+        "SET00125"
+      ],
+      "expected_bank_statement_id": "BNK0004",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0125",
+      "internal_id": "INT0125",
+      "expected_settlement_ids": [
+        "SET00126"
+      ],
+      "expected_bank_statement_id": "BNK0005",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0126",
+      "internal_id": "INT0126",
+      "expected_settlement_ids": [
+        "SET00127"
+      ],
+      "expected_bank_statement_id": "BNK0006",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0127",
+      "internal_id": "INT0127",
+      "expected_settlement_ids": [
+        "SET00128"
+      ],
+      "expected_bank_statement_id": "BNK0007",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0128",
+      "internal_id": "INT0128",
+      "expected_settlement_ids": [
+        "SET00129"
+      ],
+      "expected_bank_statement_id": "BNK0008",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0129",
+      "internal_id": "INT0129",
+      "expected_settlement_ids": [
+        "SET00130"
+      ],
+      "expected_bank_statement_id": "BNK0009",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0130",
+      "internal_id": "INT0130",
+      "expected_settlement_ids": [
+        "SET00131"
+      ],
+      "expected_bank_statement_id": "BNK0010",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0131",
+      "internal_id": "INT0131",
+      "expected_settlement_ids": [
+        "SET00132"
+      ],
+      "expected_bank_statement_id": "BNK0011",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0132",
+      "internal_id": "INT0132",
+      "expected_settlement_ids": [
+        "SET00133"
+      ],
+      "expected_bank_statement_id": "BNK0012",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0133",
+      "internal_id": "INT0133",
+      "expected_settlement_ids": [
+        "SET00134"
+      ],
+      "expected_bank_statement_id": "BNK0013",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0134",
+      "internal_id": "INT0134",
+      "expected_settlement_ids": null,
+      "expected_bank_statement_id": null,
+      "expected_hop1": "EXCEPTION",
+      "expected_hop2": "N/A",
+      "expected_final_status": "UNMATCHED",
+      "expected_exception": "NO_COUNTERPART"
+    },
+    {
+      "case_id": "CASE-0135",
+      "internal_id": "INT0135",
+      "expected_settlement_ids": [
+        "SET00135"
+      ],
+      "expected_bank_statement_id": "BNK0015",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0136",
+      "internal_id": "INT0136",
+      "expected_settlement_ids": [
+        "SET00136"
+      ],
+      "expected_bank_statement_id": "BNK0016",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0137",
+      "internal_id": "INT0137",
+      "expected_settlement_ids": null,
+      "expected_bank_statement_id": null,
+      "expected_hop1": "EXCEPTION",
+      "expected_hop2": "N/A",
+      "expected_final_status": "UNMATCHED",
+      "expected_exception": "AMOUNT_MISMATCH"
+    },
+    {
+      "case_id": "CASE-0138",
+      "internal_id": "INT0138",
+      "expected_settlement_ids": [
+        "SET00138"
+      ],
+      "expected_bank_statement_id": "BNK0018",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0139",
+      "internal_id": "INT0139",
+      "expected_settlement_ids": [
+        "SET00139"
+      ],
+      "expected_bank_statement_id": "BNK0019",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0140",
+      "internal_id": "INT0140",
+      "expected_settlement_ids": [
+        "SET00140"
+      ],
+      "expected_bank_statement_id": "BNK0020",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0141",
+      "internal_id": "INT0141",
+      "expected_settlement_ids": [
+        "SET00141"
+      ],
+      "expected_bank_statement_id": "BNK0021",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0142",
+      "internal_id": "INT0142",
+      "expected_settlement_ids": [
+        "SET00142"
+      ],
+      "expected_bank_statement_id": "BNK0022",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0143",
+      "internal_id": "INT0143",
+      "expected_settlement_ids": [
+        "SET00143",
+        "SET00144"
+      ],
+      "expected_bank_statement_id": null,
+      "expected_hop1": "EXCEPTION",
+      "expected_hop2": "N/A",
+      "expected_final_status": "UNMATCHED",
+      "expected_exception": "DUPLICATE_SETTLEMENT"
+    },
+    {
+      "case_id": "CASE-0144",
+      "internal_id": "INT0144",
+      "expected_settlement_ids": null,
+      "expected_bank_statement_id": null,
+      "expected_hop1": "EXCEPTION",
+      "expected_hop2": "N/A",
+      "expected_final_status": "UNMATCHED",
+      "expected_exception": "NO_COUNTERPART"
+    },
+    {
+      "case_id": "CASE-0145",
+      "internal_id": "INT0145",
+      "expected_settlement_ids": [
+        "SET00145"
+      ],
+      "expected_bank_statement_id": null,
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "EXCEPTION",
+      "expected_final_status": "PARTIAL",
+      "expected_exception": "SETTLED_NOT_BANKED"
+    },
+    {
+      "case_id": "CASE-0146",
+      "internal_id": "INT0146",
+      "expected_settlement_ids": [
+        "SET00146"
+      ],
+      "expected_bank_statement_id": null,
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "EXCEPTION",
+      "expected_final_status": "PARTIAL",
+      "expected_exception": "SETTLED_NOT_BANKED"
+    },
+    {
+      "case_id": "CASE-0147",
+      "internal_id": "INT0147",
+      "expected_settlement_ids": [
+        "SET00147"
+      ],
+      "expected_bank_statement_id": null,
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "EXCEPTION",
+      "expected_final_status": "PARTIAL",
+      "expected_exception": "SETTLED_NOT_BANKED"
+    },
+    {
+      "case_id": "CASE-0148",
+      "internal_id": "INT0148",
+      "expected_settlement_ids": [
+        "SET00148"
+      ],
+      "expected_bank_statement_id": "BNK0028",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "EXCEPTION",
+      "expected_final_status": "PARTIAL",
+      "expected_exception": "PARTIAL_CREDIT"
+    },
+    {
+      "case_id": "CASE-0149",
+      "internal_id": "INT0149",
+      "expected_settlement_ids": [
+        "SET00149"
+      ],
+      "expected_bank_statement_id": "BNK0029",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "EXCEPTION",
+      "expected_final_status": "PARTIAL",
+      "expected_exception": "PARTIAL_CREDIT"
+    },
+    {
+      "case_id": "CASE-0150",
+      "internal_id": "INT0150",
+      "expected_settlement_ids": [
+        "SET00150"
+      ],
+      "expected_bank_statement_id": "BNK0030",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "EXCEPTION",
+      "expected_final_status": "PARTIAL",
+      "expected_exception": "PARTIAL_CREDIT"
+    },
+    {
+      "case_id": "CASE-0151",
+      "internal_id": "INT0151",
+      "expected_settlement_ids": [
+        "SET00151"
+      ],
+      "expected_bank_statement_id": "BNK0001",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0152",
+      "internal_id": "INT0152",
+      "expected_settlement_ids": [
+        "SET00152",
+        "SET00153"
+      ],
+      "expected_bank_statement_id": null,
+      "expected_hop1": "EXCEPTION",
+      "expected_hop2": "N/A",
+      "expected_final_status": "UNMATCHED",
+      "expected_exception": "DUPLICATE_SETTLEMENT"
+    },
+    {
+      "case_id": "CASE-0153",
+      "internal_id": "INT0153",
+      "expected_settlement_ids": [
+        "SET00154"
+      ],
+      "expected_bank_statement_id": "BNK0003",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0154",
+      "internal_id": "INT0154",
+      "expected_settlement_ids": null,
+      "expected_bank_statement_id": null,
+      "expected_hop1": "EXCEPTION",
+      "expected_hop2": "N/A",
+      "expected_final_status": "UNMATCHED",
+      "expected_exception": "NO_COUNTERPART"
+    },
+    {
+      "case_id": "CASE-0155",
+      "internal_id": "INT0155",
+      "expected_settlement_ids": [
+        "SET00155"
+      ],
+      "expected_bank_statement_id": "BNK0005",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0156",
+      "internal_id": "INT0156",
+      "expected_settlement_ids": [
+        "SET00156",
+        "SET00157"
+      ],
+      "expected_bank_statement_id": null,
+      "expected_hop1": "EXCEPTION",
+      "expected_hop2": "N/A",
+      "expected_final_status": "UNMATCHED",
+      "expected_exception": "DUPLICATE_SETTLEMENT"
+    },
+    {
+      "case_id": "CASE-0157",
+      "internal_id": "INT0157",
+      "expected_settlement_ids": [
+        "SET00158"
+      ],
+      "expected_bank_statement_id": "BNK0007",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0158",
+      "internal_id": "INT0158",
+      "expected_settlement_ids": [
+        "SET00159"
+      ],
+      "expected_bank_statement_id": "BNK0008",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0159",
+      "internal_id": "INT0159",
+      "expected_settlement_ids": null,
+      "expected_bank_statement_id": null,
+      "expected_hop1": "EXCEPTION",
+      "expected_hop2": "N/A",
+      "expected_final_status": "UNMATCHED",
+      "expected_exception": "NO_COUNTERPART"
+    },
+    {
+      "case_id": "CASE-0160",
+      "internal_id": "INT0160",
+      "expected_settlement_ids": [
+        "SET00160"
+      ],
+      "expected_bank_statement_id": "BNK0010",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0161",
+      "internal_id": "INT0161",
+      "expected_settlement_ids": [
+        "SET00161"
+      ],
+      "expected_bank_statement_id": "BNK0011",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0162",
+      "internal_id": "INT0162",
+      "expected_settlement_ids": [
+        "SET00162"
+      ],
+      "expected_bank_statement_id": "BNK0012",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0163",
+      "internal_id": "INT0163",
+      "expected_settlement_ids": [
+        "SET00163"
+      ],
+      "expected_bank_statement_id": "BNK0013",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0164",
+      "internal_id": "INT0164",
+      "expected_settlement_ids": [
+        "SET00164"
+      ],
+      "expected_bank_statement_id": "BNK0014",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0165",
+      "internal_id": "INT0165",
+      "expected_settlement_ids": [
+        "SET00165"
+      ],
+      "expected_bank_statement_id": "BNK0015",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0166",
+      "internal_id": "INT0166",
+      "expected_settlement_ids": null,
+      "expected_bank_statement_id": null,
+      "expected_hop1": "EXCEPTION",
+      "expected_hop2": "N/A",
+      "expected_final_status": "UNMATCHED",
+      "expected_exception": "AMOUNT_MISMATCH"
+    },
+    {
+      "case_id": "CASE-0167",
+      "internal_id": "INT0167",
+      "expected_settlement_ids": null,
+      "expected_bank_statement_id": null,
+      "expected_hop1": "EXCEPTION",
+      "expected_hop2": "N/A",
+      "expected_final_status": "UNMATCHED",
+      "expected_exception": "AMOUNT_MISMATCH"
+    },
+    {
+      "case_id": "CASE-0168",
+      "internal_id": "INT0168",
+      "expected_settlement_ids": [
+        "SET00168"
+      ],
+      "expected_bank_statement_id": "BNK0018",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0169",
+      "internal_id": "INT0169",
+      "expected_settlement_ids": [
+        "SET00169",
+        "SET00170"
+      ],
+      "expected_bank_statement_id": null,
+      "expected_hop1": "EXCEPTION",
+      "expected_hop2": "N/A",
+      "expected_final_status": "UNMATCHED",
+      "expected_exception": "DUPLICATE_SETTLEMENT"
+    },
+    {
+      "case_id": "CASE-0170",
+      "internal_id": "INT0170",
+      "expected_settlement_ids": [
+        "SET00171"
+      ],
+      "expected_bank_statement_id": "BNK0020",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0171",
+      "internal_id": "INT0171",
+      "expected_settlement_ids": [
+        "SET00172"
+      ],
+      "expected_bank_statement_id": "BNK0021",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0172",
+      "internal_id": "INT0172",
+      "expected_settlement_ids": [
+        "SET00173"
+      ],
+      "expected_bank_statement_id": "BNK0022",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0173",
+      "internal_id": "INT0173",
+      "expected_settlement_ids": [
+        "SET00174"
+      ],
+      "expected_bank_statement_id": "BNK0023",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0174",
+      "internal_id": "INT0174",
+      "expected_settlement_ids": [
+        "SET00175"
+      ],
+      "expected_bank_statement_id": "BNK0024",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0175",
+      "internal_id": "INT0175",
+      "expected_settlement_ids": [
+        "SET00176"
+      ],
+      "expected_bank_statement_id": null,
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "EXCEPTION",
+      "expected_final_status": "PARTIAL",
+      "expected_exception": "SETTLED_NOT_BANKED"
+    },
+    {
+      "case_id": "CASE-0176",
+      "internal_id": "INT0176",
+      "expected_settlement_ids": [
+        "SET00177"
+      ],
+      "expected_bank_statement_id": null,
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "EXCEPTION",
+      "expected_final_status": "PARTIAL",
+      "expected_exception": "SETTLED_NOT_BANKED"
+    },
+    {
+      "case_id": "CASE-0177",
+      "internal_id": "INT0177",
+      "expected_settlement_ids": [
+        "SET00178"
+      ],
+      "expected_bank_statement_id": null,
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "EXCEPTION",
+      "expected_final_status": "PARTIAL",
+      "expected_exception": "SETTLED_NOT_BANKED"
+    },
+    {
+      "case_id": "CASE-0178",
+      "internal_id": "INT0178",
+      "expected_settlement_ids": [
+        "SET00179"
+      ],
+      "expected_bank_statement_id": "BNK0028",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "EXCEPTION",
+      "expected_final_status": "PARTIAL",
+      "expected_exception": "PARTIAL_CREDIT"
+    },
+    {
+      "case_id": "CASE-0179",
+      "internal_id": "INT0179",
+      "expected_settlement_ids": [
+        "SET00180"
+      ],
+      "expected_bank_statement_id": "BNK0029",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "EXCEPTION",
+      "expected_final_status": "PARTIAL",
+      "expected_exception": "PARTIAL_CREDIT"
+    },
+    {
+      "case_id": "CASE-0180",
+      "internal_id": "INT0180",
+      "expected_settlement_ids": [
+        "SET00181"
+      ],
+      "expected_bank_statement_id": "BNK0030",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "EXCEPTION",
+      "expected_final_status": "PARTIAL",
+      "expected_exception": "PARTIAL_CREDIT"
+    },
+    {
+      "case_id": "CASE-0181",
+      "internal_id": "INT0181",
+      "expected_settlement_ids": [
+        "SET00182",
+        "SET00183"
+      ],
+      "expected_bank_statement_id": null,
+      "expected_hop1": "EXCEPTION",
+      "expected_hop2": "N/A",
+      "expected_final_status": "UNMATCHED",
+      "expected_exception": "DUPLICATE_SETTLEMENT"
+    },
+    {
+      "case_id": "CASE-0182",
+      "internal_id": "INT0182",
+      "expected_settlement_ids": [
+        "SET00184"
+      ],
+      "expected_bank_statement_id": "BNK0002",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0183",
+      "internal_id": "INT0183",
+      "expected_settlement_ids": [
+        "SET00185"
+      ],
+      "expected_bank_statement_id": "BNK0003",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0184",
+      "internal_id": "INT0184",
+      "expected_settlement_ids": [
+        "SET00186"
+      ],
+      "expected_bank_statement_id": "BNK0004",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0185",
+      "internal_id": "INT0185",
+      "expected_settlement_ids": [
+        "SET00187"
+      ],
+      "expected_bank_statement_id": "BNK0005",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0186",
+      "internal_id": "INT0186",
+      "expected_settlement_ids": [
+        "SET00188"
+      ],
+      "expected_bank_statement_id": "BNK0006",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0187",
+      "internal_id": "INT0187",
+      "expected_settlement_ids": [
+        "SET00189"
+      ],
+      "expected_bank_statement_id": "BNK0007",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0188",
+      "internal_id": "INT0188",
+      "expected_settlement_ids": [
+        "SET00190"
+      ],
+      "expected_bank_statement_id": "BNK0008",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0189",
+      "internal_id": "INT0189",
+      "expected_settlement_ids": [
+        "SET00191"
+      ],
+      "expected_bank_statement_id": "BNK0009",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0190",
+      "internal_id": "INT0190",
+      "expected_settlement_ids": [
+        "SET00192"
+      ],
+      "expected_bank_statement_id": "BNK0010",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0191",
+      "internal_id": "INT0191",
+      "expected_settlement_ids": [
+        "SET00193"
+      ],
+      "expected_bank_statement_id": "BNK0011",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0192",
+      "internal_id": "INT0192",
+      "expected_settlement_ids": null,
+      "expected_bank_statement_id": null,
+      "expected_hop1": "EXCEPTION",
+      "expected_hop2": "N/A",
+      "expected_final_status": "UNMATCHED",
+      "expected_exception": "NO_COUNTERPART"
+    },
+    {
+      "case_id": "CASE-0193",
+      "internal_id": "INT0193",
+      "expected_settlement_ids": null,
+      "expected_bank_statement_id": null,
+      "expected_hop1": "EXCEPTION",
+      "expected_hop2": "N/A",
+      "expected_final_status": "UNMATCHED",
+      "expected_exception": "NO_COUNTERPART"
+    },
+    {
+      "case_id": "CASE-0194",
+      "internal_id": "INT0194",
+      "expected_settlement_ids": [
+        "SET00194"
+      ],
+      "expected_bank_statement_id": "BNK0014",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0195",
+      "internal_id": "INT0195",
+      "expected_settlement_ids": [
+        "SET00195"
+      ],
+      "expected_bank_statement_id": "BNK0015",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0196",
+      "internal_id": "INT0196",
+      "expected_settlement_ids": [
+        "SET00196"
+      ],
+      "expected_bank_statement_id": "BNK0016",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0197",
+      "internal_id": "INT0197",
+      "expected_settlement_ids": [
+        "SET00197"
+      ],
+      "expected_bank_statement_id": "BNK0017",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0198",
+      "internal_id": "INT0198",
+      "expected_settlement_ids": null,
+      "expected_bank_statement_id": null,
+      "expected_hop1": "EXCEPTION",
+      "expected_hop2": "N/A",
+      "expected_final_status": "UNMATCHED",
+      "expected_exception": "NO_COUNTERPART"
+    },
+    {
+      "case_id": "CASE-0199",
+      "internal_id": "INT0199",
+      "expected_settlement_ids": [
+        "SET00198"
+      ],
+      "expected_bank_statement_id": "BNK0019",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0200",
+      "internal_id": "INT0200",
+      "expected_settlement_ids": null,
+      "expected_bank_statement_id": null,
+      "expected_hop1": "EXCEPTION",
+      "expected_hop2": "N/A",
+      "expected_final_status": "UNMATCHED",
+      "expected_exception": "NO_COUNTERPART"
+    },
+    {
+      "case_id": "CASE-0201",
+      "internal_id": "INT0201",
+      "expected_settlement_ids": [
+        "SET00199"
+      ],
+      "expected_bank_statement_id": "BNK0021",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0202",
+      "internal_id": "INT0202",
+      "expected_settlement_ids": [
+        "SET00200"
+      ],
+      "expected_bank_statement_id": "BNK0022",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0203",
+      "internal_id": "INT0203",
+      "expected_settlement_ids": [
+        "SET00201"
+      ],
+      "expected_bank_statement_id": "BNK0023",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0204",
+      "internal_id": "INT0204",
+      "expected_settlement_ids": [
+        "SET00202"
+      ],
+      "expected_bank_statement_id": "BNK0024",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0205",
+      "internal_id": "INT0205",
+      "expected_settlement_ids": [
+        "SET00203"
+      ],
+      "expected_bank_statement_id": null,
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "EXCEPTION",
+      "expected_final_status": "PARTIAL",
+      "expected_exception": "SETTLED_NOT_BANKED"
+    },
+    {
+      "case_id": "CASE-0206",
+      "internal_id": "INT0206",
+      "expected_settlement_ids": [
+        "SET00204"
+      ],
+      "expected_bank_statement_id": null,
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "EXCEPTION",
+      "expected_final_status": "PARTIAL",
+      "expected_exception": "SETTLED_NOT_BANKED"
+    },
+    {
+      "case_id": "CASE-0207",
+      "internal_id": "INT0207",
+      "expected_settlement_ids": [
+        "SET00205"
+      ],
+      "expected_bank_statement_id": null,
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "EXCEPTION",
+      "expected_final_status": "PARTIAL",
+      "expected_exception": "SETTLED_NOT_BANKED"
+    },
+    {
+      "case_id": "CASE-0208",
+      "internal_id": "INT0208",
+      "expected_settlement_ids": [
+        "SET00206"
+      ],
+      "expected_bank_statement_id": "BNK0028",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "EXCEPTION",
+      "expected_final_status": "PARTIAL",
+      "expected_exception": "PARTIAL_CREDIT"
+    },
+    {
+      "case_id": "CASE-0209",
+      "internal_id": "INT0209",
+      "expected_settlement_ids": [
+        "SET00207"
+      ],
+      "expected_bank_statement_id": "BNK0029",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "EXCEPTION",
+      "expected_final_status": "PARTIAL",
+      "expected_exception": "PARTIAL_CREDIT"
+    },
+    {
+      "case_id": "CASE-0210",
+      "internal_id": "INT0210",
+      "expected_settlement_ids": [
+        "SET00208"
+      ],
+      "expected_bank_statement_id": "BNK0030",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "EXCEPTION",
+      "expected_final_status": "PARTIAL",
+      "expected_exception": "PARTIAL_CREDIT"
+    },
+    {
+      "case_id": "CASE-0211",
+      "internal_id": "INT0211",
+      "expected_settlement_ids": [
+        "SET00209"
+      ],
+      "expected_bank_statement_id": "BNK0001",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0212",
+      "internal_id": "INT0212",
+      "expected_settlement_ids": [
+        "SET00210"
+      ],
+      "expected_bank_statement_id": "BNK0002",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0213",
+      "internal_id": "INT0213",
+      "expected_settlement_ids": [
+        "SET00211"
+      ],
+      "expected_bank_statement_id": "BNK0003",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0214",
+      "internal_id": "INT0214",
+      "expected_settlement_ids": [
+        "SET00212"
+      ],
+      "expected_bank_statement_id": "BNK0004",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0215",
+      "internal_id": "INT0215",
+      "expected_settlement_ids": null,
+      "expected_bank_statement_id": null,
+      "expected_hop1": "EXCEPTION",
+      "expected_hop2": "N/A",
+      "expected_final_status": "UNMATCHED",
+      "expected_exception": "AMOUNT_MISMATCH"
+    },
+    {
+      "case_id": "CASE-0216",
+      "internal_id": "INT0216",
+      "expected_settlement_ids": null,
+      "expected_bank_statement_id": null,
+      "expected_hop1": "EXCEPTION",
+      "expected_hop2": "N/A",
+      "expected_final_status": "UNMATCHED",
+      "expected_exception": "NO_COUNTERPART"
+    },
+    {
+      "case_id": "CASE-0217",
+      "internal_id": "INT0217",
+      "expected_settlement_ids": null,
+      "expected_bank_statement_id": null,
+      "expected_hop1": "EXCEPTION",
+      "expected_hop2": "N/A",
+      "expected_final_status": "UNMATCHED",
+      "expected_exception": "AMOUNT_MISMATCH"
+    },
+    {
+      "case_id": "CASE-0218",
+      "internal_id": "INT0218",
+      "expected_settlement_ids": [
+        "SET00215"
+      ],
+      "expected_bank_statement_id": "BNK0008",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0219",
+      "internal_id": "INT0219",
+      "expected_settlement_ids": [
+        "SET00216"
+      ],
+      "expected_bank_statement_id": "BNK0009",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0220",
+      "internal_id": "INT0220",
+      "expected_settlement_ids": [
+        "SET00217"
+      ],
+      "expected_bank_statement_id": "BNK0010",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0221",
+      "internal_id": "INT0221",
+      "expected_settlement_ids": [
+        "SET00218"
+      ],
+      "expected_bank_statement_id": "BNK0011",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0222",
+      "internal_id": "INT0222",
+      "expected_settlement_ids": [
+        "SET00219"
+      ],
+      "expected_bank_statement_id": "BNK0012",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0223",
+      "internal_id": "INT0223",
+      "expected_settlement_ids": [
+        "SET00220"
+      ],
+      "expected_bank_statement_id": "BNK0013",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0224",
+      "internal_id": "INT0224",
+      "expected_settlement_ids": null,
+      "expected_bank_statement_id": null,
+      "expected_hop1": "EXCEPTION",
+      "expected_hop2": "N/A",
+      "expected_final_status": "UNMATCHED",
+      "expected_exception": "NO_COUNTERPART"
+    },
+    {
+      "case_id": "CASE-0225",
+      "internal_id": "INT0225",
+      "expected_settlement_ids": [
+        "SET00221"
+      ],
+      "expected_bank_statement_id": "BNK0015",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0226",
+      "internal_id": "INT0226",
+      "expected_settlement_ids": null,
+      "expected_bank_statement_id": null,
+      "expected_hop1": "EXCEPTION",
+      "expected_hop2": "N/A",
+      "expected_final_status": "UNMATCHED",
+      "expected_exception": "AMOUNT_MISMATCH"
+    },
+    {
+      "case_id": "CASE-0227",
+      "internal_id": "INT0227",
+      "expected_settlement_ids": [
+        "SET00223"
+      ],
+      "expected_bank_statement_id": "BNK0017",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0228",
+      "internal_id": "INT0228",
+      "expected_settlement_ids": [
+        "SET00224"
+      ],
+      "expected_bank_statement_id": "BNK0018",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0229",
+      "internal_id": "INT0229",
+      "expected_settlement_ids": [
+        "SET00225"
+      ],
+      "expected_bank_statement_id": "BNK0019",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0230",
+      "internal_id": "INT0230",
+      "expected_settlement_ids": [
+        "SET00226"
+      ],
+      "expected_bank_statement_id": "BNK0020",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0231",
+      "internal_id": "INT0231",
+      "expected_settlement_ids": [
+        "SET00227"
+      ],
+      "expected_bank_statement_id": "BNK0021",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0232",
+      "internal_id": "INT0232",
+      "expected_settlement_ids": [
+        "SET00228"
+      ],
+      "expected_bank_statement_id": "BNK0022",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0233",
+      "internal_id": "INT0233",
+      "expected_settlement_ids": [
+        "SET00229"
+      ],
+      "expected_bank_statement_id": "BNK0023",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0234",
+      "internal_id": "INT0234",
+      "expected_settlement_ids": [
+        "SET00230"
+      ],
+      "expected_bank_statement_id": "BNK0024",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0235",
+      "internal_id": "INT0235",
+      "expected_settlement_ids": [
+        "SET00231"
+      ],
+      "expected_bank_statement_id": null,
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "EXCEPTION",
+      "expected_final_status": "PARTIAL",
+      "expected_exception": "SETTLED_NOT_BANKED"
+    },
+    {
+      "case_id": "CASE-0236",
+      "internal_id": "INT0236",
+      "expected_settlement_ids": [
+        "SET00232"
+      ],
+      "expected_bank_statement_id": null,
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "EXCEPTION",
+      "expected_final_status": "PARTIAL",
+      "expected_exception": "SETTLED_NOT_BANKED"
+    },
+    {
+      "case_id": "CASE-0237",
+      "internal_id": "INT0237",
+      "expected_settlement_ids": [
+        "SET00233"
+      ],
+      "expected_bank_statement_id": null,
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "EXCEPTION",
+      "expected_final_status": "PARTIAL",
+      "expected_exception": "SETTLED_NOT_BANKED"
+    },
+    {
+      "case_id": "CASE-0238",
+      "internal_id": "INT0238",
+      "expected_settlement_ids": null,
+      "expected_bank_statement_id": null,
+      "expected_hop1": "EXCEPTION",
+      "expected_hop2": "N/A",
+      "expected_final_status": "UNMATCHED",
+      "expected_exception": "AMOUNT_MISMATCH"
+    },
+    {
+      "case_id": "CASE-0239",
+      "internal_id": "INT0239",
+      "expected_settlement_ids": [
+        "SET00235",
+        "SET00236"
+      ],
+      "expected_bank_statement_id": null,
+      "expected_hop1": "EXCEPTION",
+      "expected_hop2": "N/A",
+      "expected_final_status": "UNMATCHED",
+      "expected_exception": "DUPLICATE_SETTLEMENT"
+    },
+    {
+      "case_id": "CASE-0240",
+      "internal_id": "INT0240",
+      "expected_settlement_ids": [
+        "SET00237"
+      ],
+      "expected_bank_statement_id": "BNK0030",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "EXCEPTION",
+      "expected_final_status": "PARTIAL",
+      "expected_exception": "PARTIAL_CREDIT"
+    },
+    {
+      "case_id": "CASE-0241",
+      "internal_id": "INT0241",
+      "expected_settlement_ids": [
+        "SET00238"
+      ],
+      "expected_bank_statement_id": "BNK0001",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0242",
+      "internal_id": "INT0242",
+      "expected_settlement_ids": null,
+      "expected_bank_statement_id": null,
+      "expected_hop1": "EXCEPTION",
+      "expected_hop2": "N/A",
+      "expected_final_status": "UNMATCHED",
+      "expected_exception": "AMOUNT_MISMATCH"
+    },
+    {
+      "case_id": "CASE-0243",
+      "internal_id": "INT0243",
+      "expected_settlement_ids": null,
+      "expected_bank_statement_id": null,
+      "expected_hop1": "EXCEPTION",
+      "expected_hop2": "N/A",
+      "expected_final_status": "UNMATCHED",
+      "expected_exception": "AMOUNT_MISMATCH"
+    },
+    {
+      "case_id": "CASE-0244",
+      "internal_id": "INT0244",
+      "expected_settlement_ids": [
+        "SET00241"
+      ],
+      "expected_bank_statement_id": "BNK0004",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0245",
+      "internal_id": "INT0245",
+      "expected_settlement_ids": [
+        "SET00242"
+      ],
+      "expected_bank_statement_id": "BNK0005",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0246",
+      "internal_id": "INT0246",
+      "expected_settlement_ids": null,
+      "expected_bank_statement_id": null,
+      "expected_hop1": "EXCEPTION",
+      "expected_hop2": "N/A",
+      "expected_final_status": "UNMATCHED",
+      "expected_exception": "AMOUNT_MISMATCH"
+    },
+    {
+      "case_id": "CASE-0247",
+      "internal_id": "INT0247",
+      "expected_settlement_ids": [
+        "SET00244"
+      ],
+      "expected_bank_statement_id": "BNK0007",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0248",
+      "internal_id": "INT0248",
+      "expected_settlement_ids": null,
+      "expected_bank_statement_id": null,
+      "expected_hop1": "EXCEPTION",
+      "expected_hop2": "N/A",
+      "expected_final_status": "UNMATCHED",
+      "expected_exception": "AMOUNT_MISMATCH"
+    },
+    {
+      "case_id": "CASE-0249",
+      "internal_id": "INT0249",
+      "expected_settlement_ids": [
+        "SET00246"
+      ],
+      "expected_bank_statement_id": "BNK0009",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0250",
+      "internal_id": "INT0250",
+      "expected_settlement_ids": [
+        "SET00247"
+      ],
+      "expected_bank_statement_id": "BNK0010",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0251",
+      "internal_id": "INT0251",
+      "expected_settlement_ids": [
+        "SET00248"
+      ],
+      "expected_bank_statement_id": "BNK0011",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0252",
+      "internal_id": "INT0252",
+      "expected_settlement_ids": [
+        "SET00249"
+      ],
+      "expected_bank_statement_id": "BNK0012",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0253",
+      "internal_id": "INT0253",
+      "expected_settlement_ids": [
+        "SET00250",
+        "SET00251"
+      ],
+      "expected_bank_statement_id": null,
+      "expected_hop1": "EXCEPTION",
+      "expected_hop2": "N/A",
+      "expected_final_status": "UNMATCHED",
+      "expected_exception": "DUPLICATE_SETTLEMENT"
+    },
+    {
+      "case_id": "CASE-0254",
+      "internal_id": "INT0254",
+      "expected_settlement_ids": [
+        "SET00252"
+      ],
+      "expected_bank_statement_id": "BNK0014",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0255",
+      "internal_id": "INT0255",
+      "expected_settlement_ids": [
+        "SET00253"
+      ],
+      "expected_bank_statement_id": "BNK0015",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0256",
+      "internal_id": "INT0256",
+      "expected_settlement_ids": [
+        "SET00254"
+      ],
+      "expected_bank_statement_id": "BNK0016",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0257",
+      "internal_id": "INT0257",
+      "expected_settlement_ids": [
+        "SET00255"
+      ],
+      "expected_bank_statement_id": "BNK0017",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0258",
+      "internal_id": "INT0258",
+      "expected_settlement_ids": [
+        "SET00256"
+      ],
+      "expected_bank_statement_id": "BNK0018",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0259",
+      "internal_id": "INT0259",
+      "expected_settlement_ids": [
+        "SET00257"
+      ],
+      "expected_bank_statement_id": "BNK0019",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0260",
+      "internal_id": "INT0260",
+      "expected_settlement_ids": [
+        "SET00258"
+      ],
+      "expected_bank_statement_id": "BNK0020",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0261",
+      "internal_id": "INT0261",
+      "expected_settlement_ids": [
+        "SET00259"
+      ],
+      "expected_bank_statement_id": "BNK0021",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0262",
+      "internal_id": "INT0262",
+      "expected_settlement_ids": [
+        "SET00260"
+      ],
+      "expected_bank_statement_id": "BNK0022",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0263",
+      "internal_id": "INT0263",
+      "expected_settlement_ids": [
+        "SET00261"
+      ],
+      "expected_bank_statement_id": "BNK0023",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0264",
+      "internal_id": "INT0264",
+      "expected_settlement_ids": [
+        "SET00262"
+      ],
+      "expected_bank_statement_id": "BNK0024",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0265",
+      "internal_id": "INT0265",
+      "expected_settlement_ids": [
+        "SET00263"
+      ],
+      "expected_bank_statement_id": null,
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "EXCEPTION",
+      "expected_final_status": "PARTIAL",
+      "expected_exception": "SETTLED_NOT_BANKED"
+    },
+    {
+      "case_id": "CASE-0266",
+      "internal_id": "INT0266",
+      "expected_settlement_ids": [
+        "SET00264"
+      ],
+      "expected_bank_statement_id": null,
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "EXCEPTION",
+      "expected_final_status": "PARTIAL",
+      "expected_exception": "SETTLED_NOT_BANKED"
+    },
+    {
+      "case_id": "CASE-0267",
+      "internal_id": "INT0267",
+      "expected_settlement_ids": [
+        "SET00265"
+      ],
+      "expected_bank_statement_id": null,
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "EXCEPTION",
+      "expected_final_status": "PARTIAL",
+      "expected_exception": "SETTLED_NOT_BANKED"
+    },
+    {
+      "case_id": "CASE-0268",
+      "internal_id": "INT0268",
+      "expected_settlement_ids": [
+        "SET00266"
+      ],
+      "expected_bank_statement_id": "BNK0028",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "EXCEPTION",
+      "expected_final_status": "PARTIAL",
+      "expected_exception": "PARTIAL_CREDIT"
+    },
+    {
+      "case_id": "CASE-0269",
+      "internal_id": "INT0269",
+      "expected_settlement_ids": [
+        "SET00267"
+      ],
+      "expected_bank_statement_id": "BNK0029",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "EXCEPTION",
+      "expected_final_status": "PARTIAL",
+      "expected_exception": "PARTIAL_CREDIT"
+    },
+    {
+      "case_id": "CASE-0270",
+      "internal_id": "INT0270",
+      "expected_settlement_ids": [
+        "SET00268"
+      ],
+      "expected_bank_statement_id": "BNK0030",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "EXCEPTION",
+      "expected_final_status": "PARTIAL",
+      "expected_exception": "PARTIAL_CREDIT"
+    },
+    {
+      "case_id": "CASE-0271",
+      "internal_id": "INT0271",
+      "expected_settlement_ids": null,
+      "expected_bank_statement_id": null,
+      "expected_hop1": "EXCEPTION",
+      "expected_hop2": "N/A",
+      "expected_final_status": "UNMATCHED",
+      "expected_exception": "AMOUNT_MISMATCH"
+    },
+    {
+      "case_id": "CASE-0272",
+      "internal_id": "INT0272",
+      "expected_settlement_ids": [
+        "SET00270"
+      ],
+      "expected_bank_statement_id": "BNK0002",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0273",
+      "internal_id": "INT0273",
+      "expected_settlement_ids": [
+        "SET00271",
+        "SET00272"
+      ],
+      "expected_bank_statement_id": null,
+      "expected_hop1": "EXCEPTION",
+      "expected_hop2": "N/A",
+      "expected_final_status": "UNMATCHED",
+      "expected_exception": "DUPLICATE_SETTLEMENT"
+    },
+    {
+      "case_id": "CASE-0274",
+      "internal_id": "INT0274",
+      "expected_settlement_ids": [
+        "SET00273"
+      ],
+      "expected_bank_statement_id": "BNK0004",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0275",
+      "internal_id": "INT0275",
+      "expected_settlement_ids": [
+        "SET00274"
+      ],
+      "expected_bank_statement_id": "BNK0005",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0276",
+      "internal_id": "INT0276",
+      "expected_settlement_ids": [
+        "SET00275"
+      ],
+      "expected_bank_statement_id": "BNK0006",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0277",
+      "internal_id": "INT0277",
+      "expected_settlement_ids": [
+        "SET00276"
+      ],
+      "expected_bank_statement_id": "BNK0007",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0278",
+      "internal_id": "INT0278",
+      "expected_settlement_ids": [
+        "SET00277"
+      ],
+      "expected_bank_statement_id": "BNK0008",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0279",
+      "internal_id": "INT0279",
+      "expected_settlement_ids": [
+        "SET00278"
+      ],
+      "expected_bank_statement_id": "BNK0009",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0280",
+      "internal_id": "INT0280",
+      "expected_settlement_ids": [
+        "SET00279"
+      ],
+      "expected_bank_statement_id": "BNK0010",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0281",
+      "internal_id": "INT0281",
+      "expected_settlement_ids": [
+        "SET00280"
+      ],
+      "expected_bank_statement_id": "BNK0011",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0282",
+      "internal_id": "INT0282",
+      "expected_settlement_ids": [
+        "SET00281"
+      ],
+      "expected_bank_statement_id": "BNK0012",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0283",
+      "internal_id": "INT0283",
+      "expected_settlement_ids": [
+        "SET00282"
+      ],
+      "expected_bank_statement_id": "BNK0013",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0284",
+      "internal_id": "INT0284",
+      "expected_settlement_ids": [
+        "SET00283"
+      ],
+      "expected_bank_statement_id": "BNK0014",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0285",
+      "internal_id": "INT0285",
+      "expected_settlement_ids": [
+        "SET00284"
+      ],
+      "expected_bank_statement_id": "BNK0015",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0286",
+      "internal_id": "INT0286",
+      "expected_settlement_ids": [
+        "SET00285"
+      ],
+      "expected_bank_statement_id": "BNK0016",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0287",
+      "internal_id": "INT0287",
+      "expected_settlement_ids": [
+        "SET00286"
+      ],
+      "expected_bank_statement_id": "BNK0017",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0288",
+      "internal_id": "INT0288",
+      "expected_settlement_ids": [
+        "SET00287"
+      ],
+      "expected_bank_statement_id": "BNK0018",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0289",
+      "internal_id": "INT0289",
+      "expected_settlement_ids": [
+        "SET00288"
+      ],
+      "expected_bank_statement_id": "BNK0019",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0290",
+      "internal_id": "INT0290",
+      "expected_settlement_ids": [
+        "SET00289"
+      ],
+      "expected_bank_statement_id": "BNK0020",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0291",
+      "internal_id": "INT0291",
+      "expected_settlement_ids": [
+        "SET00290"
+      ],
+      "expected_bank_statement_id": "BNK0021",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0292",
+      "internal_id": "INT0292",
+      "expected_settlement_ids": [
+        "SET00291"
+      ],
+      "expected_bank_statement_id": "BNK0022",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0293",
+      "internal_id": "INT0293",
+      "expected_settlement_ids": [
+        "SET00292"
+      ],
+      "expected_bank_statement_id": "BNK0023",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0294",
+      "internal_id": "INT0294",
+      "expected_settlement_ids": [
+        "SET00293"
+      ],
+      "expected_bank_statement_id": "BNK0024",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0295",
+      "internal_id": "INT0295",
+      "expected_settlement_ids": null,
+      "expected_bank_statement_id": null,
+      "expected_hop1": "EXCEPTION",
+      "expected_hop2": "N/A",
+      "expected_final_status": "UNMATCHED",
+      "expected_exception": "AMOUNT_MISMATCH"
+    },
+    {
+      "case_id": "CASE-0296",
+      "internal_id": "INT0296",
+      "expected_settlement_ids": null,
+      "expected_bank_statement_id": null,
+      "expected_hop1": "EXCEPTION",
+      "expected_hop2": "N/A",
+      "expected_final_status": "UNMATCHED",
+      "expected_exception": "AMOUNT_MISMATCH"
+    },
+    {
+      "case_id": "CASE-0297",
+      "internal_id": "INT0297",
+      "expected_settlement_ids": null,
+      "expected_bank_statement_id": null,
+      "expected_hop1": "EXCEPTION",
+      "expected_hop2": "N/A",
+      "expected_final_status": "UNMATCHED",
+      "expected_exception": "NO_COUNTERPART"
+    },
+    {
+      "case_id": "CASE-0298",
+      "internal_id": "INT0298",
+      "expected_settlement_ids": [
+        "SET00296"
+      ],
+      "expected_bank_statement_id": "BNK0028",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "EXCEPTION",
+      "expected_final_status": "PARTIAL",
+      "expected_exception": "PARTIAL_CREDIT"
+    },
+    {
+      "case_id": "CASE-0299",
+      "internal_id": "INT0299",
+      "expected_settlement_ids": [
+        "SET00297"
+      ],
+      "expected_bank_statement_id": "BNK0029",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "EXCEPTION",
+      "expected_final_status": "PARTIAL",
+      "expected_exception": "PARTIAL_CREDIT"
+    },
+    {
+      "case_id": "CASE-0300",
+      "internal_id": "INT0300",
+      "expected_settlement_ids": [
+        "SET00298"
+      ],
+      "expected_bank_statement_id": "BNK0030",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "EXCEPTION",
+      "expected_final_status": "PARTIAL",
+      "expected_exception": "PARTIAL_CREDIT"
+    },
+    {
+      "case_id": "CASE-0301",
+      "internal_id": "INT0301",
+      "expected_settlement_ids": [
+        "SET00299"
+      ],
+      "expected_bank_statement_id": "BNK0001",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0302",
+      "internal_id": "INT0302",
+      "expected_settlement_ids": [
+        "SET00300"
+      ],
+      "expected_bank_statement_id": "BNK0002",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0303",
+      "internal_id": "INT0303",
+      "expected_settlement_ids": [
+        "SET00301"
+      ],
+      "expected_bank_statement_id": "BNK0003",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0304",
+      "internal_id": "INT0304",
+      "expected_settlement_ids": null,
+      "expected_bank_statement_id": null,
+      "expected_hop1": "EXCEPTION",
+      "expected_hop2": "N/A",
+      "expected_final_status": "UNMATCHED",
+      "expected_exception": "AMOUNT_MISMATCH"
+    },
+    {
+      "case_id": "CASE-0305",
+      "internal_id": "INT0305",
+      "expected_settlement_ids": [
+        "SET00303"
+      ],
+      "expected_bank_statement_id": "BNK0005",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0306",
+      "internal_id": "INT0306",
+      "expected_settlement_ids": [
+        "SET00304"
+      ],
+      "expected_bank_statement_id": "BNK0006",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0307",
+      "internal_id": "INT0307",
+      "expected_settlement_ids": null,
+      "expected_bank_statement_id": null,
+      "expected_hop1": "EXCEPTION",
+      "expected_hop2": "N/A",
+      "expected_final_status": "UNMATCHED",
+      "expected_exception": "AMOUNT_MISMATCH"
+    },
+    {
+      "case_id": "CASE-0308",
+      "internal_id": "INT0308",
+      "expected_settlement_ids": [
+        "SET00306"
+      ],
+      "expected_bank_statement_id": "BNK0008",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0309",
+      "internal_id": "INT0309",
+      "expected_settlement_ids": null,
+      "expected_bank_statement_id": null,
+      "expected_hop1": "EXCEPTION",
+      "expected_hop2": "N/A",
+      "expected_final_status": "UNMATCHED",
+      "expected_exception": "AMOUNT_MISMATCH"
+    },
+    {
+      "case_id": "CASE-0310",
+      "internal_id": "INT0310",
+      "expected_settlement_ids": null,
+      "expected_bank_statement_id": null,
+      "expected_hop1": "EXCEPTION",
+      "expected_hop2": "N/A",
+      "expected_final_status": "UNMATCHED",
+      "expected_exception": "AMOUNT_MISMATCH"
+    },
+    {
+      "case_id": "CASE-0311",
+      "internal_id": "INT0311",
+      "expected_settlement_ids": [
+        "SET00309",
+        "SET00310"
+      ],
+      "expected_bank_statement_id": null,
+      "expected_hop1": "EXCEPTION",
+      "expected_hop2": "N/A",
+      "expected_final_status": "UNMATCHED",
+      "expected_exception": "DUPLICATE_SETTLEMENT"
+    },
+    {
+      "case_id": "CASE-0312",
+      "internal_id": "INT0312",
+      "expected_settlement_ids": null,
+      "expected_bank_statement_id": null,
+      "expected_hop1": "EXCEPTION",
+      "expected_hop2": "N/A",
+      "expected_final_status": "UNMATCHED",
+      "expected_exception": "AMOUNT_MISMATCH"
+    },
+    {
+      "case_id": "CASE-0313",
+      "internal_id": "INT0313",
+      "expected_settlement_ids": [
+        "SET00312"
+      ],
+      "expected_bank_statement_id": "BNK0013",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0314",
+      "internal_id": "INT0314",
+      "expected_settlement_ids": [
+        "SET00313"
+      ],
+      "expected_bank_statement_id": "BNK0014",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0315",
+      "internal_id": "INT0315",
+      "expected_settlement_ids": [
+        "SET00314"
+      ],
+      "expected_bank_statement_id": "BNK0015",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0316",
+      "internal_id": "INT0316",
+      "expected_settlement_ids": [
+        "SET00315"
+      ],
+      "expected_bank_statement_id": "BNK0016",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0317",
+      "internal_id": "INT0317",
+      "expected_settlement_ids": [
+        "SET00316"
+      ],
+      "expected_bank_statement_id": "BNK0017",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0318",
+      "internal_id": "INT0318",
+      "expected_settlement_ids": null,
+      "expected_bank_statement_id": null,
+      "expected_hop1": "EXCEPTION",
+      "expected_hop2": "N/A",
+      "expected_final_status": "UNMATCHED",
+      "expected_exception": "NO_COUNTERPART"
+    },
+    {
+      "case_id": "CASE-0319",
+      "internal_id": "INT0319",
+      "expected_settlement_ids": [
+        "SET00317"
+      ],
+      "expected_bank_statement_id": "BNK0019",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0320",
+      "internal_id": "INT0320",
+      "expected_settlement_ids": [
+        "SET00318"
+      ],
+      "expected_bank_statement_id": "BNK0020",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0321",
+      "internal_id": "INT0321",
+      "expected_settlement_ids": [
+        "SET00319"
+      ],
+      "expected_bank_statement_id": "BNK0021",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0322",
+      "internal_id": "INT0322",
+      "expected_settlement_ids": [
+        "SET00320"
+      ],
+      "expected_bank_statement_id": "BNK0022",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0323",
+      "internal_id": "INT0323",
+      "expected_settlement_ids": null,
+      "expected_bank_statement_id": null,
+      "expected_hop1": "EXCEPTION",
+      "expected_hop2": "N/A",
+      "expected_final_status": "UNMATCHED",
+      "expected_exception": "AMOUNT_MISMATCH"
+    },
+    {
+      "case_id": "CASE-0324",
+      "internal_id": "INT0324",
+      "expected_settlement_ids": [
+        "SET00322"
+      ],
+      "expected_bank_statement_id": "BNK0024",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0325",
+      "internal_id": "INT0325",
+      "expected_settlement_ids": [
+        "SET00323"
+      ],
+      "expected_bank_statement_id": null,
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "EXCEPTION",
+      "expected_final_status": "PARTIAL",
+      "expected_exception": "SETTLED_NOT_BANKED"
+    },
+    {
+      "case_id": "CASE-0326",
+      "internal_id": "INT0326",
+      "expected_settlement_ids": [
+        "SET00324"
+      ],
+      "expected_bank_statement_id": null,
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "EXCEPTION",
+      "expected_final_status": "PARTIAL",
+      "expected_exception": "SETTLED_NOT_BANKED"
+    },
+    {
+      "case_id": "CASE-0327",
+      "internal_id": "INT0327",
+      "expected_settlement_ids": [
+        "SET00325"
+      ],
+      "expected_bank_statement_id": null,
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "EXCEPTION",
+      "expected_final_status": "PARTIAL",
+      "expected_exception": "SETTLED_NOT_BANKED"
+    },
+    {
+      "case_id": "CASE-0328",
+      "internal_id": "INT0328",
+      "expected_settlement_ids": null,
+      "expected_bank_statement_id": null,
+      "expected_hop1": "EXCEPTION",
+      "expected_hop2": "N/A",
+      "expected_final_status": "UNMATCHED",
+      "expected_exception": "NO_COUNTERPART"
+    },
+    {
+      "case_id": "CASE-0329",
+      "internal_id": "INT0329",
+      "expected_settlement_ids": [
+        "SET00326"
+      ],
+      "expected_bank_statement_id": "BNK0029",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "EXCEPTION",
+      "expected_final_status": "PARTIAL",
+      "expected_exception": "PARTIAL_CREDIT"
+    },
+    {
+      "case_id": "CASE-0330",
+      "internal_id": "INT0330",
+      "expected_settlement_ids": [
+        "SET00327",
+        "SET00328"
+      ],
+      "expected_bank_statement_id": null,
+      "expected_hop1": "EXCEPTION",
+      "expected_hop2": "N/A",
+      "expected_final_status": "UNMATCHED",
+      "expected_exception": "DUPLICATE_SETTLEMENT"
+    },
+    {
+      "case_id": "CASE-0331",
+      "internal_id": "INT0331",
+      "expected_settlement_ids": [
+        "SET00329"
+      ],
+      "expected_bank_statement_id": "BNK0001",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0332",
+      "internal_id": "INT0332",
+      "expected_settlement_ids": [
+        "SET00330"
+      ],
+      "expected_bank_statement_id": "BNK0002",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0333",
+      "internal_id": "INT0333",
+      "expected_settlement_ids": [
+        "SET00331"
+      ],
+      "expected_bank_statement_id": "BNK0003",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0334",
+      "internal_id": "INT0334",
+      "expected_settlement_ids": [
+        "SET00332"
+      ],
+      "expected_bank_statement_id": "BNK0004",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0335",
+      "internal_id": "INT0335",
+      "expected_settlement_ids": [
+        "SET00333"
+      ],
+      "expected_bank_statement_id": "BNK0005",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0336",
+      "internal_id": "INT0336",
+      "expected_settlement_ids": [
+        "SET00334"
+      ],
+      "expected_bank_statement_id": "BNK0006",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0337",
+      "internal_id": "INT0337",
+      "expected_settlement_ids": null,
+      "expected_bank_statement_id": null,
+      "expected_hop1": "EXCEPTION",
+      "expected_hop2": "N/A",
+      "expected_final_status": "UNMATCHED",
+      "expected_exception": "NO_COUNTERPART"
+    },
+    {
+      "case_id": "CASE-0338",
+      "internal_id": "INT0338",
+      "expected_settlement_ids": [
+        "SET00335"
+      ],
+      "expected_bank_statement_id": "BNK0008",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0339",
+      "internal_id": "INT0339",
+      "expected_settlement_ids": null,
+      "expected_bank_statement_id": null,
+      "expected_hop1": "EXCEPTION",
+      "expected_hop2": "N/A",
+      "expected_final_status": "UNMATCHED",
+      "expected_exception": "NO_COUNTERPART"
+    },
+    {
+      "case_id": "CASE-0340",
+      "internal_id": "INT0340",
+      "expected_settlement_ids": null,
+      "expected_bank_statement_id": null,
+      "expected_hop1": "EXCEPTION",
+      "expected_hop2": "N/A",
+      "expected_final_status": "UNMATCHED",
+      "expected_exception": "NO_COUNTERPART"
+    },
+    {
+      "case_id": "CASE-0341",
+      "internal_id": "INT0341",
+      "expected_settlement_ids": null,
+      "expected_bank_statement_id": null,
+      "expected_hop1": "EXCEPTION",
+      "expected_hop2": "N/A",
+      "expected_final_status": "UNMATCHED",
+      "expected_exception": "NO_COUNTERPART"
+    },
+    {
+      "case_id": "CASE-0342",
+      "internal_id": "INT0342",
+      "expected_settlement_ids": [
+        "SET00336"
+      ],
+      "expected_bank_statement_id": "BNK0012",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0343",
+      "internal_id": "INT0343",
+      "expected_settlement_ids": null,
+      "expected_bank_statement_id": null,
+      "expected_hop1": "EXCEPTION",
+      "expected_hop2": "N/A",
+      "expected_final_status": "UNMATCHED",
+      "expected_exception": "AMOUNT_MISMATCH"
+    },
+    {
+      "case_id": "CASE-0344",
+      "internal_id": "INT0344",
+      "expected_settlement_ids": null,
+      "expected_bank_statement_id": null,
+      "expected_hop1": "EXCEPTION",
+      "expected_hop2": "N/A",
+      "expected_final_status": "UNMATCHED",
+      "expected_exception": "NO_COUNTERPART"
+    },
+    {
+      "case_id": "CASE-0345",
+      "internal_id": "INT0345",
+      "expected_settlement_ids": [
+        "SET00338"
+      ],
+      "expected_bank_statement_id": "BNK0015",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0346",
+      "internal_id": "INT0346",
+      "expected_settlement_ids": [
+        "SET00339"
+      ],
+      "expected_bank_statement_id": "BNK0016",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0347",
+      "internal_id": "INT0347",
+      "expected_settlement_ids": null,
+      "expected_bank_statement_id": null,
+      "expected_hop1": "EXCEPTION",
+      "expected_hop2": "N/A",
+      "expected_final_status": "UNMATCHED",
+      "expected_exception": "AMOUNT_MISMATCH"
+    },
+    {
+      "case_id": "CASE-0348",
+      "internal_id": "INT0348",
+      "expected_settlement_ids": null,
+      "expected_bank_statement_id": null,
+      "expected_hop1": "EXCEPTION",
+      "expected_hop2": "N/A",
+      "expected_final_status": "UNMATCHED",
+      "expected_exception": "NO_COUNTERPART"
+    },
+    {
+      "case_id": "CASE-0349",
+      "internal_id": "INT0349",
+      "expected_settlement_ids": [
+        "SET00341"
+      ],
+      "expected_bank_statement_id": "BNK0019",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0350",
+      "internal_id": "INT0350",
+      "expected_settlement_ids": [
+        "SET00342"
+      ],
+      "expected_bank_statement_id": "BNK0020",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0351",
+      "internal_id": "INT0351",
+      "expected_settlement_ids": [
+        "SET00343"
+      ],
+      "expected_bank_statement_id": "BNK0021",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0352",
+      "internal_id": "INT0352",
+      "expected_settlement_ids": [
+        "SET00344"
+      ],
+      "expected_bank_statement_id": "BNK0022",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0353",
+      "internal_id": "INT0353",
+      "expected_settlement_ids": [
+        "SET00345"
+      ],
+      "expected_bank_statement_id": "BNK0023",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0354",
+      "internal_id": "INT0354",
+      "expected_settlement_ids": [
+        "SET00346"
+      ],
+      "expected_bank_statement_id": "BNK0024",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0355",
+      "internal_id": "INT0355",
+      "expected_settlement_ids": [
+        "SET00347"
+      ],
+      "expected_bank_statement_id": null,
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "EXCEPTION",
+      "expected_final_status": "PARTIAL",
+      "expected_exception": "SETTLED_NOT_BANKED"
+    },
+    {
+      "case_id": "CASE-0356",
+      "internal_id": "INT0356",
+      "expected_settlement_ids": [
+        "SET00348"
+      ],
+      "expected_bank_statement_id": null,
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "EXCEPTION",
+      "expected_final_status": "PARTIAL",
+      "expected_exception": "SETTLED_NOT_BANKED"
+    },
+    {
+      "case_id": "CASE-0357",
+      "internal_id": "INT0357",
+      "expected_settlement_ids": [
+        "SET00349"
+      ],
+      "expected_bank_statement_id": null,
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "EXCEPTION",
+      "expected_final_status": "PARTIAL",
+      "expected_exception": "SETTLED_NOT_BANKED"
+    },
+    {
+      "case_id": "CASE-0358",
+      "internal_id": "INT0358",
+      "expected_settlement_ids": [
+        "SET00350"
+      ],
+      "expected_bank_statement_id": "BNK0028",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "EXCEPTION",
+      "expected_final_status": "PARTIAL",
+      "expected_exception": "PARTIAL_CREDIT"
+    },
+    {
+      "case_id": "CASE-0359",
+      "internal_id": "INT0359",
+      "expected_settlement_ids": [
+        "SET00351"
+      ],
+      "expected_bank_statement_id": "BNK0029",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "EXCEPTION",
+      "expected_final_status": "PARTIAL",
+      "expected_exception": "PARTIAL_CREDIT"
+    },
+    {
+      "case_id": "CASE-0360",
+      "internal_id": "INT0360",
+      "expected_settlement_ids": [
+        "SET00352"
+      ],
+      "expected_bank_statement_id": "BNK0030",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "EXCEPTION",
+      "expected_final_status": "PARTIAL",
+      "expected_exception": "PARTIAL_CREDIT"
+    },
+    {
+      "case_id": "CASE-0361",
+      "internal_id": "INT0361",
+      "expected_settlement_ids": [
+        "SET00353",
+        "SET00354"
+      ],
+      "expected_bank_statement_id": null,
+      "expected_hop1": "EXCEPTION",
+      "expected_hop2": "N/A",
+      "expected_final_status": "UNMATCHED",
+      "expected_exception": "DUPLICATE_SETTLEMENT"
+    },
+    {
+      "case_id": "CASE-0362",
+      "internal_id": "INT0362",
+      "expected_settlement_ids": [
+        "SET00355"
+      ],
+      "expected_bank_statement_id": "BNK0002",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0363",
+      "internal_id": "INT0363",
+      "expected_settlement_ids": [
+        "SET00356"
+      ],
+      "expected_bank_statement_id": "BNK0003",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0364",
+      "internal_id": "INT0364",
+      "expected_settlement_ids": [
+        "SET00357"
+      ],
+      "expected_bank_statement_id": "BNK0004",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0365",
+      "internal_id": "INT0365",
+      "expected_settlement_ids": [
+        "SET00358"
+      ],
+      "expected_bank_statement_id": "BNK0005",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0366",
+      "internal_id": "INT0366",
+      "expected_settlement_ids": [
+        "SET00359"
+      ],
+      "expected_bank_statement_id": "BNK0006",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0367",
+      "internal_id": "INT0367",
+      "expected_settlement_ids": [
+        "SET00360"
+      ],
+      "expected_bank_statement_id": "BNK0007",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0368",
+      "internal_id": "INT0368",
+      "expected_settlement_ids": [
+        "SET00361"
+      ],
+      "expected_bank_statement_id": "BNK0008",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0369",
+      "internal_id": "INT0369",
+      "expected_settlement_ids": [
+        "SET00362"
+      ],
+      "expected_bank_statement_id": "BNK0009",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0370",
+      "internal_id": "INT0370",
+      "expected_settlement_ids": [
+        "SET00363"
+      ],
+      "expected_bank_statement_id": "BNK0010",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0371",
+      "internal_id": "INT0371",
+      "expected_settlement_ids": null,
+      "expected_bank_statement_id": null,
+      "expected_hop1": "EXCEPTION",
+      "expected_hop2": "N/A",
+      "expected_final_status": "UNMATCHED",
+      "expected_exception": "NO_COUNTERPART"
+    },
+    {
+      "case_id": "CASE-0372",
+      "internal_id": "INT0372",
+      "expected_settlement_ids": [
+        "SET00364"
+      ],
+      "expected_bank_statement_id": "BNK0012",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0373",
+      "internal_id": "INT0373",
+      "expected_settlement_ids": [
+        "SET00365"
+      ],
+      "expected_bank_statement_id": "BNK0013",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0374",
+      "internal_id": "INT0374",
+      "expected_settlement_ids": [
+        "SET00366"
+      ],
+      "expected_bank_statement_id": "BNK0014",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0375",
+      "internal_id": "INT0375",
+      "expected_settlement_ids": null,
+      "expected_bank_statement_id": null,
+      "expected_hop1": "EXCEPTION",
+      "expected_hop2": "N/A",
+      "expected_final_status": "UNMATCHED",
+      "expected_exception": "AMOUNT_MISMATCH"
+    },
+    {
+      "case_id": "CASE-0376",
+      "internal_id": "INT0376",
+      "expected_settlement_ids": [
+        "SET00368"
+      ],
+      "expected_bank_statement_id": "BNK0016",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0377",
+      "internal_id": "INT0377",
+      "expected_settlement_ids": [
+        "SET00369"
+      ],
+      "expected_bank_statement_id": "BNK0017",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0378",
+      "internal_id": "INT0378",
+      "expected_settlement_ids": [
+        "SET00370",
+        "SET00371"
+      ],
+      "expected_bank_statement_id": null,
+      "expected_hop1": "EXCEPTION",
+      "expected_hop2": "N/A",
+      "expected_final_status": "UNMATCHED",
+      "expected_exception": "DUPLICATE_SETTLEMENT"
+    },
+    {
+      "case_id": "CASE-0379",
+      "internal_id": "INT0379",
+      "expected_settlement_ids": [
+        "SET00372"
+      ],
+      "expected_bank_statement_id": "BNK0019",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0380",
+      "internal_id": "INT0380",
+      "expected_settlement_ids": [
+        "SET00373"
+      ],
+      "expected_bank_statement_id": "BNK0020",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0381",
+      "internal_id": "INT0381",
+      "expected_settlement_ids": [
+        "SET00374"
+      ],
+      "expected_bank_statement_id": "BNK0021",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0382",
+      "internal_id": "INT0382",
+      "expected_settlement_ids": [
+        "SET00375"
+      ],
+      "expected_bank_statement_id": "BNK0022",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0383",
+      "internal_id": "INT0383",
+      "expected_settlement_ids": [
+        "SET00376"
+      ],
+      "expected_bank_statement_id": "BNK0023",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0384",
+      "internal_id": "INT0384",
+      "expected_settlement_ids": [
+        "SET00377"
+      ],
+      "expected_bank_statement_id": "BNK0024",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0385",
+      "internal_id": "INT0385",
+      "expected_settlement_ids": [
+        "SET00378"
+      ],
+      "expected_bank_statement_id": null,
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "EXCEPTION",
+      "expected_final_status": "PARTIAL",
+      "expected_exception": "SETTLED_NOT_BANKED"
+    },
+    {
+      "case_id": "CASE-0386",
+      "internal_id": "INT0386",
+      "expected_settlement_ids": [
+        "SET00379"
+      ],
+      "expected_bank_statement_id": null,
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "EXCEPTION",
+      "expected_final_status": "PARTIAL",
+      "expected_exception": "SETTLED_NOT_BANKED"
+    },
+    {
+      "case_id": "CASE-0387",
+      "internal_id": "INT0387",
+      "expected_settlement_ids": [
+        "SET00380"
+      ],
+      "expected_bank_statement_id": null,
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "EXCEPTION",
+      "expected_final_status": "PARTIAL",
+      "expected_exception": "SETTLED_NOT_BANKED"
+    },
+    {
+      "case_id": "CASE-0388",
+      "internal_id": "INT0388",
+      "expected_settlement_ids": null,
+      "expected_bank_statement_id": null,
+      "expected_hop1": "EXCEPTION",
+      "expected_hop2": "N/A",
+      "expected_final_status": "UNMATCHED",
+      "expected_exception": "NO_COUNTERPART"
+    },
+    {
+      "case_id": "CASE-0389",
+      "internal_id": "INT0389",
+      "expected_settlement_ids": [
+        "SET00381"
+      ],
+      "expected_bank_statement_id": "BNK0029",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "EXCEPTION",
+      "expected_final_status": "PARTIAL",
+      "expected_exception": "PARTIAL_CREDIT"
+    },
+    {
+      "case_id": "CASE-0390",
+      "internal_id": "INT0390",
+      "expected_settlement_ids": [
+        "SET00382"
+      ],
+      "expected_bank_statement_id": "BNK0030",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "EXCEPTION",
+      "expected_final_status": "PARTIAL",
+      "expected_exception": "PARTIAL_CREDIT"
+    },
+    {
+      "case_id": "CASE-0391",
+      "internal_id": "INT0391",
+      "expected_settlement_ids": [
+        "SET00383"
+      ],
+      "expected_bank_statement_id": "BNK0001",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0392",
+      "internal_id": "INT0392",
+      "expected_settlement_ids": [
+        "SET00384"
+      ],
+      "expected_bank_statement_id": "BNK0002",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0393",
+      "internal_id": "INT0393",
+      "expected_settlement_ids": [
+        "SET00385",
+        "SET00386"
+      ],
+      "expected_bank_statement_id": null,
+      "expected_hop1": "EXCEPTION",
+      "expected_hop2": "N/A",
+      "expected_final_status": "UNMATCHED",
+      "expected_exception": "DUPLICATE_SETTLEMENT"
+    },
+    {
+      "case_id": "CASE-0394",
+      "internal_id": "INT0394",
+      "expected_settlement_ids": [
+        "SET00387"
+      ],
+      "expected_bank_statement_id": "BNK0004",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0395",
+      "internal_id": "INT0395",
+      "expected_settlement_ids": null,
+      "expected_bank_statement_id": null,
+      "expected_hop1": "EXCEPTION",
+      "expected_hop2": "N/A",
+      "expected_final_status": "UNMATCHED",
+      "expected_exception": "AMOUNT_MISMATCH"
+    },
+    {
+      "case_id": "CASE-0396",
+      "internal_id": "INT0396",
+      "expected_settlement_ids": null,
+      "expected_bank_statement_id": null,
+      "expected_hop1": "EXCEPTION",
+      "expected_hop2": "N/A",
+      "expected_final_status": "UNMATCHED",
+      "expected_exception": "AMOUNT_MISMATCH"
+    },
+    {
+      "case_id": "CASE-0397",
+      "internal_id": "INT0397",
+      "expected_settlement_ids": [
+        "SET00390"
+      ],
+      "expected_bank_statement_id": "BNK0007",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0398",
+      "internal_id": "INT0398",
+      "expected_settlement_ids": null,
+      "expected_bank_statement_id": null,
+      "expected_hop1": "EXCEPTION",
+      "expected_hop2": "N/A",
+      "expected_final_status": "UNMATCHED",
+      "expected_exception": "NO_COUNTERPART"
+    },
+    {
+      "case_id": "CASE-0399",
+      "internal_id": "INT0399",
+      "expected_settlement_ids": null,
+      "expected_bank_statement_id": null,
+      "expected_hop1": "EXCEPTION",
+      "expected_hop2": "N/A",
+      "expected_final_status": "UNMATCHED",
+      "expected_exception": "AMOUNT_MISMATCH"
+    },
+    {
+      "case_id": "CASE-0400",
+      "internal_id": "INT0400",
+      "expected_settlement_ids": [
+        "SET00392"
+      ],
+      "expected_bank_statement_id": "BNK0010",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0401",
+      "internal_id": "INT0401",
+      "expected_settlement_ids": [
+        "SET00393"
+      ],
+      "expected_bank_statement_id": "BNK0011",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0402",
+      "internal_id": "INT0402",
+      "expected_settlement_ids": [
+        "SET00394"
+      ],
+      "expected_bank_statement_id": "BNK0012",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0403",
+      "internal_id": "INT0403",
+      "expected_settlement_ids": null,
+      "expected_bank_statement_id": null,
+      "expected_hop1": "EXCEPTION",
+      "expected_hop2": "N/A",
+      "expected_final_status": "UNMATCHED",
+      "expected_exception": "AMOUNT_MISMATCH"
+    },
+    {
+      "case_id": "CASE-0404",
+      "internal_id": "INT0404",
+      "expected_settlement_ids": [
+        "SET00396"
+      ],
+      "expected_bank_statement_id": "BNK0014",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0405",
+      "internal_id": "INT0405",
+      "expected_settlement_ids": [
+        "SET00397"
+      ],
+      "expected_bank_statement_id": "BNK0015",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0406",
+      "internal_id": "INT0406",
+      "expected_settlement_ids": [
+        "SET00398"
+      ],
+      "expected_bank_statement_id": "BNK0016",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0407",
+      "internal_id": "INT0407",
+      "expected_settlement_ids": [
+        "SET00399",
+        "SET00400"
+      ],
+      "expected_bank_statement_id": null,
+      "expected_hop1": "EXCEPTION",
+      "expected_hop2": "N/A",
+      "expected_final_status": "UNMATCHED",
+      "expected_exception": "DUPLICATE_SETTLEMENT"
+    },
+    {
+      "case_id": "CASE-0408",
+      "internal_id": "INT0408",
+      "expected_settlement_ids": [
+        "SET00401"
+      ],
+      "expected_bank_statement_id": "BNK0018",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0409",
+      "internal_id": "INT0409",
+      "expected_settlement_ids": [
+        "SET00402"
+      ],
+      "expected_bank_statement_id": "BNK0019",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0410",
+      "internal_id": "INT0410",
+      "expected_settlement_ids": [
+        "SET00403"
+      ],
+      "expected_bank_statement_id": "BNK0020",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0411",
+      "internal_id": "INT0411",
+      "expected_settlement_ids": [
+        "SET00404"
+      ],
+      "expected_bank_statement_id": "BNK0021",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0412",
+      "internal_id": "INT0412",
+      "expected_settlement_ids": [
+        "SET00405"
+      ],
+      "expected_bank_statement_id": "BNK0022",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0413",
+      "internal_id": "INT0413",
+      "expected_settlement_ids": [
+        "SET00406"
+      ],
+      "expected_bank_statement_id": "BNK0023",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0414",
+      "internal_id": "INT0414",
+      "expected_settlement_ids": [
+        "SET00407"
+      ],
+      "expected_bank_statement_id": "BNK0024",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0415",
+      "internal_id": "INT0415",
+      "expected_settlement_ids": [
+        "SET00408"
+      ],
+      "expected_bank_statement_id": null,
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "EXCEPTION",
+      "expected_final_status": "PARTIAL",
+      "expected_exception": "SETTLED_NOT_BANKED"
+    },
+    {
+      "case_id": "CASE-0416",
+      "internal_id": "INT0416",
+      "expected_settlement_ids": [
+        "SET00409"
+      ],
+      "expected_bank_statement_id": null,
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "EXCEPTION",
+      "expected_final_status": "PARTIAL",
+      "expected_exception": "SETTLED_NOT_BANKED"
+    },
+    {
+      "case_id": "CASE-0417",
+      "internal_id": "INT0417",
+      "expected_settlement_ids": [
+        "SET00410"
+      ],
+      "expected_bank_statement_id": null,
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "EXCEPTION",
+      "expected_final_status": "PARTIAL",
+      "expected_exception": "SETTLED_NOT_BANKED"
+    },
+    {
+      "case_id": "CASE-0418",
+      "internal_id": "INT0418",
+      "expected_settlement_ids": [
+        "SET00411",
+        "SET00412"
+      ],
+      "expected_bank_statement_id": null,
+      "expected_hop1": "EXCEPTION",
+      "expected_hop2": "N/A",
+      "expected_final_status": "UNMATCHED",
+      "expected_exception": "DUPLICATE_SETTLEMENT"
+    },
+    {
+      "case_id": "CASE-0419",
+      "internal_id": "INT0419",
+      "expected_settlement_ids": [
+        "SET00413"
+      ],
+      "expected_bank_statement_id": "BNK0029",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "EXCEPTION",
+      "expected_final_status": "PARTIAL",
+      "expected_exception": "PARTIAL_CREDIT"
+    },
+    {
+      "case_id": "CASE-0420",
+      "internal_id": "INT0420",
+      "expected_settlement_ids": null,
+      "expected_bank_statement_id": null,
+      "expected_hop1": "EXCEPTION",
+      "expected_hop2": "N/A",
+      "expected_final_status": "UNMATCHED",
+      "expected_exception": "AMOUNT_MISMATCH"
+    },
+    {
+      "case_id": "CASE-0421",
+      "internal_id": "INT0421",
+      "expected_settlement_ids": null,
+      "expected_bank_statement_id": null,
+      "expected_hop1": "EXCEPTION",
+      "expected_hop2": "N/A",
+      "expected_final_status": "UNMATCHED",
+      "expected_exception": "AMOUNT_MISMATCH"
+    },
+    {
+      "case_id": "CASE-0422",
+      "internal_id": "INT0422",
+      "expected_settlement_ids": [
+        "SET00416"
+      ],
+      "expected_bank_statement_id": "BNK0002",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0423",
+      "internal_id": "INT0423",
+      "expected_settlement_ids": [
+        "SET00417"
+      ],
+      "expected_bank_statement_id": "BNK0003",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0424",
+      "internal_id": "INT0424",
+      "expected_settlement_ids": [
+        "SET00418"
+      ],
+      "expected_bank_statement_id": "BNK0004",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0425",
+      "internal_id": "INT0425",
+      "expected_settlement_ids": [
+        "SET00419"
+      ],
+      "expected_bank_statement_id": "BNK0005",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0426",
+      "internal_id": "INT0426",
+      "expected_settlement_ids": [
+        "SET00420"
+      ],
+      "expected_bank_statement_id": "BNK0006",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0427",
+      "internal_id": "INT0427",
+      "expected_settlement_ids": null,
+      "expected_bank_statement_id": null,
+      "expected_hop1": "EXCEPTION",
+      "expected_hop2": "N/A",
+      "expected_final_status": "UNMATCHED",
+      "expected_exception": "AMOUNT_MISMATCH"
+    },
+    {
+      "case_id": "CASE-0428",
+      "internal_id": "INT0428",
+      "expected_settlement_ids": [
+        "SET00422"
+      ],
+      "expected_bank_statement_id": "BNK0008",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0429",
+      "internal_id": "INT0429",
+      "expected_settlement_ids": [
+        "SET00423"
+      ],
+      "expected_bank_statement_id": "BNK0009",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0430",
+      "internal_id": "INT0430",
+      "expected_settlement_ids": null,
+      "expected_bank_statement_id": null,
+      "expected_hop1": "EXCEPTION",
+      "expected_hop2": "N/A",
+      "expected_final_status": "UNMATCHED",
+      "expected_exception": "NO_COUNTERPART"
+    },
+    {
+      "case_id": "CASE-0431",
+      "internal_id": "INT0431",
+      "expected_settlement_ids": null,
+      "expected_bank_statement_id": null,
+      "expected_hop1": "EXCEPTION",
+      "expected_hop2": "N/A",
+      "expected_final_status": "UNMATCHED",
+      "expected_exception": "AMOUNT_MISMATCH"
+    },
+    {
+      "case_id": "CASE-0432",
+      "internal_id": "INT0432",
+      "expected_settlement_ids": null,
+      "expected_bank_statement_id": null,
+      "expected_hop1": "EXCEPTION",
+      "expected_hop2": "N/A",
+      "expected_final_status": "UNMATCHED",
+      "expected_exception": "AMOUNT_MISMATCH"
+    },
+    {
+      "case_id": "CASE-0433",
+      "internal_id": "INT0433",
+      "expected_settlement_ids": [
+        "SET00426"
+      ],
+      "expected_bank_statement_id": "BNK0013",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0434",
+      "internal_id": "INT0434",
+      "expected_settlement_ids": [
+        "SET00427"
+      ],
+      "expected_bank_statement_id": "BNK0014",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0435",
+      "internal_id": "INT0435",
+      "expected_settlement_ids": [
+        "SET00428"
+      ],
+      "expected_bank_statement_id": "BNK0015",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0436",
+      "internal_id": "INT0436",
+      "expected_settlement_ids": [
+        "SET00429"
+      ],
+      "expected_bank_statement_id": "BNK0016",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0437",
+      "internal_id": "INT0437",
+      "expected_settlement_ids": [
+        "SET00430"
+      ],
+      "expected_bank_statement_id": "BNK0017",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0438",
+      "internal_id": "INT0438",
+      "expected_settlement_ids": [
+        "SET00431"
+      ],
+      "expected_bank_statement_id": "BNK0018",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0439",
+      "internal_id": "INT0439",
+      "expected_settlement_ids": null,
+      "expected_bank_statement_id": null,
+      "expected_hop1": "EXCEPTION",
+      "expected_hop2": "N/A",
+      "expected_final_status": "UNMATCHED",
+      "expected_exception": "NO_COUNTERPART"
+    },
+    {
+      "case_id": "CASE-0440",
+      "internal_id": "INT0440",
+      "expected_settlement_ids": [
+        "SET00432"
+      ],
+      "expected_bank_statement_id": "BNK0020",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0441",
+      "internal_id": "INT0441",
+      "expected_settlement_ids": [
+        "SET00433"
+      ],
+      "expected_bank_statement_id": "BNK0021",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0442",
+      "internal_id": "INT0442",
+      "expected_settlement_ids": [
+        "SET00434"
+      ],
+      "expected_bank_statement_id": "BNK0022",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0443",
+      "internal_id": "INT0443",
+      "expected_settlement_ids": [
+        "SET00435"
+      ],
+      "expected_bank_statement_id": "BNK0023",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0444",
+      "internal_id": "INT0444",
+      "expected_settlement_ids": [
+        "SET00436"
+      ],
+      "expected_bank_statement_id": "BNK0024",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0445",
+      "internal_id": "INT0445",
+      "expected_settlement_ids": [
+        "SET00437"
+      ],
+      "expected_bank_statement_id": null,
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "EXCEPTION",
+      "expected_final_status": "PARTIAL",
+      "expected_exception": "SETTLED_NOT_BANKED"
+    },
+    {
+      "case_id": "CASE-0446",
+      "internal_id": "INT0446",
+      "expected_settlement_ids": [
+        "SET00438"
+      ],
+      "expected_bank_statement_id": null,
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "EXCEPTION",
+      "expected_final_status": "PARTIAL",
+      "expected_exception": "SETTLED_NOT_BANKED"
+    },
+    {
+      "case_id": "CASE-0447",
+      "internal_id": "INT0447",
+      "expected_settlement_ids": null,
+      "expected_bank_statement_id": null,
+      "expected_hop1": "EXCEPTION",
+      "expected_hop2": "N/A",
+      "expected_final_status": "UNMATCHED",
+      "expected_exception": "AMOUNT_MISMATCH"
+    },
+    {
+      "case_id": "CASE-0448",
+      "internal_id": "INT0448",
+      "expected_settlement_ids": [
+        "SET00440"
+      ],
+      "expected_bank_statement_id": "BNK0028",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "EXCEPTION",
+      "expected_final_status": "PARTIAL",
+      "expected_exception": "PARTIAL_CREDIT"
+    },
+    {
+      "case_id": "CASE-0449",
+      "internal_id": "INT0449",
+      "expected_settlement_ids": [
+        "SET00441"
+      ],
+      "expected_bank_statement_id": "BNK0029",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "EXCEPTION",
+      "expected_final_status": "PARTIAL",
+      "expected_exception": "PARTIAL_CREDIT"
+    },
+    {
+      "case_id": "CASE-0450",
+      "internal_id": "INT0450",
+      "expected_settlement_ids": [
+        "SET00442"
+      ],
+      "expected_bank_statement_id": "BNK0030",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "EXCEPTION",
+      "expected_final_status": "PARTIAL",
+      "expected_exception": "PARTIAL_CREDIT"
+    },
+    {
+      "case_id": "CASE-0451",
+      "internal_id": "INT0451",
+      "expected_settlement_ids": null,
+      "expected_bank_statement_id": null,
+      "expected_hop1": "EXCEPTION",
+      "expected_hop2": "N/A",
+      "expected_final_status": "UNMATCHED",
+      "expected_exception": "AMOUNT_MISMATCH"
+    },
+    {
+      "case_id": "CASE-0452",
+      "internal_id": "INT0452",
+      "expected_settlement_ids": [
+        "SET00444"
+      ],
+      "expected_bank_statement_id": "BNK0002",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0453",
+      "internal_id": "INT0453",
+      "expected_settlement_ids": [
+        "SET00445"
+      ],
+      "expected_bank_statement_id": "BNK0003",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0454",
+      "internal_id": "INT0454",
+      "expected_settlement_ids": null,
+      "expected_bank_statement_id": null,
+      "expected_hop1": "EXCEPTION",
+      "expected_hop2": "N/A",
+      "expected_final_status": "UNMATCHED",
+      "expected_exception": "AMOUNT_MISMATCH"
+    },
+    {
+      "case_id": "CASE-0455",
+      "internal_id": "INT0455",
+      "expected_settlement_ids": [
+        "SET00447"
+      ],
+      "expected_bank_statement_id": "BNK0005",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0456",
+      "internal_id": "INT0456",
+      "expected_settlement_ids": [
+        "SET00448"
+      ],
+      "expected_bank_statement_id": "BNK0006",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0457",
+      "internal_id": "INT0457",
+      "expected_settlement_ids": [
+        "SET00449"
+      ],
+      "expected_bank_statement_id": "BNK0007",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0458",
+      "internal_id": "INT0458",
+      "expected_settlement_ids": [
+        "SET00450"
+      ],
+      "expected_bank_statement_id": "BNK0008",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0459",
+      "internal_id": "INT0459",
+      "expected_settlement_ids": [
+        "SET00451"
+      ],
+      "expected_bank_statement_id": "BNK0009",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0460",
+      "internal_id": "INT0460",
+      "expected_settlement_ids": [
+        "SET00452"
+      ],
+      "expected_bank_statement_id": "BNK0010",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0461",
+      "internal_id": "INT0461",
+      "expected_settlement_ids": [
+        "SET00453"
+      ],
+      "expected_bank_statement_id": "BNK0011",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0462",
+      "internal_id": "INT0462",
+      "expected_settlement_ids": [
+        "SET00454"
+      ],
+      "expected_bank_statement_id": "BNK0012",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0463",
+      "internal_id": "INT0463",
+      "expected_settlement_ids": null,
+      "expected_bank_statement_id": null,
+      "expected_hop1": "EXCEPTION",
+      "expected_hop2": "N/A",
+      "expected_final_status": "UNMATCHED",
+      "expected_exception": "AMOUNT_MISMATCH"
+    },
+    {
+      "case_id": "CASE-0464",
+      "internal_id": "INT0464",
+      "expected_settlement_ids": [
+        "SET00456"
+      ],
+      "expected_bank_statement_id": "BNK0014",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0465",
+      "internal_id": "INT0465",
+      "expected_settlement_ids": [
+        "SET00457",
+        "SET00458"
+      ],
+      "expected_bank_statement_id": null,
+      "expected_hop1": "EXCEPTION",
+      "expected_hop2": "N/A",
+      "expected_final_status": "UNMATCHED",
+      "expected_exception": "DUPLICATE_SETTLEMENT"
+    },
+    {
+      "case_id": "CASE-0466",
+      "internal_id": "INT0466",
+      "expected_settlement_ids": null,
+      "expected_bank_statement_id": null,
+      "expected_hop1": "EXCEPTION",
+      "expected_hop2": "N/A",
+      "expected_final_status": "UNMATCHED",
+      "expected_exception": "NO_COUNTERPART"
+    },
+    {
+      "case_id": "CASE-0467",
+      "internal_id": "INT0467",
+      "expected_settlement_ids": null,
+      "expected_bank_statement_id": null,
+      "expected_hop1": "EXCEPTION",
+      "expected_hop2": "N/A",
+      "expected_final_status": "UNMATCHED",
+      "expected_exception": "NO_COUNTERPART"
+    },
+    {
+      "case_id": "CASE-0468",
+      "internal_id": "INT0468",
+      "expected_settlement_ids": [
+        "SET00459"
+      ],
+      "expected_bank_statement_id": "BNK0018",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0469",
+      "internal_id": "INT0469",
+      "expected_settlement_ids": [
+        "SET00460"
+      ],
+      "expected_bank_statement_id": "BNK0019",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0470",
+      "internal_id": "INT0470",
+      "expected_settlement_ids": [
+        "SET00461"
+      ],
+      "expected_bank_statement_id": "BNK0020",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0471",
+      "internal_id": "INT0471",
+      "expected_settlement_ids": [
+        "SET00462"
+      ],
+      "expected_bank_statement_id": "BNK0021",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0472",
+      "internal_id": "INT0472",
+      "expected_settlement_ids": [
+        "SET00463"
+      ],
+      "expected_bank_statement_id": "BNK0022",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0473",
+      "internal_id": "INT0473",
+      "expected_settlement_ids": [
+        "SET00464"
+      ],
+      "expected_bank_statement_id": "BNK0023",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0474",
+      "internal_id": "INT0474",
+      "expected_settlement_ids": [
+        "SET00465"
+      ],
+      "expected_bank_statement_id": "BNK0024",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0475",
+      "internal_id": "INT0475",
+      "expected_settlement_ids": [
+        "SET00466"
+      ],
+      "expected_bank_statement_id": null,
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "EXCEPTION",
+      "expected_final_status": "PARTIAL",
+      "expected_exception": "SETTLED_NOT_BANKED"
+    },
+    {
+      "case_id": "CASE-0476",
+      "internal_id": "INT0476",
+      "expected_settlement_ids": [
+        "SET00467"
+      ],
+      "expected_bank_statement_id": null,
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "EXCEPTION",
+      "expected_final_status": "PARTIAL",
+      "expected_exception": "SETTLED_NOT_BANKED"
+    },
+    {
+      "case_id": "CASE-0477",
+      "internal_id": "INT0477",
+      "expected_settlement_ids": [
+        "SET00468"
+      ],
+      "expected_bank_statement_id": null,
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "EXCEPTION",
+      "expected_final_status": "PARTIAL",
+      "expected_exception": "SETTLED_NOT_BANKED"
+    },
+    {
+      "case_id": "CASE-0478",
+      "internal_id": "INT0478",
+      "expected_settlement_ids": [
+        "SET00469"
+      ],
+      "expected_bank_statement_id": "BNK0028",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "EXCEPTION",
+      "expected_final_status": "PARTIAL",
+      "expected_exception": "PARTIAL_CREDIT"
+    },
+    {
+      "case_id": "CASE-0479",
+      "internal_id": "INT0479",
+      "expected_settlement_ids": [
+        "SET00470"
+      ],
+      "expected_bank_statement_id": "BNK0029",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "EXCEPTION",
+      "expected_final_status": "PARTIAL",
+      "expected_exception": "PARTIAL_CREDIT"
+    },
+    {
+      "case_id": "CASE-0480",
+      "internal_id": "INT0480",
+      "expected_settlement_ids": [
+        "SET00471"
+      ],
+      "expected_bank_statement_id": "BNK0030",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "EXCEPTION",
+      "expected_final_status": "PARTIAL",
+      "expected_exception": "PARTIAL_CREDIT"
+    },
+    {
+      "case_id": "CASE-0481",
+      "internal_id": "INT0481",
+      "expected_settlement_ids": null,
+      "expected_bank_statement_id": null,
+      "expected_hop1": "EXCEPTION",
+      "expected_hop2": "N/A",
+      "expected_final_status": "UNMATCHED",
+      "expected_exception": "NO_COUNTERPART"
+    },
+    {
+      "case_id": "CASE-0482",
+      "internal_id": "INT0482",
+      "expected_settlement_ids": [
+        "SET00472",
+        "SET00473"
+      ],
+      "expected_bank_statement_id": null,
+      "expected_hop1": "EXCEPTION",
+      "expected_hop2": "N/A",
+      "expected_final_status": "UNMATCHED",
+      "expected_exception": "DUPLICATE_SETTLEMENT"
+    },
+    {
+      "case_id": "CASE-0483",
+      "internal_id": "INT0483",
+      "expected_settlement_ids": [
+        "SET00474"
+      ],
+      "expected_bank_statement_id": "BNK0003",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0484",
+      "internal_id": "INT0484",
+      "expected_settlement_ids": [
+        "SET00475"
+      ],
+      "expected_bank_statement_id": "BNK0004",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0485",
+      "internal_id": "INT0485",
+      "expected_settlement_ids": [
+        "SET00476"
+      ],
+      "expected_bank_statement_id": "BNK0005",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0486",
+      "internal_id": "INT0486",
+      "expected_settlement_ids": [
+        "SET00477"
+      ],
+      "expected_bank_statement_id": "BNK0006",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0487",
+      "internal_id": "INT0487",
+      "expected_settlement_ids": [
+        "SET00478"
+      ],
+      "expected_bank_statement_id": "BNK0007",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0488",
+      "internal_id": "INT0488",
+      "expected_settlement_ids": [
+        "SET00479"
+      ],
+      "expected_bank_statement_id": "BNK0008",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0489",
+      "internal_id": "INT0489",
+      "expected_settlement_ids": [
+        "SET00480"
+      ],
+      "expected_bank_statement_id": "BNK0009",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0490",
+      "internal_id": "INT0490",
+      "expected_settlement_ids": null,
+      "expected_bank_statement_id": null,
+      "expected_hop1": "EXCEPTION",
+      "expected_hop2": "N/A",
+      "expected_final_status": "UNMATCHED",
+      "expected_exception": "AMOUNT_MISMATCH"
+    },
+    {
+      "case_id": "CASE-0491",
+      "internal_id": "INT0491",
+      "expected_settlement_ids": [
+        "SET00482"
+      ],
+      "expected_bank_statement_id": "BNK0011",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0492",
+      "internal_id": "INT0492",
+      "expected_settlement_ids": [
+        "SET00483"
+      ],
+      "expected_bank_statement_id": "BNK0012",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0493",
+      "internal_id": "INT0493",
+      "expected_settlement_ids": null,
+      "expected_bank_statement_id": null,
+      "expected_hop1": "EXCEPTION",
+      "expected_hop2": "N/A",
+      "expected_final_status": "UNMATCHED",
+      "expected_exception": "NO_COUNTERPART"
+    },
+    {
+      "case_id": "CASE-0494",
+      "internal_id": "INT0494",
+      "expected_settlement_ids": [
+        "SET00484"
+      ],
+      "expected_bank_statement_id": "BNK0014",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0495",
+      "internal_id": "INT0495",
+      "expected_settlement_ids": [
+        "SET00485"
+      ],
+      "expected_bank_statement_id": "BNK0015",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0496",
+      "internal_id": "INT0496",
+      "expected_settlement_ids": [
+        "SET00486"
+      ],
+      "expected_bank_statement_id": "BNK0016",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0497",
+      "internal_id": "INT0497",
+      "expected_settlement_ids": [
+        "SET00487"
+      ],
+      "expected_bank_statement_id": "BNK0017",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0498",
+      "internal_id": "INT0498",
+      "expected_settlement_ids": [
+        "SET00488"
+      ],
+      "expected_bank_statement_id": "BNK0018",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0499",
+      "internal_id": "INT0499",
+      "expected_settlement_ids": [
+        "SET00489"
+      ],
+      "expected_bank_statement_id": "BNK0019",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    },
+    {
+      "case_id": "CASE-0500",
+      "internal_id": "INT0500",
+      "expected_settlement_ids": [
+        "SET00490"
+      ],
+      "expected_bank_statement_id": "BNK0020",
+      "expected_hop1": "MATCHED",
+      "expected_hop2": "MATCHED",
+      "expected_final_status": "FULL",
+      "expected_exception": null
+    }
+  ],
+  "orphan_settlements": [
+    "SET00491",
+    "SET00492",
+    "SET00493",
+    "SET00494",
+    "SET00495",
+    "SET00496",
+    "SET00497",
+    "SET00498",
+    "SET00499",
+    "SET00500",
+    "SET00501",
+    "SET00502",
+    "SET00503",
+    "SET00504",
+    "SET00505"
+  ],
+  "unexplained_bank_credits": [
+    "BNK0031",
+    "BNK0032"
+  ]
+}
