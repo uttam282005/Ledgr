@@ -317,7 +317,7 @@
                   <th class="px-4 py-2.5 text-left font-medium">ID</th>
                   <th class="px-4 py-2.5 text-right font-medium">Ledger ₹</th>
                   <th class="px-4 py-2.5 text-right font-medium">Settlement ₹</th>
-                  <th class="px-4 py-2.5 text-right font-medium">Bank ₹</th>
+                  <th class="px-4 py-2.5 text-right font-medium">Bank Batch Amount</th>
                   <th class="px-4 py-2.5 text-left font-medium">Status</th>
                   <th class="px-4 py-2.5 text-right font-medium"></th>
                 </tr>
@@ -1219,6 +1219,22 @@
         const settledAmt = m.settled_amount_inr != null && m.settled_amount_inr > 0 ? m.settled_amount_inr.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2}) : '—';
         const bankAmt = m.bank_credited_inr != null && m.bank_credited_inr > 0 ? m.bank_credited_inr.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2}) : '—';
 
+        let settledCellHTML = '—';
+        if (settledAmt !== '—') {
+          const setInfo = m.settlement_id
+            ? `<div class="text-[10px] text-ink-muted font-sans font-normal tracking-tight"><span class="font-mono text-ink-muted">${escapeHTML(m.settlement_id)}</span></div>`
+            : '';
+          settledCellHTML = `<div class="font-mono text-ink font-medium">₹${settledAmt}</div>${setInfo}`;
+        }
+
+        let bankCellHTML = '—';
+        if (bankAmt !== '—') {
+          const batchInfo = m.batch_id
+            ? `<div class="text-[10px] text-ink-muted font-sans font-normal tracking-tight">Batch: <span class="font-mono text-ink font-medium">${escapeHTML(m.batch_id)}</span></div>`
+            : (m.bank_statement_id ? `<div class="text-[10px] text-ink-muted font-sans font-normal tracking-tight">Ref: <span class="font-mono text-ink font-medium">${escapeHTML(m.bank_statement_id)}</span></div>` : '');
+          bankCellHTML = `<div class="font-mono text-ink font-medium">₹${bankAmt}</div>${batchInfo}`;
+        }
+
         const tr = document.createElement('tr');
         tr.id = `chain-row-${m.internal_id}`;
         tr.className = 'hover:bg-sand/40 transition cursor-pointer border-b border-rule';
@@ -1227,8 +1243,8 @@
         tr.innerHTML = `
           <td class="px-4 py-3 font-mono font-medium text-ink">${escapeHTML(m.internal_id)}</td>
           <td class="px-4 py-3 text-right font-mono text-ink">₹${internalAmt}</td>
-          <td class="px-4 py-3 text-right font-mono text-ink">${settledAmt !== '—' ? '₹' + settledAmt : '—'}</td>
-          <td class="px-4 py-3 text-right font-mono text-ink">${bankAmt !== '—' ? '₹' + bankAmt : '—'}</td>
+          <td class="px-4 py-3 text-right">${settledCellHTML}</td>
+          <td class="px-4 py-3 text-right">${bankCellHTML}</td>
           <td class="px-4 py-3">${statusBadge}</td>
           <td class="px-4 py-3 text-right" onclick="event.stopPropagation()">
             <button onclick="toggleInlineAudit('${m.internal_id}')" class="text-xs text-[#0F5C56] hover:underline font-medium cursor-pointer">Audit</button>
@@ -1266,12 +1282,16 @@
         if (!res.ok) throw new Error('No audit record found');
         const a = await res.json();
         const content = document.getElementById(`inline-audit-content-${recordID}`);
+        const chainPath = a.record_ids && a.record_ids.length > 0
+          ? `<div class="mt-1 text-ink-muted">2-Hop Chain: <span class="font-mono text-ink font-medium">${escapeHTML(a.record_ids.join(' ➔ '))}</span></div>`
+          : '';
         content.innerHTML = `
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
             <div>
               <div class="font-medium text-ink mb-1">Deterministic rule</div>
               <div>Rule: <span class="font-mono text-ink font-medium">${escapeHTML(a.rule_applied || 'N/A')}</span></div>
               <div>Outcome: <span class="font-mono text-ink font-medium">${escapeHTML(a.outcome || 'N/A')}</span></div>
+              ${chainPath}
               <div class="mt-2 text-ink-muted font-medium">Fields compared:</div>
               <pre class="mt-1 p-2 bg-paper border border-rule rounded-md font-mono text-[11px] overflow-x-auto text-ink">${escapeHTML(JSON.stringify(JSON.parse(a.fields_compared || '{}'), null, 2))}</pre>
             </div>
