@@ -117,6 +117,7 @@ APPROVED DATABASE SCHEMA:
 - reconciliation_matches (id UUID, run_id UUID, internal_id TEXT, settlement_id TEXT, bank_statement_id TEXT, hop1_rule TEXT, hop2_rule TEXT, hop1_confidence NUMERIC, hop2_confidence NUMERIC, reconciliation_status TEXT, fee_delta_paise BIGINT, expected_bank_amount_paise BIGINT, actual_bank_amount_paise BIGINT, bank_delta_paise BIGINT)
 - exceptions (id UUID, run_id UUID, record_id TEXT, source TEXT ['internal','settlement','bank'], category TEXT, hop TEXT ['HOP1','HOP2'], reason TEXT, expected_amount_paise BIGINT, actual_amount_paise BIGINT, delta_paise BIGINT, exposure_paise BIGINT, ai_status TEXT, ai_summary TEXT, ai_action TEXT, ai_confidence TEXT)
 - audit_log (decision_id UUID, run_id UUID, record_ids TEXT[], rule_applied TEXT, fields_compared JSONB, candidates_considered JSONB, outcome TEXT, ai_reasoning TEXT)
+- active_merchants (merchant_id TEXT) -- View containing distinct merchant IDs only. Has NO other columns.
 
 CRITICAL SQL RULES & JOINS:
 1. REASONS / WHY / DISCREPANCIES / FAILURES / ISSUES:
@@ -255,10 +256,10 @@ func generateSQLOffline(question string, runID string, meta *DBMetadataContext) 
 		// Failure reasons, causes, or issues for merchant settlements
 		if hasReasonIntent {
 			if strings.Contains(lower, "pending") || strings.Contains(lower, "not banked") {
-				sql := fmt.Sprintf(`SELECT e.record_id, e.category, e.exposure_paise, e.reason, e.ai_summary, e.ai_action, sr.batch_id, sr.settlement_date FROM exceptions e JOIN settlement_records sr ON e.record_id = sr.id AND e.run_id = sr.run_id WHERE e.run_id = '%s' AND e.category = 'SETTLED_NOT_BANKED' AND sr.merchant_id = '%s' LIMIT 50;`, runID, mid)
+				sql := fmt.Sprintf(`SELECT e.record_id, e.category, e.exposure_paise, e.reason, e.ai_summary, e.ai_action, sr.batch_id, sr.settlement_date FROM exceptions e JOIN settlement_records sr ON (e.record_id = sr.id OR e.record_id = sr.batch_id) AND e.run_id = sr.run_id WHERE e.run_id = '%s' AND e.category = 'SETTLED_NOT_BANKED' AND sr.merchant_id = '%s' LIMIT 50;`, runID, mid)
 				return &SQLGenerationResult{SQL: sql, Unsupported: false}, nil
 			}
-			sql := fmt.Sprintf(`SELECT e.category, e.reason, COUNT(*) AS count, SUM(e.exposure_paise) AS total_exposure_paise FROM exceptions e LEFT JOIN internal_transactions it ON e.record_id = it.id AND e.run_id = it.run_id LEFT JOIN settlement_records sr ON e.record_id = sr.id AND e.run_id = sr.run_id LEFT JOIN bank_statements bs ON e.record_id = bs.id AND e.run_id = bs.run_id WHERE e.run_id = '%s' AND COALESCE(it.merchant_id, sr.merchant_id, bs.merchant_id) = '%s' GROUP BY e.category, e.reason ORDER BY count DESC, total_exposure_paise DESC LIMIT 50;`, runID, mid)
+			sql := fmt.Sprintf(`SELECT e.category, e.reason, COUNT(*) AS count, SUM(e.exposure_paise) AS total_exposure_paise FROM exceptions e LEFT JOIN internal_transactions it ON e.record_id = it.id AND e.run_id = it.run_id LEFT JOIN settlement_records sr ON (e.record_id = sr.id OR e.record_id = sr.batch_id) AND e.run_id = sr.run_id LEFT JOIN bank_statements bs ON e.record_id = bs.id AND e.run_id = bs.run_id WHERE e.run_id = '%s' AND COALESCE(it.merchant_id, sr.merchant_id, bs.merchant_id) = '%s' GROUP BY e.category, e.reason ORDER BY count DESC, total_exposure_paise DESC LIMIT 50;`, runID, mid)
 			return &SQLGenerationResult{SQL: sql, Unsupported: false}, nil
 		}
 
@@ -267,7 +268,7 @@ func generateSQLOffline(question string, runID string, meta *DBMetadataContext) 
 			(strings.Contains(lower, "pending") && strings.Contains(lower, "settlement")) ||
 			strings.Contains(lower, "settled not banked") ||
 			strings.Contains(lower, "settled_not_banked") {
-			sql := fmt.Sprintf(`SELECT e.record_id, e.category, e.exposure_paise, e.reason, e.ai_summary, e.ai_action, sr.batch_id, sr.settlement_date FROM exceptions e JOIN settlement_records sr ON e.record_id = sr.id AND e.run_id = sr.run_id WHERE e.run_id = '%s' AND e.category = 'SETTLED_NOT_BANKED' AND sr.merchant_id = '%s' LIMIT 50;`, runID, mid)
+			sql := fmt.Sprintf(`SELECT e.record_id, e.category, e.exposure_paise, e.reason, e.ai_summary, e.ai_action, sr.batch_id, sr.settlement_date FROM exceptions e JOIN settlement_records sr ON (e.record_id = sr.id OR e.record_id = sr.batch_id) AND e.run_id = sr.run_id WHERE e.run_id = '%s' AND e.category = 'SETTLED_NOT_BANKED' AND sr.merchant_id = '%s' LIMIT 50;`, runID, mid)
 			return &SQLGenerationResult{SQL: sql, Unsupported: false}, nil
 		}
 

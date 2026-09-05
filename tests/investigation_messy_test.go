@@ -22,15 +22,18 @@ func TestMessyInvestigation(t *testing.T) {
 
 	rawInternal, err := os.ReadFile(internalPath)
 	if err != nil {
-		t.Fatalf("Failed reading internal CSV: %v", err)
+		t.Skipf("Skipping messy investigation test (internal CSV not found): %v", err)
+		return
 	}
 	rawSettlement, err := os.ReadFile(settlementPath)
 	if err != nil {
-		t.Fatalf("Failed reading settlement CSV: %v", err)
+		t.Skipf("Skipping messy investigation test (settlement CSV not found): %v", err)
+		return
 	}
 	rawBank, err := os.ReadFile(bankPath)
 	if err != nil {
-		t.Fatalf("Failed reading bank CSV: %v", err)
+		t.Skipf("Skipping messy investigation test (bank CSV not found): %v", err)
+		return
 	}
 
 	t.Logf("=== 1. Internal Ledger Mapping ===")

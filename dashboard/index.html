@@ -458,7 +458,7 @@
         </div>
 
         <!-- Question Input Form -->
-        <form id="qa-form" onsubmit="submitQA(event)" class="flex gap-2">
+        <form id="qa-form" onsubmit="submitQA(event); return false;" action="javascript:void(0);" class="flex gap-2">
           <input id="qa-input" type="text" placeholder="Ask any financial reconciliation question..."
                  class="flex-1 bg-sand border border-rule rounded-md px-4 py-2.5 text-sm text-ink placeholder-ink-muted focus:outline-none focus:border-[#0F5C56] transition">
           <button id="qa-submit-btn" type="submit" class="px-5 py-2.5 bg-[#0F5C56] hover:opacity-90 text-paper rounded-md text-sm font-medium transition flex items-center space-x-1.5 cursor-pointer disabled:opacity-50">
@@ -1428,8 +1428,9 @@
 
     // Settlement Q&A
     function askPreset(btn, q) {
-      document.getElementById('qa-input').value = q;
-      document.getElementById('qa-form').dispatchEvent(new Event('submit'));
+      const input = document.getElementById('qa-input');
+      if (input) input.value = q;
+      submitQA();
     }
 
     function formatAnswerHTML(text) {
@@ -1442,9 +1443,9 @@
     }
 
     async function submitQA(e) {
-      if (e) e.preventDefault();
+      if (e && e.preventDefault) e.preventDefault();
       const input = document.getElementById('qa-input');
-      const q = input.value.trim();
+      const q = input ? input.value.trim() : '';
       if (!q) return;
 
       const resultsContainer = document.getElementById('qa-results');
@@ -1522,6 +1523,13 @@
         }
       } catch (err) {
         document.getElementById('qa-answer-text').innerHTML = `<span class="text-[#A13B3B]">Error executing Q&A: ${escapeHTML(err.message)}</span>`;
+        document.getElementById('qa-duration').innerText = 'Failed';
+        document.getElementById('qa-sql-box').innerText = '-- Request could not be completed';
+        const astBadge = document.getElementById('qa-ast-badge');
+        if (astBadge) {
+          astBadge.className = 'font-mono text-[11px] text-[#A13B3B]';
+          astBadge.innerText = 'Execution Failed';
+        }
       } finally {
         btn.disabled = false;
         btn.innerHTML = '<span>Ask</span>';

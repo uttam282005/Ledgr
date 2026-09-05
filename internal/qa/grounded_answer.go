@@ -260,8 +260,19 @@ func generateGroundedAnswerOffline(question string, rows []map[string]interface{
 		return fmt.Sprintf("Exception breakdown by category: %s.", strings.Join(parts, "; "))
 	}
 
-	// Case 5: Merchant aggregation
-	if merchantID, ok := firstRow["merchant_id"].(string); ok {
+	// Case 5a: Distinct merchants list (only merchant_id column returned)
+	if _, ok := firstRow["merchant_id"].(string); ok && len(firstRow) == 1 {
+		var mList []string
+		for _, r := range rows {
+			if m, ok := r["merchant_id"].(string); ok && m != "" {
+				mList = append(mList, m)
+			}
+		}
+		return fmt.Sprintf("Active merchants in this reconciliation run: %s.", strings.Join(mList, ", "))
+	}
+
+	// Case 5b: Merchant aggregation (with exception_count, total_exposure_paise, or count)
+	if merchantID, ok := firstRow["merchant_id"].(string); ok && (firstRow["exception_count"] != nil || firstRow["total_exposure_paise"] != nil || (firstRow["count"] != nil && len(firstRow) <= 4)) {
 		var b strings.Builder
 		countVal, hasCount := firstRow["exception_count"]
 		if !hasCount {

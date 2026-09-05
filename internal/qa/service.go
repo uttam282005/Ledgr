@@ -120,7 +120,8 @@ func (s *QAService) Ask(ctx context.Context, runID string, question string) (*QA
 			Question:     question,
 			SQL:          valResult.SanitizedQuery,
 			ASTValid:     true,
-			Answer:       "An error occurred executing the read-only query on PostgreSQL.",
+			Unsupported:  true,
+			Answer:       "Could not complete database query for this inquiry against the current reconciliation run. Please rephrase or try one of the suggested controller queries (e.g., cash exposure, match rates, or exception causes).",
 			ErrorMessage: err.Error(),
 			DurationMs:   time.Since(startTime).Milliseconds(),
 		}, nil
