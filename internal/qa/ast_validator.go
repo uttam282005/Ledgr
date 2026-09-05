@@ -10,12 +10,20 @@ import (
 // AllowedTables defines the explicit application schema allowlist.
 var AllowedTables = map[string]bool{
 	"reconciliation_runs":    true,
+	"runs":                   true,
+	"run_uploads":            true,
 	"internal_transactions":  true,
+	"transactions":           true,
 	"settlement_records":     true,
+	"settlements":            true,
 	"bank_statements":        true,
+	"banks":                  true,
 	"reconciliation_matches": true,
+	"matches":                true,
 	"exceptions":             true,
 	"audit_log":              true,
+	"active_merchants":       true,
+	"merchants":              true,
 }
 
 // ForbiddenFunctions lists dangerous or informational Postgres functions.

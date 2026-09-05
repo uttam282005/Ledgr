@@ -22,6 +22,7 @@ type SQLGenerationResult struct {
 var (
 	recordIDRegex  = regexp.MustCompile(`(?i)\b(INT|SET|BNK)[0-9]+\b`)
 	injectionRegex = regexp.MustCompile(`(?i)(ignore\s+previous|drop\s+table|delete\s+from|update\s+|insert\s+into|truncate|grant\s+|revoke\s+|union\s+select|select\s+pg_|information_schema)`)
+	greetingRegex  = regexp.MustCompile(`(?i)^(hello|hi|hey|greetings|help|who are you|what can you do|guide)\b`)
 )
 
 // GenerateSQL converts a natural-language question into a single safe PostgreSQL query.
@@ -168,7 +169,7 @@ CRITICAL SQL RULES & JOINS:
 	httpReq.Header.Set("Content-Type", "application/json")
 	httpReq.Header.Set("Authorization", "Bearer "+apiKey)
 
-	client := &http.Client{Timeout: 15 * time.Second}
+	client := &http.Client{Timeout: 4 * time.Second}
 	resp, err := client.Do(httpReq)
 	if err != nil {
 		return nil, err
@@ -212,13 +213,26 @@ CRITICAL SQL RULES & JOINS:
 }
 
 func generateSQLOffline(question string, runID string, meta *DBMetadataContext) (*SQLGenerationResult, error) {
-	lower := strings.ToLower(question)
+	trimmed := strings.TrimSpace(question)
+	lower := strings.ToLower(trimmed)
 
-	// Check if question specifies a record ID (INT..., SET..., BNK...)
+	// 1. Check if question specifies a record ID (INT..., SET..., BNK...)
 	if match := recordIDRegex.FindString(question); match != "" {
 		idUpper := strings.ToUpper(match)
 		sql := fmt.Sprintf(`SELECT record_id, category, hop, reason, exposure_paise, ai_summary, ai_action, ai_confidence FROM exceptions WHERE run_id = '%s' AND record_id = '%s' LIMIT 1;`, runID, idUpper)
 		return &SQLGenerationResult{SQL: sql, Unsupported: false}, nil
+	}
+
+	// 2. Friendly conversational greetings / assistant capabilities
+	if greetingRegex.MatchString(trimmed) {
+		remainder := strings.TrimSpace(greetingRegex.ReplaceAllString(trimmed, ""))
+		remainder = strings.Trim(remainder, ",!?. ")
+		if remainder == "" || strings.EqualFold(remainder, "there") || strings.EqualFold(remainder, "assistant") || strings.EqualFold(remainder, "please") {
+			return &SQLGenerationResult{
+				Unsupported: true,
+				Reason:      "I am the Ledgr Financial Controller assistant. Ask me questions about: 1. Full-chain match counts & match rates; 2. Largest cash exposure by merchant; 3. Exception breakdown & failure root causes; 4. Hop 1 vs Hop 2 summaries; 5. Specific record diagnoses (e.g. 'Why did INT0013 fail?'); 6. Unbanked settlements or fee deltas.",
+			}, nil
+		}
 	}
 
 	var merchants []MerchantInfo
@@ -234,11 +248,11 @@ func generateSQLOffline(question string, runID string, meta *DBMetadataContext) 
 		strings.Contains(lower, "issue") || strings.Contains(lower, "problem") ||
 		strings.Contains(lower, "discrepanc")
 
-	// Merchant-specific queries
+	// 3. Merchant-specific queries
 	if resolvedMerchant != nil {
 		mid := resolvedMerchant.ID
 
-		// 1. Failure reasons, causes, or issues for merchant settlements
+		// Failure reasons, causes, or issues for merchant settlements
 		if hasReasonIntent {
 			if strings.Contains(lower, "pending") || strings.Contains(lower, "not banked") {
 				sql := fmt.Sprintf(`SELECT e.record_id, e.category, e.exposure_paise, e.reason, e.ai_summary, e.ai_action, sr.batch_id, sr.settlement_date FROM exceptions e JOIN settlement_records sr ON e.record_id = sr.id AND e.run_id = sr.run_id WHERE e.run_id = '%s' AND e.category = 'SETTLED_NOT_BANKED' AND sr.merchant_id = '%s' LIMIT 50;`, runID, mid)
@@ -248,7 +262,7 @@ func generateSQLOffline(question string, runID string, meta *DBMetadataContext) 
 			return &SQLGenerationResult{SQL: sql, Unsupported: false}, nil
 		}
 
-		// 2. Pending settlements for merchant (settled but not banked)
+		// Pending settlements for merchant (settled but not banked)
 		if strings.Contains(lower, "pending settlement") ||
 			(strings.Contains(lower, "pending") && strings.Contains(lower, "settlement")) ||
 			strings.Contains(lower, "settled not banked") ||
@@ -257,101 +271,224 @@ func generateSQLOffline(question string, runID string, meta *DBMetadataContext) 
 			return &SQLGenerationResult{SQL: sql, Unsupported: false}, nil
 		}
 
-		// 3. Duplicate settlements for merchant
+		// Duplicate settlements for merchant
 		if strings.Contains(lower, "duplicate") {
 			sql := fmt.Sprintf(`SELECT e.record_id, e.category, e.exposure_paise, e.reason, e.ai_summary, e.ai_action FROM exceptions e JOIN settlement_records sr ON e.record_id = sr.id AND e.run_id = sr.run_id WHERE e.run_id = '%s' AND e.category = 'DUPLICATE_SETTLEMENT' AND sr.merchant_id = '%s' LIMIT 50;`, runID, mid)
 			return &SQLGenerationResult{SQL: sql, Unsupported: false}, nil
 		}
 
-		// 4. Unresolved exposure / cash exposure for merchant
+		// Unresolved exposure / cash exposure for merchant
 		if strings.Contains(lower, "exposure") || strings.Contains(lower, "unresolved") {
 			sql := fmt.Sprintf(`SELECT COALESCE(it.merchant_id, sr.merchant_id, bs.merchant_id, 'UNKNOWN') AS merchant_id, COUNT(*) AS exception_count, SUM(e.exposure_paise) AS total_exposure_paise FROM exceptions e LEFT JOIN internal_transactions it ON e.record_id = it.id AND e.run_id = it.run_id LEFT JOIN settlement_records sr ON e.record_id = sr.id AND e.run_id = sr.run_id LEFT JOIN bank_statements bs ON e.record_id = bs.id AND e.run_id = bs.run_id WHERE e.run_id = '%s' AND COALESCE(it.merchant_id, sr.merchant_id, bs.merchant_id) = '%s' GROUP BY 1;`, runID, mid)
 			return &SQLGenerationResult{SQL: sql, Unsupported: false}, nil
 		}
 
-		// 5. Raw settlements list for merchant (ONLY if explicitly asking to list/view/show, NOT reasons)
+		// Raw settlements list for merchant
 		isListQuery := strings.Contains(lower, "list") || strings.Contains(lower, "show") || strings.Contains(lower, "view") || strings.Contains(lower, "all settlements")
-		if isListQuery {
+		if isListQuery && strings.Contains(lower, "settlement") {
 			sql := fmt.Sprintf(`SELECT id, settled_amount_paise, currency, settlement_date, batch_id FROM settlement_records WHERE run_id = '%s' AND merchant_id = '%s' ORDER BY settlement_date DESC LIMIT 50;`, runID, mid)
 			return &SQLGenerationResult{SQL: sql, Unsupported: false}, nil
 		}
 
-		// 6. General exceptions for merchant
+		// Raw transactions list for merchant
+		if isListQuery && (strings.Contains(lower, "transaction") || strings.Contains(lower, "internal")) {
+			sql := fmt.Sprintf(`SELECT id, amount_paise, currency, transaction_date, reference_id FROM internal_transactions WHERE run_id = '%s' AND merchant_id = '%s' ORDER BY transaction_date DESC LIMIT 50;`, runID, mid)
+			return &SQLGenerationResult{SQL: sql, Unsupported: false}, nil
+		}
+
+		// General exceptions for merchant
 		if strings.Contains(lower, "exception") || strings.Contains(lower, "how many") || strings.Contains(lower, "fail") {
 			sql := fmt.Sprintf(`SELECT e.record_id, e.category, e.hop, e.reason, e.exposure_paise, e.ai_summary, e.ai_action FROM exceptions e LEFT JOIN internal_transactions it ON e.record_id = it.id AND e.run_id = it.run_id LEFT JOIN settlement_records sr ON e.record_id = sr.id AND e.run_id = sr.run_id LEFT JOIN bank_statements bs ON e.record_id = bs.id AND e.run_id = bs.run_id WHERE e.run_id = '%s' AND COALESCE(it.merchant_id, sr.merchant_id, bs.merchant_id) = '%s' LIMIT 50;`, runID, mid)
 			return &SQLGenerationResult{SQL: sql, Unsupported: false}, nil
 		}
 	}
 
-	// Question: Reasons / causes for exceptions (general)
-	if hasReasonIntent {
-		sql := fmt.Sprintf(`SELECT category, reason, COUNT(*) AS count, SUM(exposure_paise) AS total_exposure_paise FROM exceptions WHERE run_id = '%s' GROUP BY category, reason ORDER BY count DESC LIMIT 50;`, runID)
-		return &SQLGenerationResult{SQL: sql, Unsupported: false}, nil
-	}
-
-	// Question: AI Investigation status / counts
-	if strings.Contains(lower, "investigated by ai") || strings.Contains(lower, "ai investigated") || strings.Contains(lower, "ai status") || (strings.Contains(lower, "ai") && strings.Contains(lower, "investigat")) {
-		sql := fmt.Sprintf(`SELECT ai_status, COUNT(*) AS count FROM exceptions WHERE run_id = '%s' AND ai_status != 'NOT_REQUIRED' GROUP BY ai_status ORDER BY count DESC;`, runID)
-		return &SQLGenerationResult{SQL: sql, Unsupported: false}, nil
-	}
-
-	// Question: Merchant with most exceptions
-	if strings.Contains(lower, "most unresolved") || strings.Contains(lower, "most exceptions") || strings.Contains(lower, "highest exception") {
-		sql := fmt.Sprintf(`SELECT COALESCE(it.merchant_id, sr.merchant_id, bs.merchant_id, 'UNKNOWN') AS merchant_id, COUNT(*) AS exception_count, SUM(e.exposure_paise) AS total_exposure_paise FROM exceptions e LEFT JOIN internal_transactions it ON e.record_id = it.id AND e.run_id = it.run_id LEFT JOIN settlement_records sr ON e.record_id = sr.id AND e.run_id = sr.run_id LEFT JOIN bank_statements bs ON e.record_id = bs.id AND e.run_id = bs.run_id WHERE e.run_id = '%s' GROUP BY 1 ORDER BY exception_count DESC LIMIT 5;`, runID)
-		return &SQLGenerationResult{SQL: sql, Unsupported: false}, nil
-	}
-
-	// Question: Largest unresolved cash exposure
-	if strings.Contains(lower, "largest") && (strings.Contains(lower, "exposure") || strings.Contains(lower, "cash")) ||
-		strings.Contains(lower, "highest exposure") {
-		sql := fmt.Sprintf(`SELECT COALESCE(it.merchant_id, sr.merchant_id, bs.merchant_id, 'UNKNOWN') AS merchant_id, SUM(e.exposure_paise) AS total_exposure_paise, COUNT(*) AS exception_count FROM exceptions e LEFT JOIN internal_transactions it ON e.record_id = it.id AND e.run_id = it.run_id LEFT JOIN settlement_records sr ON e.record_id = sr.id AND e.run_id = sr.run_id LEFT JOIN bank_statements bs ON e.record_id = bs.id AND e.run_id = bs.run_id WHERE e.run_id = '%s' GROUP BY 1 ORDER BY total_exposure_paise DESC LIMIT 5;`, runID)
-		return &SQLGenerationResult{SQL: sql, Unsupported: false}, nil
-	}
-
-	// Question: Total unresolved amount / cash exposure
-	if strings.Contains(lower, "total unresolved") || strings.Contains(lower, "total cash exposure") || strings.Contains(lower, "total exposure") {
-		sql := fmt.Sprintf(`SELECT unresolved_amount_paise, exception_count, full_chain_count, source_records_processed FROM reconciliation_runs WHERE run_id = '%s';`, runID)
-		return &SQLGenerationResult{SQL: sql, Unsupported: false}, nil
-	}
-
-	// Question: Settled but not banked (general)
-	if strings.Contains(lower, "settled but not banked") || strings.Contains(lower, "settled_not_banked") || strings.Contains(lower, "not banked") || strings.Contains(lower, "pending settlement") {
-		sql := fmt.Sprintf(`SELECT COUNT(*) AS count, COALESCE(SUM(exposure_paise), 0) AS total_exposure_paise FROM exceptions WHERE run_id = '%s' AND category = 'SETTLED_NOT_BANKED';`, runID)
-		return &SQLGenerationResult{SQL: sql, Unsupported: false}, nil
-	}
-
-	// Question: Banked but not settled
-	if strings.Contains(lower, "banked not settled") || strings.Contains(lower, "banked_not_settled") || strings.Contains(lower, "unexplained bank") {
-		sql := fmt.Sprintf(`SELECT record_id, expected_amount_paise, actual_amount_paise, exposure_paise, reason FROM exceptions WHERE run_id = '%s' AND category = 'BANKED_NOT_SETTLED' LIMIT 10;`, runID)
-		return &SQLGenerationResult{SQL: sql, Unsupported: false}, nil
-	}
-
-	// Question: Reconciliation status counts (FULL, PARTIAL, UNMATCHED)
-	if strings.Contains(lower, "reconciliation status") || strings.Contains(lower, "full chain") || strings.Contains(lower, "full match") || strings.Contains(lower, "unmatched") || strings.Contains(lower, "partial") || (strings.Contains(lower, "status") && !strings.Contains(lower, "ai status")) {
-		sql := fmt.Sprintf(`SELECT reconciliation_status, COUNT(*) AS count FROM reconciliation_matches WHERE run_id = '%s' GROUP BY reconciliation_status ORDER BY count DESC;`, runID)
-		return &SQLGenerationResult{SQL: sql, Unsupported: false}, nil
-	}
-
-	// Question: Category breakdown
-	if strings.Contains(lower, "category") || strings.Contains(lower, "breakdown") || strings.Contains(lower, "taxonomy") {
-		sql := fmt.Sprintf(`SELECT category, hop, COUNT(*) AS count, SUM(exposure_paise) AS total_exposure_paise FROM exceptions WHERE run_id = '%s' GROUP BY category, hop ORDER BY count DESC;`, runID)
-		return &SQLGenerationResult{SQL: sql, Unsupported: false}, nil
-	}
-
-	// Question: Hop 1 vs Hop 2 / match summary
-	if strings.Contains(lower, "hop 1") || strings.Contains(lower, "hop 2") || strings.Contains(lower, "hop1") || strings.Contains(lower, "hop2") || strings.Contains(lower, "summary") {
+	// 4. Hop 1 vs Hop 2 / match summary (MUST come BEFORE generic match check)
+	if strings.Contains(lower, "hop 1") || strings.Contains(lower, "hop 2") || strings.Contains(lower, "hop1") || strings.Contains(lower, "hop2") {
 		sql := fmt.Sprintf(`SELECT hop1_matched_count, hop2_matched_count, full_chain_count, exception_count, throughput_records_per_sec FROM reconciliation_runs WHERE run_id = '%s';`, runID)
 		return &SQLGenerationResult{SQL: sql, Unsupported: false}, nil
 	}
 
-	// Question: Batches / settlement batches
+	// 5. Batches / settlement batches (MUST come BEFORE generic settlement check)
 	if strings.Contains(lower, "batch") {
 		sql := fmt.Sprintf(`SELECT batch_id, COUNT(*) AS settlement_count, SUM(settled_amount_paise) AS total_settled_paise FROM settlement_records WHERE run_id = '%s' GROUP BY batch_id ORDER BY total_settled_paise DESC LIMIT 10;`, runID)
 		return &SQLGenerationResult{SQL: sql, Unsupported: false}, nil
 	}
 
-	// Generic Unsupported Filter
-	unsupportedPhrases := []string{"weather", "poem", "joke", "who are you", "president", "capital of", "recipe"}
+	// 6. Settled but not banked (general) (MUST come BEFORE generic settlement check)
+	if strings.Contains(lower, "settled but not banked") || strings.Contains(lower, "settled_not_banked") || strings.Contains(lower, "not banked") || strings.Contains(lower, "pending settlement") {
+		if strings.Contains(lower, "count") || strings.Contains(lower, "how many") {
+			sql := fmt.Sprintf(`SELECT COUNT(*) AS count, COALESCE(SUM(exposure_paise), 0) AS total_exposure_paise FROM exceptions WHERE run_id = '%s' AND category = 'SETTLED_NOT_BANKED';`, runID)
+			return &SQLGenerationResult{SQL: sql, Unsupported: false}, nil
+		}
+		sql := fmt.Sprintf(`SELECT record_id, expected_amount_paise, exposure_paise, reason, ai_summary FROM exceptions WHERE run_id = '%s' AND category = 'SETTLED_NOT_BANKED' LIMIT 50;`, runID)
+		return &SQLGenerationResult{SQL: sql, Unsupported: false}, nil
+	}
+
+	// 7. Banked but not settled (general) (MUST come BEFORE generic bank check)
+	if strings.Contains(lower, "banked not settled") || strings.Contains(lower, "banked_not_settled") || strings.Contains(lower, "unexplained bank") {
+		sql := fmt.Sprintf(`SELECT record_id, expected_amount_paise, actual_amount_paise, exposure_paise, reason FROM exceptions WHERE run_id = '%s' AND category = 'BANKED_NOT_SETTLED' LIMIT 50;`, runID)
+		return &SQLGenerationResult{SQL: sql, Unsupported: false}, nil
+	}
+
+	// 8. Merchants List & Aggregations (e.g. "Which merchant has the most unresolved exceptions?")
+	if strings.Contains(lower, "merchant") {
+		if strings.Contains(lower, "most unresolved") || strings.Contains(lower, "most exceptions") || strings.Contains(lower, "highest exception") {
+			sql := fmt.Sprintf(`SELECT COALESCE(it.merchant_id, sr.merchant_id, bs.merchant_id, 'UNKNOWN') AS merchant_id, COUNT(*) AS exception_count, SUM(e.exposure_paise) AS total_exposure_paise FROM exceptions e LEFT JOIN internal_transactions it ON e.record_id = it.id AND e.run_id = it.run_id LEFT JOIN settlement_records sr ON e.record_id = sr.id AND e.run_id = sr.run_id LEFT JOIN bank_statements bs ON e.record_id = bs.id AND e.run_id = bs.run_id WHERE e.run_id = '%s' GROUP BY 1 ORDER BY exception_count DESC LIMIT 5;`, runID)
+			return &SQLGenerationResult{SQL: sql, Unsupported: false}, nil
+		}
+		if strings.Contains(lower, "largest") || strings.Contains(lower, "exposure") {
+			sql := fmt.Sprintf(`SELECT COALESCE(it.merchant_id, sr.merchant_id, bs.merchant_id, 'UNKNOWN') AS merchant_id, SUM(e.exposure_paise) AS total_exposure_paise, COUNT(*) AS exception_count FROM exceptions e LEFT JOIN internal_transactions it ON e.record_id = it.id AND e.run_id = it.run_id LEFT JOIN settlement_records sr ON e.record_id = sr.id AND e.run_id = sr.run_id LEFT JOIN bank_statements bs ON e.record_id = bs.id AND e.run_id = bs.run_id WHERE e.run_id = '%s' GROUP BY 1 ORDER BY total_exposure_paise DESC LIMIT 5;`, runID)
+			return &SQLGenerationResult{SQL: sql, Unsupported: false}, nil
+		}
+		sql := fmt.Sprintf(`SELECT DISTINCT merchant_id FROM (SELECT merchant_id FROM internal_transactions WHERE run_id = '%s' UNION SELECT merchant_id FROM settlement_records WHERE run_id = '%s' UNION SELECT merchant_id FROM bank_statements WHERE run_id = '%s') m WHERE merchant_id IS NOT NULL AND merchant_id != '' ORDER BY merchant_id;`, runID, runID, runID)
+		return &SQLGenerationResult{SQL: sql, Unsupported: false}, nil
+	}
+
+	// 9. Total unresolved amount / cash exposure
+	if strings.Contains(lower, "total unresolved") || strings.Contains(lower, "total cash exposure") || strings.Contains(lower, "total exposure") || (strings.Contains(lower, "how much") && strings.Contains(lower, "unresolved")) {
+		sql := fmt.Sprintf(`SELECT unresolved_amount_paise, exception_count, full_chain_count, source_records_processed FROM reconciliation_runs WHERE run_id = '%s';`, runID)
+		return &SQLGenerationResult{SQL: sql, Unsupported: false}, nil
+	}
+
+	// 10. Category breakdown
+	if strings.Contains(lower, "category") || (strings.Contains(lower, "breakdown") && strings.Contains(lower, "exception")) || strings.Contains(lower, "taxonomy") {
+		sql := fmt.Sprintf(`SELECT category, hop, COUNT(*) AS count, SUM(exposure_paise) AS total_exposure_paise FROM exceptions WHERE run_id = '%s' GROUP BY category, hop ORDER BY count DESC;`, runID)
+		return &SQLGenerationResult{SQL: sql, Unsupported: false}, nil
+	}
+
+	// 11. Reasons / causes for exceptions (general)
+	if hasReasonIntent {
+		sql := fmt.Sprintf(`SELECT category, reason, COUNT(*) AS count, SUM(exposure_paise) AS total_exposure_paise FROM exceptions WHERE run_id = '%s' GROUP BY category, reason ORDER BY count DESC LIMIT 50;`, runID)
+		return &SQLGenerationResult{SQL: sql, Unsupported: false}, nil
+	}
+
+	// 12. Matches and Reconciliation Status
+	if strings.Contains(lower, "match") {
+		// Match rate or percentage
+		if strings.Contains(lower, "rate") || strings.Contains(lower, "percent") || strings.Contains(lower, "pct") {
+			sql := fmt.Sprintf(`SELECT hop1_matched_count, hop2_matched_count, full_chain_count, internal_count, settlement_count, bank_count, throughput_records_per_sec FROM reconciliation_runs WHERE run_id = '%s' LIMIT 1;`, runID)
+			return &SQLGenerationResult{SQL: sql, Unsupported: false}, nil
+		}
+		// Summary
+		if strings.Contains(lower, "summary") {
+			sql := fmt.Sprintf(`SELECT hop1_matched_count, hop2_matched_count, full_chain_count, exception_count, throughput_records_per_sec FROM reconciliation_runs WHERE run_id = '%s';`, runID)
+			return &SQLGenerationResult{SQL: sql, Unsupported: false}, nil
+		}
+		// Full match
+		if strings.Contains(lower, "full") {
+			sql := fmt.Sprintf(`SELECT id, internal_id, settlement_id, bank_statement_id, hop1_rule, hop2_rule, fee_delta_paise FROM reconciliation_matches WHERE run_id = '%s' AND reconciliation_status = 'FULL' LIMIT 50;`, runID)
+			return &SQLGenerationResult{SQL: sql, Unsupported: false}, nil
+		}
+		// Partial match
+		if strings.Contains(lower, "partial") {
+			sql := fmt.Sprintf(`SELECT id, internal_id, settlement_id, bank_statement_id, hop1_rule, hop2_rule, fee_delta_paise FROM reconciliation_matches WHERE run_id = '%s' AND reconciliation_status = 'PARTIAL' LIMIT 50;`, runID)
+			return &SQLGenerationResult{SQL: sql, Unsupported: false}, nil
+		}
+		// Unmatched
+		if strings.Contains(lower, "unmatched") {
+			sql := fmt.Sprintf(`SELECT id, internal_id, settlement_id, hop1_rule, fee_delta_paise FROM reconciliation_matches WHERE run_id = '%s' AND reconciliation_status = 'UNMATCHED' LIMIT 50;`, runID)
+			return &SQLGenerationResult{SQL: sql, Unsupported: false}, nil
+		}
+		// Match counts / breakdown
+		if strings.Contains(lower, "how many") || strings.Contains(lower, "count") || strings.Contains(lower, "breakdown") || strings.Contains(lower, "status") {
+			sql := fmt.Sprintf(`SELECT reconciliation_status, COUNT(*) AS count FROM reconciliation_matches WHERE run_id = '%s' GROUP BY reconciliation_status ORDER BY count DESC;`, runID)
+			return &SQLGenerationResult{SQL: sql, Unsupported: false}, nil
+		}
+		// Generic matches list (e.g. "show me all matches", "list matches")
+		sql := fmt.Sprintf(`SELECT id, internal_id, settlement_id, bank_statement_id, hop1_rule, hop2_rule, reconciliation_status, fee_delta_paise FROM reconciliation_matches WHERE run_id = '%s' LIMIT 50;`, runID)
+		return &SQLGenerationResult{SQL: sql, Unsupported: false}, nil
+	}
+
+	// 13. Transactions / Internal Ledger
+	if strings.Contains(lower, "transaction") || strings.Contains(lower, "internal record") || strings.Contains(lower, "internal ledger") {
+		if strings.Contains(lower, "how many") || strings.Contains(lower, "count") || strings.Contains(lower, "processed") {
+			sql := fmt.Sprintf(`SELECT internal_count, source_records_processed FROM reconciliation_runs WHERE run_id = '%s' LIMIT 1;`, runID)
+			return &SQLGenerationResult{SQL: sql, Unsupported: false}, nil
+		}
+		if strings.Contains(lower, "unmatched") {
+			sql := fmt.Sprintf(`SELECT it.id, it.amount_paise, it.currency, it.transaction_date, it.merchant_id FROM internal_transactions it JOIN reconciliation_matches rm ON it.id = rm.internal_id AND it.run_id = rm.run_id WHERE it.run_id = '%s' AND rm.reconciliation_status = 'UNMATCHED' LIMIT 50;`, runID)
+			return &SQLGenerationResult{SQL: sql, Unsupported: false}, nil
+		}
+		sql := fmt.Sprintf(`SELECT id, amount_paise, currency, transaction_date, merchant_id, reference_id FROM internal_transactions WHERE run_id = '%s' ORDER BY transaction_date DESC LIMIT 50;`, runID)
+		return &SQLGenerationResult{SQL: sql, Unsupported: false}, nil
+	}
+
+	// 14. Settlements / Gateway Records
+	if strings.Contains(lower, "settlement") {
+		if strings.Contains(lower, "duplicate") {
+			sql := fmt.Sprintf(`SELECT record_id, hop, reason, exposure_paise, ai_summary, ai_action FROM exceptions WHERE run_id = '%s' AND category = 'DUPLICATE_SETTLEMENT' LIMIT 50;`, runID)
+			return &SQLGenerationResult{SQL: sql, Unsupported: false}, nil
+		}
+		if strings.Contains(lower, "orphan") || strings.Contains(lower, "unlinked") {
+			sql := fmt.Sprintf(`SELECT record_id, actual_amount_paise, exposure_paise, reason, ai_action FROM exceptions WHERE run_id = '%s' AND category = 'ORPHAN_SETTLEMENT' LIMIT 50;`, runID)
+			return &SQLGenerationResult{SQL: sql, Unsupported: false}, nil
+		}
+		if strings.Contains(lower, "total") || strings.Contains(lower, "amount") || strings.Contains(lower, "sum") {
+			sql := fmt.Sprintf(`SELECT COUNT(*) AS total_settlements, SUM(settled_amount_paise) AS total_settled_paise FROM settlement_records WHERE run_id = '%s';`, runID)
+			return &SQLGenerationResult{SQL: sql, Unsupported: false}, nil
+		}
+		sql := fmt.Sprintf(`SELECT id, settled_amount_paise, currency, settlement_date, merchant_id, batch_id, reference_id FROM settlement_records WHERE run_id = '%s' ORDER BY settlement_date DESC LIMIT 50;`, runID)
+		return &SQLGenerationResult{SQL: sql, Unsupported: false}, nil
+	}
+
+	// 15. Bank Statements / Deposits
+	if strings.Contains(lower, "bank statement") || strings.Contains(lower, "bank deposit") ||
+		(strings.Contains(lower, "bank") && !strings.Contains(lower, "not banked") && !strings.Contains(lower, "not settled")) {
+		if strings.Contains(lower, "total") || strings.Contains(lower, "amount") || strings.Contains(lower, "sum") {
+			sql := fmt.Sprintf(`SELECT COUNT(*) as statement_count, SUM(credited_amount_paise) as total_credited_paise FROM bank_statements WHERE run_id = '%s';`, runID)
+			return &SQLGenerationResult{SQL: sql, Unsupported: false}, nil
+		}
+		sql := fmt.Sprintf(`SELECT id, credited_amount_paise, currency, credit_date, merchant_id, batch_reference, narration FROM bank_statements WHERE run_id = '%s' ORDER BY credit_date DESC LIMIT 50;`, runID)
+		return &SQLGenerationResult{SQL: sql, Unsupported: false}, nil
+	}
+
+	// 16. Specific Exception Categories
+	if strings.Contains(lower, "mismatch") {
+		sql := fmt.Sprintf(`SELECT record_id, expected_amount_paise, actual_amount_paise, delta_paise, exposure_paise, reason FROM exceptions WHERE run_id = '%s' AND category = 'AMOUNT_MISMATCH' LIMIT 50;`, runID)
+		return &SQLGenerationResult{SQL: sql, Unsupported: false}, nil
+	}
+	if strings.Contains(lower, "partial credit") {
+		sql := fmt.Sprintf(`SELECT record_id, expected_amount_paise, actual_amount_paise, delta_paise, exposure_paise, reason FROM exceptions WHERE run_id = '%s' AND category = 'PARTIAL_CREDIT' LIMIT 50;`, runID)
+		return &SQLGenerationResult{SQL: sql, Unsupported: false}, nil
+	}
+	if strings.Contains(lower, "no counterpart") {
+		sql := fmt.Sprintf(`SELECT record_id, expected_amount_paise, exposure_paise, reason FROM exceptions WHERE run_id = '%s' AND category = 'NO_COUNTERPART' LIMIT 50;`, runID)
+		return &SQLGenerationResult{SQL: sql, Unsupported: false}, nil
+	}
+
+	// 17. Deltas / Fees
+	if strings.Contains(lower, "delta") || strings.Contains(lower, "fee") {
+		sql := fmt.Sprintf(`SELECT id, internal_id, settlement_id, fee_delta_paise, bank_delta_paise, reconciliation_status FROM reconciliation_matches WHERE run_id = '%s' ORDER BY ABS(fee_delta_paise) DESC LIMIT 10;`, runID)
+		return &SQLGenerationResult{SQL: sql, Unsupported: false}, nil
+	}
+
+	// 18. Audit Logs / Decisions
+	if strings.Contains(lower, "audit") || strings.Contains(lower, "decision") {
+		sql := fmt.Sprintf(`SELECT decision_id, rule_applied, outcome, ai_reasoning, record_ids FROM audit_log WHERE run_id = '%s' LIMIT 50;`, runID)
+		return &SQLGenerationResult{SQL: sql, Unsupported: false}, nil
+	}
+
+	// 19. AI Investigation status / counts
+	if strings.Contains(lower, "investigated by ai") || strings.Contains(lower, "ai investigated") || strings.Contains(lower, "ai status") || (strings.Contains(lower, "ai") && strings.Contains(lower, "investigat")) {
+		sql := fmt.Sprintf(`SELECT ai_status, COUNT(*) AS count FROM exceptions WHERE run_id = '%s' AND ai_status != 'NOT_REQUIRED' GROUP BY ai_status ORDER BY count DESC;`, runID)
+		return &SQLGenerationResult{SQL: sql, Unsupported: false}, nil
+	}
+
+	// 20. Reconciliation status breakdown (FULL, PARTIAL, UNMATCHED)
+	if strings.Contains(lower, "reconciliation status") || strings.Contains(lower, "full chain") || strings.Contains(lower, "full match") || strings.Contains(lower, "unmatched") || strings.Contains(lower, "partial") || (strings.Contains(lower, "status") && !strings.Contains(lower, "ai status")) {
+		sql := fmt.Sprintf(`SELECT reconciliation_status, COUNT(*) AS count FROM reconciliation_matches WHERE run_id = '%s' GROUP BY reconciliation_status ORDER BY count DESC;`, runID)
+		return &SQLGenerationResult{SQL: sql, Unsupported: false}, nil
+	}
+
+	// 21. Run Overview / Summary / Details
+	if strings.Contains(lower, "run") || strings.Contains(lower, "overview") || strings.Contains(lower, "throughput") || strings.Contains(lower, "performance") {
+		sql := fmt.Sprintf(`SELECT run_id, status, internal_count, settlement_count, bank_count, hop1_matched_count, hop2_matched_count, full_chain_count, exception_count, unresolved_amount_paise, throughput_records_per_sec FROM reconciliation_runs WHERE run_id = '%s' LIMIT 1;`, runID)
+		return &SQLGenerationResult{SQL: sql, Unsupported: false}, nil
+	}
+
+	// 22. Generic Unsupported Filter for Non-Financial queries
+	unsupportedPhrases := []string{"weather", "poem", "joke", "president", "capital of", "recipe", "sport", "game", "movie", "song"}
 	for _, phrase := range unsupportedPhrases {
 		if strings.Contains(lower, phrase) {
 			return &SQLGenerationResult{
@@ -361,8 +498,8 @@ func generateSQLOffline(question string, runID string, meta *DBMetadataContext) 
 		}
 	}
 
-	// Default to top exceptions summary if vague but financial
-	if strings.Contains(lower, "exception") || strings.Contains(lower, "issue") || strings.Contains(lower, "fail") {
+	// 23. Default to top exceptions summary if vague but financial
+	if strings.Contains(lower, "exception") || strings.Contains(lower, "issue") || strings.Contains(lower, "fail") || strings.Contains(lower, "error") {
 		sql := fmt.Sprintf(`SELECT category, count(*) as count, sum(exposure_paise) as exposure_paise FROM exceptions WHERE run_id = '%s' GROUP BY category ORDER BY count DESC LIMIT 5;`, runID)
 		return &SQLGenerationResult{SQL: sql, Unsupported: false}, nil
 	}

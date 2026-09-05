@@ -1,6 +1,9 @@
 package reconciliation
 
 import (
+	"fmt"
+	"sort"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -46,13 +49,50 @@ func ReconcileRun(
 ) *ReconciliationOutput {
 	engineStart := time.Now()
 
+	skipHop1 := len(settlements) == 0
+	skipHop2 := len(bankStatements) == 0
+
 	// 1. Hop 1: Internal Ledger ↔ Settlement Records
-	hop1Results := ReconcileHop1(internals, settlements, maxDiscountPct)
+	var hop1Results []Hop1Result
+	if !skipHop1 {
+		hop1Results = ReconcileHop1(internals, settlements, maxDiscountPct)
+	} else {
+		// When no settlements are uploaded, mark all internals as not evaluated for Hop 1
+		for _, it := range internals {
+			reason := "Hop 1 not evaluated — no settlement uploaded for this run"
+			cat := models.CategoryNoCounterpart
+			hop1Results = append(hop1Results, Hop1Result{
+				InternalID:        it.ID,
+				Matched:           false,
+				Rule:              "HOP1_SKIPPED",
+				Confidence:        0.0,
+				ExceptionCategory: &cat,
+				ExceptionReason:   reason,
+				FieldsCompared: map[string]interface{}{
+					"gross_amount_paise": it.AmountPaise,
+				},
+			})
+		}
+	}
 
 	// 2. Hop 2: Settlement Batches ↔ Bank Statements
-	hop2Summary := ReconcileHop2(settlements, bankStatements)
+	var hop2Summary *Hop2Summary
+	if !skipHop2 && !skipHop1 {
+		hop2Summary = ReconcileHop2(settlements, bankStatements)
+	} else {
+		hop2Summary = &Hop2Summary{
+			BatchResults:      make(map[string]*Hop2BatchResult),
+			OrphanBankCredits: nil,
+		}
+	}
 
-	// Index settlements for quick lookup
+	// Index internals and settlements for quick lookup
+	internalMap := make(map[string]*models.InternalTransaction, len(internals))
+	for i := range internals {
+		it := &internals[i]
+		internalMap[it.ID] = it
+	}
+
 	settlementMap := make(map[string]*models.SettlementRecord, len(settlements))
 	consumedSettlementIDs := make(map[string]bool)
 	for i := range settlements {
@@ -94,36 +134,79 @@ func ReconcileRun(
 				match.Hop1Rule = &r
 			}
 
-			// Exception
 			cat := *h1.ExceptionCategory
-			var expPaise *int64
-			// Find gross amount from fields compared
-			if gross, ok := h1.FieldsCompared["gross_amount_paise"].(int64); ok {
-				exp := gross
-				expPaise = &exp
-				totalUnresolvedExposure += exp
-			}
+			if cat == models.CategoryDuplicateSettlement && len(h1.DuplicateSettlementIDs) > 0 {
+				// Surface the duplicate candidate settlements as DUPLICATE_SETTLEMENT exceptions
+				for _, dupSetID := range h1.DuplicateSettlementIDs {
+					consumedSettlementIDs[dupSetID] = true
+					var actAmt *int64
+					var expPaise *int64
+					if sRec, ok := settlementMap[dupSetID]; ok {
+						amt := sRec.SettledAmountPaise
+						actAmt = &amt
+						expPaise = &amt
+						totalUnresolvedExposure += amt
+					}
+					excID := uuid.New()
+					exc := models.Exception{
+						ID:                  excID,
+						RunID:               runID,
+						RecordID:            dupSetID,
+						Source:              "settlement",
+						Category:            cat,
+						Hop:                 "HOP1",
+						Reason:              fmt.Sprintf("Duplicate settlement candidate (%s) competing for internal transaction %s", dupSetID, h1.InternalID),
+						ExpectedAmountPaise: expPaise,
+						ActualAmountPaise:   actAmt,
+						ExposurePaise:       expPaise,
+						AIStatus:            models.AIPending,
+						CreatedAt:           time.Now().UTC(),
+					}
+					exceptions = append(exceptions, exc)
+				}
+			} else {
+				var expPaise *int64
+				var actPaise *int64
+				if h1.SettlementID != nil {
+					consumedSettlementIDs[*h1.SettlementID] = true
+					if sRec, ok := settlementMap[*h1.SettlementID]; ok {
+						amt := sRec.SettledAmountPaise
+						actPaise = &amt
+					}
+				}
+				// Find gross amount from fields compared or internalMap fallback
+				if gross, ok := h1.FieldsCompared["gross_amount_paise"].(int64); ok {
+					exp := gross
+					expPaise = &exp
+					totalUnresolvedExposure += exp
+				} else if it, ok := internalMap[h1.InternalID]; ok {
+					exp := it.AmountPaise
+					expPaise = &exp
+					totalUnresolvedExposure += exp
+				}
 
-			aiStatus := models.AINotRequired
-			if IsAIEligible(cat) {
-				aiStatus = models.AIPending
-			}
+				aiStatus := models.AINotRequired
+				if IsAIEligible(cat) {
+					aiStatus = models.AIPending
+				}
 
-			excID := uuid.New()
-			exc := models.Exception{
-				ID:                  excID,
-				RunID:               runID,
-				RecordID:            h1.InternalID,
-				Source:              "internal",
-				Category:            cat,
-				Hop:                 "HOP1",
-				Reason:              h1.ExceptionReason,
-				ExpectedAmountPaise: expPaise,
-				ExposurePaise:       expPaise,
-				AIStatus:            aiStatus,
-				CreatedAt:           time.Now().UTC(),
+				excID := uuid.New()
+				exc := models.Exception{
+					ID:                  excID,
+					RunID:               runID,
+					RecordID:            h1.InternalID,
+					Source:              "internal",
+					Category:            cat,
+					Hop:                 "HOP1",
+					Reason:              h1.ExceptionReason,
+					ExpectedAmountPaise: expPaise,
+					ActualAmountPaise:   actPaise,
+					ExposurePaise:       expPaise,
+					AIStatus:            aiStatus,
+					CreatedAt:           time.Now().UTC(),
+				}
+				exceptions = append(exceptions, exc)
 			}
-			exceptions = append(exceptions, exc)
 
 			audit := models.AuditLog{
 				DecisionID:           decisionID,
@@ -149,9 +232,31 @@ func ReconcileRun(
 
 			// Check Hop 2 outcome for the batch of this settlement
 			settlementRec := settlementMap[setID]
-			batchRes, hasBatch := hop2Summary.BatchResults[settlementRec.BatchID]
+			bKey := strings.TrimSpace(settlementRec.BatchID)
+			if bKey == "" {
+				bKey = fmt.Sprintf("__UNBATCHED_%s", settlementRec.ID)
+			}
+			batchRes, hasBatch := hop2Summary.BatchResults[bKey]
 
-			if hasBatch && batchRes.Matched {
+			if skipHop2 {
+				// Partial run: Bank statements not uploaded, Hop 2 skipped per spec
+				match.ReconciliationStatus = models.StatusPartial
+				hop2Note := "Hop 2 not evaluated — no bank statement uploaded for this run"
+				match.Hop2Rule = &hop2Note
+				match.Hop2Confidence = 0.0
+
+				audit := models.AuditLog{
+					DecisionID:           decisionID,
+					RunID:                runID,
+					RecordIDs:            involvedRecords,
+					RuleApplied:          h1.Rule + " (Hop 2 Skipped)",
+					FieldsCompared:       h1.FieldsJSON(),
+					CandidatesConsidered: h1.CandidatesJSON(),
+					Outcome:              "PARTIAL",
+					CreatedAt:            time.Now().UTC(),
+				}
+				auditLogs = append(auditLogs, audit)
+			} else if hasBatch && batchRes.Matched {
 				// Hop 2 Matched! -> FULL terminal status
 				hop2MatchedCount++
 				fullChainCount++
@@ -194,53 +299,6 @@ func ReconcileRun(
 					}
 				}
 
-				// Create Hop 2 Exception
-				var cat string
-				var reason string
-				var expPaise *int64
-
-				if hasBatch && batchRes.ExceptionCategory != nil {
-					cat = *batchRes.ExceptionCategory
-					reason = batchRes.ExceptionReason
-					if cat == models.CategoryPartialCredit && batchRes.ShortfallPaise != nil {
-						exp := *batchRes.ShortfallPaise
-						expPaise = &exp
-						totalUnresolvedExposure += exp
-					} else if batchRes.ExposurePaise != nil {
-						exp := settlementRec.SettledAmountPaise
-						expPaise = &exp
-						totalUnresolvedExposure += exp
-					}
-				} else {
-					cat = models.CategorySettledNotBanked
-					reason = "Settlement record was never credited in any bank statement"
-					exp := settlementRec.SettledAmountPaise
-					expPaise = &exp
-					totalUnresolvedExposure += exp
-				}
-
-				aiStatus := models.AINotRequired
-				if IsAIEligible(cat) {
-					aiStatus = models.AIPending
-				}
-
-				excID := uuid.New()
-				exc := models.Exception{
-					ID:                  excID,
-					RunID:               runID,
-					RecordID:            setID,
-					Source:              "settlement",
-					Category:            cat,
-					Hop:                 "HOP2",
-					Reason:              reason,
-					ExpectedAmountPaise: &settlementRec.SettledAmountPaise,
-					ActualAmountPaise:   batchRes.ActualAmountPaise,
-					ExposurePaise:       expPaise,
-					AIStatus:            aiStatus,
-					CreatedAt:           time.Now().UTC(),
-				}
-				exceptions = append(exceptions, exc)
-
 				audit := models.AuditLog{
 					DecisionID:           decisionID,
 					RunID:                runID,
@@ -258,8 +316,65 @@ func ReconcileRun(
 		matches = append(matches, match)
 	}
 
-	// 4. Orphan Settlements: settlements that were never consumed by any internal transaction
-	for _, s := range settlements {
+	// 4. Batch Exceptions from Hop 2
+	if !skipHop2 && !skipHop1 {
+		batchIDs := make([]string, 0, len(hop2Summary.BatchResults))
+		for bID := range hop2Summary.BatchResults {
+			batchIDs = append(batchIDs, bID)
+		}
+		sort.Strings(batchIDs)
+
+		for _, bID := range batchIDs {
+			bRes := hop2Summary.BatchResults[bID]
+			if !bRes.Matched && bRes.ExceptionCategory != nil {
+				cat := *bRes.ExceptionCategory
+				aiStatus := models.AINotRequired
+				if IsAIEligible(cat) {
+					aiStatus = models.AIPending
+				}
+				var expPaise *int64
+				if cat == models.CategoryPartialCredit && bRes.ShortfallPaise != nil {
+					exp := *bRes.ShortfallPaise
+					expPaise = &exp
+					totalUnresolvedExposure += exp
+				} else if bRes.ExposurePaise != nil {
+					exp := *bRes.ExposurePaise
+					expPaise = &exp
+					totalUnresolvedExposure += exp
+				} else {
+					exp := bRes.ExpectedAmountPaise
+					expPaise = &exp
+					totalUnresolvedExposure += exp
+				}
+
+				exc := models.Exception{
+					ID:                  uuid.New(),
+					RunID:               runID,
+					RecordID:            bRes.BatchID,
+					Source:              "settlement",
+					Category:            cat,
+					Hop:                 "HOP2",
+					Reason:              bRes.ExceptionReason,
+					ExpectedAmountPaise: &bRes.ExpectedAmountPaise,
+					ActualAmountPaise:   bRes.ActualAmountPaise,
+					DeltaPaise:          bRes.BankDeltaPaise,
+					ExposurePaise:       expPaise,
+					AIStatus:            aiStatus,
+					CreatedAt:           time.Now().UTC(),
+				}
+				exceptions = append(exceptions, exc)
+			}
+		}
+	}
+
+	// 5. Orphan Settlements: settlements that were never consumed or associated
+	sortedSettlements := make([]models.SettlementRecord, len(settlements))
+	copy(sortedSettlements, settlements)
+	sort.SliceStable(sortedSettlements, func(i, j int) bool {
+		return sortedSettlements[i].ID < sortedSettlements[j].ID
+	})
+
+	for _, s := range sortedSettlements {
 		if !consumedSettlementIDs[s.ID] {
 			cat := models.CategoryOrphanSettlement
 			amt := s.SettledAmountPaise
@@ -316,7 +431,10 @@ func ReconcileRun(
 
 	engineDuration := time.Since(engineStart)
 	totalSourceRecords := len(internals) + len(settlements) + len(bankStatements)
-	throughput := float64(totalSourceRecords) / engineDuration.Seconds()
+	var throughput float64
+	if totalSourceRecords > 0 && engineDuration.Seconds() > 0 {
+		throughput = float64(totalSourceRecords) / engineDuration.Seconds()
+	}
 
 	return &ReconciliationOutput{
 		RunID:               runID,

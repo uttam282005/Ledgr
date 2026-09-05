@@ -61,6 +61,7 @@ func (s *QAService) Ask(ctx context.Context, runID string, question string) (*QA
 		return &QAResponse{
 			Question:    question,
 			Unsupported: true,
+			ASTValid:    true,
 			Answer:      genResult.Reason,
 			DurationMs:  time.Since(startTime).Milliseconds(),
 		}, nil
@@ -68,7 +69,7 @@ func (s *QAService) Ask(ctx context.Context, runID string, question string) (*QA
 
 	// 3. AST Validation & Security Checks
 	valResult, err := ValidateSQL(genResult.SQL)
-	if (err != nil || !valResult.Valid) && s.apiKey != "" {
+	if err != nil || !valResult.Valid {
 		// Fallback to offline SQL generator if LLM generated an invalid/unapproved query
 		offlineResult, offlineErr := generateSQLOffline(question, runID, meta)
 		if offlineErr == nil && !offlineResult.Unsupported {
@@ -100,7 +101,7 @@ func (s *QAService) Ask(ctx context.Context, runID string, question string) (*QA
 
 	// 4. Execute query on read-only database role
 	execResult, err := ExecuteReadOnly(ctx, s.readOnlyDB, valResult.SanitizedQuery)
-	if err != nil && s.apiKey != "" {
+	if err != nil {
 		// Fallback to offline SQL generator if LLM query failed DB execution
 		offlineResult, offlineErr := generateSQLOffline(question, runID, meta)
 		if offlineErr == nil && !offlineResult.Unsupported {
@@ -125,8 +126,16 @@ func (s *QAService) Ask(ctx context.Context, runID string, question string) (*QA
 		}, nil
 	}
 
-	// 4. Grounded Answer Synthesis
-	answer := GenerateGroundedAnswer(ctx, question, valResult.SanitizedQuery, execResult.Rows, s.apiKey, s.baseURL, s.model)
+	// 5. Grounded Answer Synthesis
+	var answer string
+	var runStatus string
+	_ = s.readOnlyDB.QueryRowContext(ctx, "SELECT status FROM reconciliation_runs WHERE run_id = $1;", runID).Scan(&runStatus)
+
+	if len(execResult.Rows) == 0 && (runStatus == "DRAFT" || runStatus == "") {
+		answer = "This reconciliation run is currently in DRAFT status — reconciliation has not been executed on this dataset yet. Run 3-way reconciliation from the Overview tab or Ingest modal to generate matches and exceptions."
+	} else {
+		answer = GenerateGroundedAnswer(ctx, question, valResult.SanitizedQuery, execResult.Rows, s.apiKey, s.baseURL, s.model)
+	}
 
 	return &QAResponse{
 		Question:    question,

@@ -30,7 +30,7 @@ func setupQATestDB(t *testing.T) (*sql.DB, string) {
 	}
 
 	var runID string
-	err = database.QueryRow("SELECT run_id FROM reconciliation_runs ORDER BY started_at DESC LIMIT 1;").Scan(&runID)
+	err = database.QueryRow("SELECT run_id FROM reconciliation_runs WHERE seed = 42 ORDER BY started_at DESC LIMIT 1;").Scan(&runID)
 	if err != nil {
 		t.Fatalf("No reconciliation run found in DB. Run 'make seed reconcile' first: %v", err)
 	}

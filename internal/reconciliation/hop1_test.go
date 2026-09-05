@@ -340,3 +340,337 @@ func TestReconcileHop1_FullDatasetPerformance(t *testing.T) {
 		t.Errorf("Expected recall >= 85%%, got %.2f%%", recall)
 	}
 }
+
+func TestReconcileHop1_CurrencyMismatchDoesNotMatch(t *testing.T) {
+	runID := uuid.New()
+	baseTime := time.Date(2026, 9, 1, 10, 0, 0, 0, time.UTC)
+	ref := "REF_CURR_MISMATCH"
+
+	internals := []models.InternalTransaction{
+		{
+			ID:              "INT_USD",
+			RunID:           runID,
+			AmountPaise:     100000,
+			Currency:        "USD",
+			TransactionDate: baseTime,
+			MerchantID:      "MERCH_TEST",
+			ReferenceID:     &ref,
+		},
+	}
+	settlements := []models.SettlementRecord{
+		{
+			ID:                 "SET_INR",
+			RunID:              runID,
+			SettledAmountPaise: 100000,
+			Currency:           "INR",
+			SettlementDate:     baseTime.Add(24 * time.Hour),
+			MerchantID:         "MERCH_TEST",
+			ReferenceID:        &ref,
+			BatchID:            "BATCH_01",
+		},
+	}
+
+	results := ReconcileHop1(internals, settlements, 2.5)
+	if len(results) != 1 {
+		t.Fatalf("Expected 1 result, got %d", len(results))
+	}
+	if results[0].Matched {
+		t.Fatalf("CRITICAL: matched USD internal transaction against INR settlement")
+	}
+}
+
+func TestReconcileHop1_EmptyReference_DoesNotMatchAsExactReference(t *testing.T) {
+	runID := uuid.New()
+	baseTime := time.Date(2026, 9, 1, 10, 0, 0, 0, time.UTC)
+	emptyRef := ""
+
+	internals := []models.InternalTransaction{
+		{
+			ID:              "INT_EMPTY_REF",
+			RunID:           runID,
+			AmountPaise:     100000,
+			Currency:        "INR",
+			TransactionDate: baseTime,
+			MerchantID:      "MERCH_TEST",
+			ReferenceID:     &emptyRef,
+		},
+	}
+	settlements := []models.SettlementRecord{
+		{
+			ID:                 "SET_DIFF_AMOUNT",
+			RunID:              runID,
+			SettledAmountPaise: 50000, // completely different amount
+			Currency:           "INR",
+			SettlementDate:     baseTime.Add(24 * time.Hour),
+			MerchantID:         "MERCH_TEST",
+			ReferenceID:        &emptyRef,
+			BatchID:            "BATCH_01",
+		},
+	}
+
+	results := ReconcileHop1(internals, settlements, 2.5)
+	if len(results) != 1 {
+		t.Fatalf("Expected 1 result, got %d", len(results))
+	}
+	if results[0].Matched {
+		t.Fatalf("empty string reference incorrectly matched as exact reference")
+	}
+}
+
+func TestReconcileHop1_SettlementPriorToTransactionDate(t *testing.T) {
+	runID := uuid.New()
+	baseTime := time.Date(2026, 9, 5, 10, 0, 0, 0, time.UTC)
+
+	internals := []models.InternalTransaction{
+		{
+			ID:              "INT_PRIOR",
+			RunID:           runID,
+			AmountPaise:     100000,
+			Currency:        "INR",
+			TransactionDate: baseTime,
+			MerchantID:      "MERCH_TEST",
+		},
+	}
+	settlements := []models.SettlementRecord{
+		{
+			ID:                 "SET_PRIOR",
+			RunID:              runID,
+			SettledAmountPaise: 99000,
+			Currency:           "INR",
+			SettlementDate:     baseTime.Add(-48 * time.Hour), // 2 days BEFORE transaction
+			MerchantID:         "MERCH_TEST",
+			BatchID:            "BATCH_01",
+		},
+	}
+
+	results := ReconcileHop1(internals, settlements, 2.5)
+	if len(results) != 1 {
+		t.Fatalf("Expected 1 result, got %d", len(results))
+	}
+	if results[0].Matched {
+		t.Fatalf("Settlement prior to transaction date should not match")
+	}
+	if results[0].ExceptionCategory == nil || *results[0].ExceptionCategory != models.CategoryDateOutOfRange {
+		t.Errorf("Expected CategoryDateOutOfRange, got %v", results[0].ExceptionCategory)
+	}
+}
+
+func TestReconcileHop1_EmptyInputs(t *testing.T) {
+	results := ReconcileHop1([]models.InternalTransaction{}, []models.SettlementRecord{}, 2.5)
+	if len(results) != 0 {
+		t.Errorf("Expected 0 results for empty inputs, got %d", len(results))
+	}
+}
+
+func TestReconcileHop1_Rule1TakesPrecedenceOverGreedyRule2(t *testing.T) {
+	runID := uuid.New()
+	baseTime := time.Date(2026, 9, 1, 10, 0, 0, 0, time.UTC)
+	ref := "REF_EXPLICIT"
+
+	// INT_A has NO reference, but alphabetically precedes INT_B.
+	// INT_B has an explicit reference matching SET_1.
+	internals := []models.InternalTransaction{
+		{
+			ID:              "INT_A",
+			RunID:           runID,
+			AmountPaise:     100000,
+			Currency:        "INR",
+			TransactionDate: baseTime,
+			MerchantID:      "MERCH_TEST",
+			ReferenceID:     nil,
+		},
+		{
+			ID:              "INT_B",
+			RunID:           runID,
+			AmountPaise:     100000,
+			Currency:        "INR",
+			TransactionDate: baseTime,
+			MerchantID:      "MERCH_TEST",
+			ReferenceID:     &ref,
+		},
+	}
+
+	settlements := []models.SettlementRecord{
+		{
+			ID:                 "SET_1",
+			RunID:              runID,
+			SettledAmountPaise: 99000, // 1% fee
+			Currency:           "INR",
+			SettlementDate:     baseTime.Add(24 * time.Hour),
+			MerchantID:         "MERCH_TEST",
+			ReferenceID:        &ref,
+			BatchID:            "BATCH_01",
+		},
+	}
+
+	results := ReconcileHop1(internals, settlements, 2.5)
+	if len(results) != 2 {
+		t.Fatalf("Expected 2 results, got %d", len(results))
+	}
+
+	resMap := make(map[string]Hop1Result)
+	for _, r := range results {
+		resMap[r.InternalID] = r
+	}
+
+	// INT_B must match SET_1 via Rule 1
+	resB := resMap["INT_B"]
+	if !resB.Matched {
+		t.Fatalf("Expected INT_B to match SET_1, got unmatched: %s", resB.ExceptionReason)
+	}
+	if resB.Rule != RuleExactReference {
+		t.Errorf("Expected rule %s, got %s", RuleExactReference, resB.Rule)
+	}
+	if resB.SettlementID == nil || *resB.SettlementID != "SET_1" {
+		t.Errorf("Expected SET_1, got %v", resB.SettlementID)
+	}
+
+	// INT_A must NOT steal SET_1; since no other settlement exists, it must be NO_COUNTERPART
+	resA := resMap["INT_A"]
+	if resA.Matched {
+		t.Fatalf("INT_A must not greedily steal SET_1 via Rule 2")
+	}
+	if resA.ExceptionCategory == nil || *resA.ExceptionCategory != models.CategoryNoCounterpart {
+		t.Errorf("Expected CategoryNoCounterpart for INT_A, got %v", resA.ExceptionCategory)
+	}
+}
+
+func TestReconcileHop1_DuplicateInternalReference(t *testing.T) {
+	runID := uuid.New()
+	baseTime := time.Date(2026, 9, 1, 10, 0, 0, 0, time.UTC)
+	ref := "REF_DUP_INTERNAL"
+
+	// Two internal transactions share the same reference ID
+	internals := []models.InternalTransaction{
+		{
+			ID:              "INT_DUP_1",
+			RunID:           runID,
+			AmountPaise:     100000,
+			Currency:        "INR",
+			TransactionDate: baseTime,
+			MerchantID:      "MERCH_TEST",
+			ReferenceID:     &ref,
+		},
+		{
+			ID:              "INT_DUP_2",
+			RunID:           runID,
+			AmountPaise:     100000,
+			Currency:        "INR",
+			TransactionDate: baseTime,
+			MerchantID:      "MERCH_TEST",
+			ReferenceID:     &ref,
+		},
+	}
+
+	settlements := []models.SettlementRecord{
+		{
+			ID:                 "SET_DUP_1",
+			RunID:              runID,
+			SettledAmountPaise: 99000,
+			Currency:           "INR",
+			SettlementDate:     baseTime.Add(24 * time.Hour),
+			MerchantID:         "MERCH_TEST",
+			ReferenceID:        &ref,
+			BatchID:            "BATCH_01",
+		},
+	}
+
+	results := ReconcileHop1(internals, settlements, 2.5)
+	if len(results) != 2 {
+		t.Fatalf("Expected 2 results, got %d", len(results))
+	}
+
+	for _, r := range results {
+		if r.Matched {
+			t.Errorf("Internal %s should not match when duplicate internal references exist", r.InternalID)
+		}
+		if r.ExceptionCategory == nil || *r.ExceptionCategory != models.CategoryDuplicateSettlement {
+			t.Errorf("Expected CategoryDuplicateSettlement, got %v", r.ExceptionCategory)
+		}
+	}
+}
+
+func TestReconcileHop1_CaseInsensitiveReference(t *testing.T) {
+	runID := uuid.New()
+	baseTime := time.Date(2026, 9, 1, 10, 0, 0, 0, time.UTC)
+	refInt := "  ref_case_test_01  "
+	refSet := "REF_CASE_TEST_01"
+
+	internals := []models.InternalTransaction{
+		{
+			ID:              "INT_CASE_1",
+			RunID:           runID,
+			AmountPaise:     50000,
+			Currency:        "inr",
+			TransactionDate: baseTime,
+			MerchantID:      "MERCH_TEST",
+			ReferenceID:     &refInt,
+		},
+	}
+
+	settlements := []models.SettlementRecord{
+		{
+			ID:                 "SET_CASE_1",
+			RunID:              runID,
+			SettledAmountPaise: 49500,
+			Currency:           "INR",
+			SettlementDate:     baseTime.Add(24 * time.Hour),
+			MerchantID:         "MERCH_TEST",
+			ReferenceID:        &refSet,
+			BatchID:            "BATCH_01",
+		},
+	}
+
+	results := ReconcileHop1(internals, settlements, 2.5)
+	if len(results) != 1 {
+		t.Fatalf("Expected 1 result, got %d", len(results))
+	}
+	if !results[0].Matched {
+		t.Fatalf("Expected case-insensitive match, got: %s", results[0].ExceptionReason)
+	}
+	if results[0].Rule != RuleExactReference {
+		t.Errorf("Expected rule %s, got %s", RuleExactReference, results[0].Rule)
+	}
+}
+
+func TestReconcileHop1_InvalidAmountAndDateOutOfRange_DoesNotProduceDateOutOfRange(t *testing.T) {
+	runID := uuid.New()
+	baseTime := time.Date(2026, 9, 1, 10, 0, 0, 0, time.UTC)
+
+	// An internal transaction of ₹10,000
+	internals := []models.InternalTransaction{
+		{
+			ID:              "INT_ISOLATED",
+			RunID:           runID,
+			AmountPaise:     1000000, // ₹10,000
+			Currency:        "INR",
+			TransactionDate: baseTime,
+			MerchantID:      "MERCH_TEST",
+		},
+	}
+
+	// A completely unrelated settlement of ₹100 20 days later
+	settlements := []models.SettlementRecord{
+		{
+			ID:                 "SET_UNRELATED",
+			RunID:              runID,
+			SettledAmountPaise: 10000, // ₹100 (99% diff)
+			Currency:           "INR",
+			SettlementDate:     baseTime.Add(20 * 24 * time.Hour), // 20 days later
+			MerchantID:         "MERCH_TEST",
+			BatchID:            "BATCH_01",
+		},
+	}
+
+	results := ReconcileHop1(internals, settlements, 2.5)
+	if len(results) != 1 {
+		t.Fatalf("Expected 1 result, got %d", len(results))
+	}
+	if results[0].Matched {
+		t.Fatalf("Unrelated transaction must not match")
+	}
+	// It must be NO_COUNTERPART, NOT DATE_OUT_OF_RANGE
+	if results[0].ExceptionCategory == nil || *results[0].ExceptionCategory != models.CategoryNoCounterpart {
+		t.Errorf("Expected CategoryNoCounterpart, got %v", results[0].ExceptionCategory)
+	}
+}

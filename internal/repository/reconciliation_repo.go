@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -132,9 +133,22 @@ func (r *Repository) SaveReconciliationResults(
 
 	completedAt := time.Now().UTC()
 
+	// 0. Clean slate: remove previous matches, exceptions, and audit logs for this run
+	if _, err := tx.ExecContext(ctx, `DELETE FROM reconciliation_matches WHERE run_id = $1;`, out.RunID); err != nil {
+		return fmt.Errorf("failed deleting existing matches: %w", err)
+	}
+	if _, err := tx.ExecContext(ctx, `DELETE FROM exceptions WHERE run_id = $1;`, out.RunID); err != nil {
+		return fmt.Errorf("failed deleting existing exceptions: %w", err)
+	}
+	if _, err := tx.ExecContext(ctx, `DELETE FROM audit_log WHERE run_id = $1;`, out.RunID); err != nil {
+		return fmt.Errorf("failed deleting existing audit logs: %w", err)
+	}
+
 	// 1. Update reconciliation_runs
 	updateRunQuery := `
 		UPDATE reconciliation_runs SET
+			status = 'RECONCILED',
+			last_reconciled_at = $1,
 			completed_at = $1,
 			hop1_matched_count = $2,
 			hop2_matched_count = $3,
@@ -307,3 +321,230 @@ func (r *Repository) SaveReconciliationResults(
 
 	return tx.Commit()
 }
+
+// RunListItem represents a summary item for a run.
+type RunListItem struct {
+	RunID                   uuid.UUID  `json:"run_id"`
+	Name                    string     `json:"name"`
+	Status                  string     `json:"status"`
+	CreatedAt               time.Time  `json:"created_at"`
+	LastReconciledAt        *time.Time `json:"last_reconciled_at,omitempty"`
+	UploadCount             int        `json:"upload_count"`
+	InternalCount           int        `json:"internal_count"`
+	SettlementCount         int        `json:"settlement_count"`
+	BankCount               int        `json:"bank_count"`
+	Hop1MatchedCount        int        `json:"hop1_matched_count"`
+	Hop2MatchedCount        int        `json:"hop2_matched_count"`
+	FullChainCount          int        `json:"full_chain_count"`
+	ExceptionCount          int        `json:"exception_count"`
+	UnresolvedAmountPaise   int64      `json:"unresolved_amount_paise"`
+	UnresolvedAmountINR     float64    `json:"unresolved_amount_inr"`
+	ThroughputRecordsPerSec float64    `json:"throughput_records_per_sec"`
+}
+
+// RunDetail represents detailed metadata, metrics, uploads, and exception breakdown for a run.
+type RunDetail struct {
+	RunID                   uuid.UUID          `json:"run_id"`
+	Name                    string             `json:"name"`
+	Status                  string             `json:"status"`
+	CreatedAt               time.Time          `json:"created_at"`
+	LastReconciledAt        *time.Time         `json:"last_reconciled_at,omitempty"`
+	InternalCount           int                `json:"internal_count"`
+	SettlementCount         int                `json:"settlement_count"`
+	BankCount               int                `json:"bank_count"`
+	Hop1MatchedCount        int                `json:"hop1_matched_count"`
+	Hop2MatchedCount        int                `json:"hop2_matched_count"`
+	FullChainCount          int                `json:"full_chain_count"`
+	ExceptionCount          int                `json:"exception_count"`
+	UnresolvedAmountPaise   int64              `json:"unresolved_amount_paise"`
+	UnresolvedAmountINR     float64            `json:"unresolved_amount_inr"`
+	EngineDurationMs        int64              `json:"engine_duration_ms"`
+	ThroughputRecordsPerSec float64            `json:"throughput_records_per_sec"`
+	Uploads                 []models.RunUpload `json:"uploads"`
+	ExceptionBreakdown      map[string]int     `json:"exception_breakdown"`
+}
+
+// CreateRun inserts a new isolated reconciliation run.
+func (r *Repository) CreateRun(ctx context.Context, name string) (*models.ReconciliationRun, error) {
+	runID := uuid.New()
+	trimmed := strings.TrimSpace(name)
+	if trimmed == "" {
+		trimmed = fmt.Sprintf("Run %s", time.Now().Format("02 Jan 15:04"))
+	}
+
+	query := `
+		INSERT INTO reconciliation_runs (
+			run_id, name, status, created_at, started_at, seed, dataset_version, engine_version
+		) VALUES ($1, $2, 'DRAFT', NOW(), NOW(), 0, 'custom-upload', 'v1.0.0')
+		RETURNING run_id, name, status, created_at, started_at;
+	`
+	var run models.ReconciliationRun
+	err := r.db.QueryRowContext(ctx, query, runID, trimmed).Scan(
+		&run.RunID, &run.Name, &run.Status, &run.CreatedAt, &run.StartedAt,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("failed creating run: %w", err)
+	}
+	return &run, nil
+}
+
+// ListRuns returns all runs ordered by created_at DESC with upload counts.
+func (r *Repository) ListRuns(ctx context.Context) ([]RunListItem, error) {
+	query := `
+		SELECT
+			r.run_id,
+			COALESCE(NULLIF(r.name, ''), 'Run ' || SUBSTRING(r.run_id::text, 1, 8)) AS name,
+			r.status,
+			r.created_at,
+			r.last_reconciled_at,
+			COALESCE(COUNT(u.upload_id), 0) AS upload_count,
+			r.internal_count,
+			r.settlement_count,
+			r.bank_count,
+			r.hop1_matched_count,
+			r.hop2_matched_count,
+			r.full_chain_count,
+			r.exception_count,
+			r.unresolved_amount_paise,
+			r.throughput_records_per_sec
+		FROM reconciliation_runs r
+		LEFT JOIN run_uploads u ON r.run_id = u.run_id
+		GROUP BY r.run_id
+		ORDER BY r.created_at DESC;
+	`
+	rows, err := r.db.QueryContext(ctx, query)
+	if err != nil {
+		return nil, fmt.Errorf("failed querying runs list: %w", err)
+	}
+	defer rows.Close()
+
+	var items []RunListItem
+	for rows.Next() {
+		var it RunListItem
+		if err := rows.Scan(
+			&it.RunID, &it.Name, &it.Status, &it.CreatedAt, &it.LastReconciledAt,
+			&it.UploadCount, &it.InternalCount, &it.SettlementCount, &it.BankCount,
+			&it.Hop1MatchedCount, &it.Hop2MatchedCount, &it.FullChainCount,
+			&it.ExceptionCount, &it.UnresolvedAmountPaise, &it.ThroughputRecordsPerSec,
+		); err != nil {
+			return nil, fmt.Errorf("failed scanning run list item: %w", err)
+		}
+		it.UnresolvedAmountINR = float64(it.UnresolvedAmountPaise) / 100.0
+		items = append(items, it)
+	}
+	return items, nil
+}
+
+// GetRunDetail returns full run information including its uploaded files.
+func (r *Repository) GetRunDetail(ctx context.Context, runID uuid.UUID) (*RunDetail, error) {
+	query := `
+		SELECT
+			run_id,
+			COALESCE(NULLIF(name, ''), 'Run ' || SUBSTRING(run_id::text, 1, 8)) AS name,
+			status,
+			created_at,
+			last_reconciled_at,
+			internal_count,
+			settlement_count,
+			bank_count,
+			hop1_matched_count,
+			hop2_matched_count,
+			full_chain_count,
+			exception_count,
+			unresolved_amount_paise,
+			engine_duration_ms,
+			throughput_records_per_sec
+		FROM reconciliation_runs
+		WHERE run_id = $1;
+	`
+	var d RunDetail
+	err := r.db.QueryRowContext(ctx, query, runID).Scan(
+		&d.RunID, &d.Name, &d.Status, &d.CreatedAt, &d.LastReconciledAt,
+		&d.InternalCount, &d.SettlementCount, &d.BankCount,
+		&d.Hop1MatchedCount, &d.Hop2MatchedCount, &d.FullChainCount,
+		&d.ExceptionCount, &d.UnresolvedAmountPaise,
+		&d.EngineDurationMs, &d.ThroughputRecordsPerSec,
+	)
+	if err != nil {
+		return nil, err
+	}
+	d.UnresolvedAmountINR = float64(d.UnresolvedAmountPaise) / 100.0
+	d.Uploads = []models.RunUpload{}
+	d.ExceptionBreakdown = make(map[string]int)
+
+	// Fetch uploads for this run
+	upQuery := `
+		SELECT upload_id, run_id, source_type, filename, column_mapping, row_count, uploaded_at
+		FROM run_uploads
+		WHERE run_id = $1
+		ORDER BY uploaded_at ASC;
+	`
+	upRows, err := r.db.QueryContext(ctx, upQuery, runID)
+	if err == nil {
+		defer upRows.Close()
+		for upRows.Next() {
+			var u models.RunUpload
+			if err := upRows.Scan(
+				&u.UploadID, &u.RunID, &u.SourceType, &u.Filename,
+				&u.ColumnMapping, &u.RowCount, &u.UploadedAt,
+			); err == nil {
+				d.Uploads = append(d.Uploads, u)
+			}
+		}
+	}
+
+	// Fetch exception category breakdown
+	excQuery := `SELECT category, COUNT(*) FROM exceptions WHERE run_id = $1 GROUP BY category;`
+	excRows, err := r.db.QueryContext(ctx, excQuery, runID)
+	if err == nil {
+		defer excRows.Close()
+		for excRows.Next() {
+			var cat string
+			var count int
+			if err := excRows.Scan(&cat, &count); err == nil {
+				d.ExceptionBreakdown[cat] = count
+			}
+		}
+	}
+
+	return &d, nil
+}
+
+// DeleteRun deletes a run and all associated records via CASCADE.
+func (r *Repository) DeleteRun(ctx context.Context, runID uuid.UUID) error {
+	query := `DELETE FROM reconciliation_runs WHERE run_id = $1;`
+	res, err := r.db.ExecContext(ctx, query, runID)
+	if err != nil {
+		return fmt.Errorf("failed deleting run: %w", err)
+	}
+	rowsAff, _ := res.RowsAffected()
+	if rowsAff == 0 {
+		return fmt.Errorf("run not found")
+	}
+	return nil
+}
+
+// RecordUpload records an uploaded file into run_uploads and marks the run STALE if previously RECONCILED.
+func (r *Repository) RecordUpload(ctx context.Context, upload models.RunUpload) error {
+	query := `
+		INSERT INTO run_uploads (
+			upload_id, run_id, source_type, filename, column_mapping, row_count, uploaded_at
+		) VALUES ($1, $2, $3, $4, $5, $6, NOW());
+	`
+	if _, err := r.db.ExecContext(ctx, query,
+		upload.UploadID, upload.RunID, upload.SourceType, upload.Filename,
+		upload.ColumnMapping, upload.RowCount,
+	); err != nil {
+		return fmt.Errorf("failed recording upload: %w", err)
+	}
+
+	// Invalidate previous results: if run was RECONCILED, flip to STALE
+	updateQuery := `
+		UPDATE reconciliation_runs
+		SET status = 'STALE'
+		WHERE run_id = $1 AND status = 'RECONCILED';
+	`
+	_, _ = r.db.ExecContext(ctx, updateQuery, upload.RunID)
+	return nil
+}
+

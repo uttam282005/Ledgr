@@ -24,9 +24,9 @@ func TestAPI_RunEndpoints(t *testing.T) {
 	qaService := qa.NewQAService(database, cfg.NvidiaAPIKey, cfg.NvidiaNIMBaseURL, cfg.NvidiaNIMModel)
 	server := NewServer(database, qaService, cfg)
 
-	// Fetch latest run_id from DB
+	// Fetch latest 500-case seeded run_id from DB
 	var runID uuid.UUID
-	err = database.QueryRow(`SELECT run_id FROM reconciliation_runs ORDER BY started_at DESC LIMIT 1;`).Scan(&runID)
+	err = database.QueryRow(`SELECT run_id FROM reconciliation_runs WHERE seed = 42 ORDER BY started_at DESC LIMIT 1;`).Scan(&runID)
 	if err != nil {
 		t.Fatalf("No run found in DB: %v", err)
 	}

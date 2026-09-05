@@ -51,9 +51,14 @@ Rules:
 4. Be concise, direct, and structured. Bullet points are encouraged when listing multiple reasons or breakdown categories.
 5. Do not speculate or extrapolate beyond the provided data.`
 
-	// Enrich rows with pre-calculated formatted Indian Rupee strings
-	enrichedRows := make([]map[string]interface{}, len(rows))
-	for i, r := range rows {
+	// Enrich rows with pre-calculated formatted Indian Rupee strings (capped at 10 rows for fast LLM inference)
+	maxRows := len(rows)
+	if maxRows > 10 {
+		maxRows = 10
+	}
+	enrichedRows := make([]map[string]interface{}, maxRows)
+	for i := 0; i < maxRows; i++ {
+		r := rows[i]
 		er := make(map[string]interface{})
 		for k, v := range r {
 			er[k] = v
@@ -97,7 +102,7 @@ Rules:
 	httpReq.Header.Set("Content-Type", "application/json")
 	httpReq.Header.Set("Authorization", "Bearer "+apiKey)
 
-	client := &http.Client{Timeout: 15 * time.Second}
+	client := &http.Client{Timeout: 4 * time.Second}
 	resp, err := client.Do(httpReq)
 	if err != nil {
 		return "", err
@@ -288,6 +293,38 @@ func generateGroundedAnswerOffline(question string, rows []map[string]interface{
 		return b.String()
 	}
 
+	// Case 5b: Hop 1 vs Hop 2 match summary
+	if h1, ok := firstRow["hop1_matched_count"]; ok {
+		h2 := firstRow["hop2_matched_count"]
+		full := firstRow["full_chain_count"]
+		ex := firstRow["exception_count"]
+		return fmt.Sprintf("Hop match summary: Hop 1 (hop1) matched = %v, Hop 2 (hop2) matched = %v, Full chain reconciled = %v, Exceptions = %v.", h1, h2, full, ex)
+	}
+
+	// Case 5c: Settlement batches summary
+	if _, ok := firstRow["batch_id"]; ok {
+		var parts []string
+		for _, r := range rows {
+			bID := r["batch_id"]
+			sCnt := r["settlement_count"]
+			tAmt := formatPaise(r["total_settled_paise"])
+			if sCnt != nil {
+				parts = append(parts, fmt.Sprintf("Batch %v: %v settlements totaling %s", bID, sCnt, tAmt))
+			} else {
+				parts = append(parts, fmt.Sprintf("Batch %v (%s)", bID, tAmt))
+			}
+		}
+		return fmt.Sprintf("Top settlement batches: %s.", strings.Join(parts, "; "))
+	}
+
+	// Case 5d: Count & exposure summary
+	if cnt, ok := firstRow["count"]; ok && len(firstRow) <= 2 {
+		if exp, hasExp := firstRow["total_exposure_paise"]; hasExp {
+			return fmt.Sprintf("Settled but not banked count: %v record(s) with total unresolved exposure of %s.", cnt, formatPaise(exp))
+		}
+		return fmt.Sprintf("Total count: %v record(s).", cnt)
+	}
+
 	// Case 6: Reconciliation run totals (unresolved_amount_paise, exception_count, full_chain_count)
 	if unres, ok := firstRow["unresolved_amount_paise"]; ok {
 		exCount := firstRow["exception_count"]
@@ -296,7 +333,67 @@ func generateGroundedAnswerOffline(question string, rows []map[string]interface{
 			formatPaise(unres), exCount, fullCount)
 	}
 
-	// Case 7: Single count / sum result
+	// Case 7: Reconciliation matches list
+	if _, ok := firstRow["internal_id"]; ok {
+		return fmt.Sprintf("Found %d reconciliation match record(s) for this run. Result table contains ID mapping, hop matching rules, and settlement/bank deltas.", len(rows))
+	}
+
+	// Case 8: Internal transactions list
+	if _, ok := firstRow["transaction_date"]; ok {
+		var totalPaise int64
+		for _, r := range rows {
+			if a, ok := r["amount_paise"].(int64); ok {
+				totalPaise += a
+			} else if aF, ok := r["amount_paise"].(float64); ok {
+				totalPaise += int64(aF)
+			}
+		}
+		return fmt.Sprintf("Found %d internal ledger transaction(s) totaling %s.", len(rows), formatPaise(totalPaise))
+	}
+
+	// Case 9: Settlement records list
+	if _, ok := firstRow["settlement_date"]; ok {
+		var totalPaise int64
+		for _, r := range rows {
+			if a, ok := r["settled_amount_paise"].(int64); ok {
+				totalPaise += a
+			} else if aF, ok := r["settled_amount_paise"].(float64); ok {
+				totalPaise += int64(aF)
+			}
+		}
+		return fmt.Sprintf("Found %d gateway settlement record(s) totaling %s.", len(rows), formatPaise(totalPaise))
+	}
+
+	// Case 10: Bank statements list
+	if _, ok := firstRow["credit_date"]; ok {
+		var totalPaise int64
+		for _, r := range rows {
+			if a, ok := r["credited_amount_paise"].(int64); ok {
+				totalPaise += a
+			} else if aF, ok := r["credited_amount_paise"].(float64); ok {
+				totalPaise += int64(aF)
+			}
+		}
+		return fmt.Sprintf("Found %d bank statement deposit(s) totaling %s.", len(rows), formatPaise(totalPaise))
+	}
+
+	// Case 11: Merchants list
+	if _, ok := firstRow["merchant_id"]; ok && len(firstRow) == 1 {
+		var mList []string
+		for _, r := range rows {
+			if m, ok := r["merchant_id"].(string); ok {
+				mList = append(mList, m)
+			}
+		}
+		return fmt.Sprintf("Active merchants in this run (%d): %s.", len(mList), strings.Join(mList, ", "))
+	}
+
+	// Case 12: Audit log
+	if _, ok := firstRow["decision_id"]; ok {
+		return fmt.Sprintf("Found %d audit decision log entry/entries for this run with rule execution and outcome metadata.", len(rows))
+	}
+
+	// Case 13: Generic / Single count or aggregate result
 	var parts []string
 	for k, v := range firstRow {
 		if strings.Contains(k, "paise") || strings.Contains(k, "amount") {

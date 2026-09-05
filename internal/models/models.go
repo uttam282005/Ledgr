@@ -1,14 +1,26 @@
 package models
 
 import (
+	"encoding/json"
 	"time"
 
 	"github.com/google/uuid"
 )
 
-// ReconciliationRun represents a single deterministic evaluation run.
+// Run status constants per spec
+const (
+	RunStatusDraft      = "DRAFT"
+	RunStatusReconciled = "RECONCILED"
+	RunStatusStale      = "STALE"
+)
+
+// ReconciliationRun represents an isolated reconciliation workspace run.
 type ReconciliationRun struct {
 	RunID                   uuid.UUID  `json:"run_id" db:"run_id"`
+	Name                    string     `json:"name" db:"name"`
+	Status                  string     `json:"status" db:"status"` // DRAFT | RECONCILED | STALE
+	CreatedAt               time.Time  `json:"created_at" db:"created_at"`
+	LastReconciledAt        *time.Time `json:"last_reconciled_at,omitempty" db:"last_reconciled_at"`
 	Seed                    int64      `json:"seed" db:"seed"`
 	DatasetVersion          string     `json:"dataset_version" db:"dataset_version"`
 	EngineVersion           string     `json:"engine_version" db:"engine_version"`
@@ -26,6 +38,18 @@ type ReconciliationRun struct {
 	SourceRecordsProcessed  int        `json:"source_records_processed" db:"source_records_processed"`
 	ThroughputRecordsPerSec float64    `json:"throughput_records_per_sec" db:"throughput_records_per_sec"`
 }
+
+// RunUpload tracks a single uploaded file inside a run.
+type RunUpload struct {
+	UploadID      uuid.UUID       `json:"upload_id" db:"upload_id"`
+	RunID         uuid.UUID       `json:"run_id" db:"run_id"`
+	SourceType    string          `json:"source_type" db:"source_type"`
+	Filename      string          `json:"filename" db:"filename"`
+	ColumnMapping json.RawMessage `json:"column_mapping" db:"column_mapping"`
+	RowCount      int             `json:"row_count" db:"row_count"`
+	UploadedAt    time.Time       `json:"uploaded_at" db:"uploaded_at"`
+}
+
 
 // InternalTransaction represents a gross ledger record.
 type InternalTransaction struct {

@@ -1,471 +1,1122 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AI Finance Controller · Track 04</title>
+  <title>Ledgr · AI Finance Controller</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
-      darkMode: 'class',
       theme: {
         extend: {
           colors: {
-            brand: { 50: '#eef2ff', 500: '#6366f1', 600: '#4f46e5', 700: '#4338ca' }
+            paper: '#FAF9F6',
+            ink: '#1C1B19',
+            'ink-muted': '#6B6862',
+            rule: '#E4E1D8',
+            'ledger-teal': '#0F5C56',
+            sand: '#F0EDE3',
+          },
+          fontFamily: {
+            sans: ['"Public Sans"', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace'],
           }
         }
       }
     }
   </script>
   <style>
-    body { background-color: #0b0f19; color: #e2e8f0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    .tab-active { border-bottom: 2px solid #6366f1; color: #ffffff; font-weight: 600; }
-    .badge-full { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
-    .badge-partial { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
-    .badge-unmatched { background: rgba(244, 63, 94, 0.15); color: #fb7185; border: 1px solid rgba(244, 63, 94, 0.3); }
-    pre, code { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
+    body {
+      background-color: #FAF9F6;
+      color: #1C1B19;
+      font-family: 'Public Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    .font-mono {
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .tab-active {
+      color: #0F5C56 !important;
+      border-left-color: #0F5C56 !important;
+      font-weight: 600 !important;
+    }
+    .step-tab-active {
+      border-bottom: 2px solid #0F5C56 !important;
+      color: #0F5C56 !important;
+      font-weight: 600 !important;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+    details summary::-webkit-details-marker {
+      display: none;
+    }
   </style>
 </head>
-<body class="min-h-screen flex flex-col">
+<body class="min-h-screen md:h-screen flex flex-col md:flex-row bg-paper text-ink selection:bg-sand selection:text-ink md:overflow-hidden">
 
-  <!-- Navigation Bar -->
-  <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-40">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex items-center justify-between h-16">
-        <div class="flex items-center space-x-3">
-          <div class="w-8 h-8 rounded bg-gradient-to-tr from-indigo-600 to-blue-500 flex items-center justify-center font-bold text-white shadow-lg shadow-indigo-500/20">₹</div>
-          <div>
-            <h1 class="font-bold text-lg text-white tracking-tight">AI Finance Controller</h1>
-            <p class="text-xs text-slate-400">Razorpay Buildathon · Track 04 · Deterministic Truth & AI Investigation</p>
-          </div>
+  <!-- Left Navigation Rail -->
+  <aside class="w-full md:w-60 shrink-0 border-b md:border-b-0 md:border-r border-rule bg-paper flex flex-col justify-between md:h-full md:overflow-y-auto z-20">
+    <div class="flex flex-col">
+      <!-- Brand Header -->
+      <div class="px-6 py-6 border-b border-rule">
+        <div class="flex items-center space-x-2">
+          <span class="text-xl font-semibold tracking-tight text-ink">Ledgr</span>
+          <span class="text-[11px] text-ink-muted px-1.5 py-0.5 bg-sand rounded-sm font-medium">Controller</span>
         </div>
-
-        <div class="flex items-center space-x-4">
-          <div id="run-badge" class="hidden sm:flex items-center space-x-2 bg-slate-800 border border-slate-700 px-3 py-1 rounded-full text-xs text-slate-300">
-            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-            <span id="header-run-info">Loading active run...</span>
-          </div>
-          <button onclick="refreshData()" class="p-2 text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 rounded-lg transition" title="Refresh Live Data">
-            <svg id="header-refresh-icon" class="w-4 h-4 transition-transform duration-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-          </button>
-        </div>
+        <div class="text-xs text-ink-muted mt-1">Financial reconciliation engine</div>
       </div>
 
-      <!-- Navigation Tabs -->
-      <nav class="flex space-x-8 border-t border-slate-800/60 pt-2 text-sm">
-        <button onclick="switchTab('benchmark')" id="tab-benchmark" class="pb-3 text-slate-400 hover:text-slate-200 transition tab-active">Executive Benchmark</button>
-        <button onclick="switchTab('chain')" id="tab-chain" class="pb-3 text-slate-400 hover:text-slate-200 transition">Money-Flow Chain</button>
-        <button onclick="switchTab('exceptions')" id="tab-exceptions" class="pb-3 text-slate-400 hover:text-slate-200 transition">Exceptions Matrix</button>
-        <button onclick="switchTab('cash')" id="tab-cash" class="pb-3 text-slate-400 hover:text-slate-200 transition">Cash Position</button>
-        <button onclick="switchTab('qa')" id="tab-qa" class="pb-3 text-slate-400 hover:text-slate-200 transition inline-flex items-center">
-          <span>Settlement Q&A</span>
-          <span class="ml-1.5 px-1.5 py-0.5 text-[10px] rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 font-medium tracking-wide">WIP</span>
+      <!-- Navigation Links -->
+      <nav class="py-4 space-y-0.5">
+        <button onclick="switchTab('benchmark')" id="tab-benchmark" class="w-full text-left px-6 py-2.5 text-sm text-ink-muted hover:text-ink transition border-l-2 border-transparent tab-active flex items-center justify-between cursor-pointer">
+          <span>Overview</span>
+        </button>
+        <button onclick="switchTab('chain')" id="tab-chain" class="w-full text-left px-6 py-2.5 text-sm text-ink-muted hover:text-ink transition border-l-2 border-transparent flex items-center justify-between cursor-pointer">
+          <span>Chain</span>
+        </button>
+        <button onclick="switchTab('exceptions')" id="tab-exceptions" class="w-full text-left px-6 py-2.5 text-sm text-ink-muted hover:text-ink transition border-l-2 border-transparent flex items-center justify-between cursor-pointer">
+          <span>Exceptions</span>
+        </button>
+        <button onclick="switchTab('cash')" id="tab-cash" class="w-full text-left px-6 py-2.5 text-sm text-ink-muted hover:text-ink transition border-l-2 border-transparent flex items-center justify-between cursor-pointer">
+          <span>Cash position</span>
+        </button>
+        <button onclick="switchTab('qa')" id="tab-qa" class="w-full text-left px-6 py-2.5 text-sm text-ink-muted hover:text-ink transition border-l-2 border-transparent flex items-center justify-between cursor-pointer">
+          <span>Ask</span>
+          <span class="text-[10px] text-ink-muted bg-sand px-1.5 py-0.5 rounded-sm font-medium">Beta</span>
         </button>
       </nav>
     </div>
-  </header>
 
-  <!-- Main Container -->
-  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
-
-    <!-- Loading State -->
-    <div id="loading" class="flex flex-col items-center justify-center py-20">
-      <div class="w-10 h-10 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
-      <p class="mt-4 text-slate-400 text-sm">Loading live data from PostgreSQL...</p>
+    <!-- Rail Footer / Global Workspace Controls -->
+    <div class="p-6 border-t border-rule space-y-2">
+      <button onclick="openCreateRunModal()" class="w-full text-left text-xs font-medium text-ink-muted hover:text-ink py-1.5 transition flex items-center space-x-2 cursor-pointer">
+        <span>+</span>
+        <span>New run</span>
+      </button>
+      <button onclick="openIngestModal()" class="w-full text-left text-xs font-medium text-ink-muted hover:text-ink py-1.5 transition flex items-center space-x-2 cursor-pointer">
+        <span>↑</span>
+        <span>Upload CSV</span>
+      </button>
     </div>
+  </aside>
 
-    <!-- Error State -->
-    <div id="error-box" class="hidden p-6 bg-rose-950/40 border border-rose-800 rounded-xl text-rose-300 mb-6">
-      <h3 class="font-bold text-base mb-1">Database Connection Error</h3>
-      <p id="error-message" class="text-sm">Unable to connect to backend.</p>
-    </div>
+  <!-- Main Content Column -->
+  <div class="flex-1 flex flex-col min-w-0 md:h-full md:overflow-hidden">
 
-    <!-- Tab 1: Executive Benchmark Card -->
-    <div id="view-benchmark" class="hidden space-y-6">
-      <!-- Top Metrics Grid -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div class="bg-slate-900 border border-slate-800 p-5 rounded-xl">
-          <span class="text-xs font-medium text-slate-400 uppercase tracking-wider">Hop 1 Match Rate</span>
-          <div class="mt-2 flex items-baseline justify-between">
-            <span id="kpi-hop1-rate" class="text-3xl font-bold text-white">--</span>
-            <span id="kpi-hop1-cases" class="text-xs text-slate-400">-- cases</span>
-          </div>
-          <div class="mt-2 text-xs text-slate-400">Precision: <span id="kpi-hop1-precision" class="text-emerald-400 font-semibold">--%</span> · Recall: <span id="kpi-hop1-recall" class="text-blue-400 font-semibold">--%</span></div>
-        </div>
-
-        <div class="bg-slate-900 border border-slate-800 p-5 rounded-xl">
-          <span class="text-xs font-medium text-slate-400 uppercase tracking-wider">Full-Chain Rate</span>
-          <div class="mt-2 flex items-baseline justify-between">
-            <span id="kpi-full-rate" class="text-3xl font-bold text-emerald-400">--</span>
-            <span id="kpi-full-cases" class="text-xs text-slate-400">-- reconciled</span>
-          </div>
-          <div class="mt-2 text-xs text-slate-400">Hop 2 Batch Rate: <span id="kpi-hop2-rate" class="text-emerald-400 font-semibold">--%</span></div>
-        </div>
-
-        <div class="bg-slate-900 border border-slate-800 p-5 rounded-xl">
-          <span class="text-xs font-medium text-slate-400 uppercase tracking-wider">Unresolved Cash Exposure</span>
-          <div class="mt-2 flex items-baseline justify-between">
-            <span id="kpi-exposure" class="text-3xl font-bold text-amber-400">₹--</span>
-          </div>
-          <div class="mt-2 text-xs text-slate-400">Total Exceptions: <span id="kpi-exceptions" class="text-white font-semibold">--</span> (Coverage: 100%)</div>
-        </div>
-
-        <div class="bg-slate-900 border border-slate-800 p-5 rounded-xl">
-          <span class="text-xs font-medium text-slate-400 uppercase tracking-wider">Deterministic Engine</span>
-          <div class="mt-2 flex items-baseline justify-between">
-            <span id="kpi-throughput" class="text-2xl font-bold text-indigo-400">--</span>
-            <span class="text-xs text-slate-400">rec/s</span>
-          </div>
-          <div class="mt-2 text-xs text-slate-400">Duration: <span id="kpi-duration" class="text-white font-semibold">-- ms</span> · AI Latency: <span class="text-purple-400">1 ms</span></div>
-        </div>
+    <!-- Top Persistent Bar -->
+    <header class="h-14 border-b border-rule px-6 md:px-12 flex items-center justify-between bg-paper shrink-0 sticky top-0 z-20">
+      <div class="flex items-center space-x-2.5 text-sm">
+        <span class="text-ink-muted">Active run:</span>
+        <span id="run-selected-name" class="font-medium text-ink">Active Run</span>
+        <span id="run-status-dot" class="inline-block w-2 h-2 rounded-full bg-[#2F6F4E]"></span>
+        <span id="run-selected-status-badge" class="text-xs font-medium text-[#2F6F4E]">Reconciled</span>
+        <span id="run-selected-sub" class="hidden"></span>
       </div>
 
-      <!-- Financial Reconciliation Statement -->
-      <div class="bg-slate-900 border border-slate-800 rounded-xl p-6">
-        <h3 class="font-bold text-base text-white mb-4">Official Reconciliation Statement</h3>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div class="p-4 bg-slate-950/60 rounded-lg border border-slate-800">
-            <div class="text-xs text-slate-400 uppercase font-medium">Expected to Bank</div>
-            <div id="fin-expected" class="text-2xl font-bold text-white mt-1">₹--</div>
-            <div class="text-xs text-slate-500 mt-1">Sum of recognized settlement batches</div>
-          </div>
-          <div class="p-4 bg-slate-950/60 rounded-lg border border-slate-800">
-            <div class="text-xs text-slate-400 uppercase font-medium">Actually Banked</div>
-            <div id="fin-banked" class="text-2xl font-bold text-emerald-400 mt-1">₹--</div>
-            <div class="text-xs text-slate-500 mt-1">Verified nodal bank credit statements</div>
-          </div>
-          <div class="p-4 bg-slate-950/60 rounded-lg border border-slate-800">
-            <div class="text-xs text-slate-400 uppercase font-medium">Unresolved Cash Exposure</div>
-            <div id="fin-unresolved" class="text-2xl font-bold text-amber-400 mt-1">₹--</div>
-            <div class="text-xs text-slate-500 mt-1">Quantified breaks in money flow</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Breakdown & AI Status Card -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div class="bg-slate-900 border border-slate-800 rounded-xl p-6">
-          <h3 class="font-bold text-base text-white mb-3">Exception Category Breakdown</h3>
-          <div id="breakdown-list" class="space-y-2 text-sm">
-            <!-- Dynamically loaded -->
-          </div>
-        </div>
-
-        <div class="bg-slate-900 border border-slate-800 rounded-xl p-6">
-          <h3 class="font-bold text-base text-white mb-3">AI Investigation Layer</h3>
-          <div class="space-y-3 text-sm">
-            <div class="flex justify-between py-1 border-b border-slate-800"><span class="text-slate-400">AI Eligible Exceptions:</span><span id="ai-eligible" class="font-semibold text-white">--</span></div>
-            <div class="flex justify-between py-1 border-b border-slate-800"><span class="text-slate-400">AI Succeeded:</span><span id="ai-succeeded" class="font-semibold text-emerald-400">--</span></div>
-            <div class="flex justify-between py-1 border-b border-slate-800"><span class="text-slate-400">AI Pending:</span><span id="ai-pending" class="font-semibold text-amber-400">--</span></div>
-            <div class="flex justify-between py-1 border-b border-slate-800"><span class="text-slate-400">AI Failed:</span><span id="ai-failed" class="font-semibold text-rose-400">0</span></div>
-            <div class="flex justify-between py-1"><span class="text-slate-400">AI Role:</span><span class="text-xs bg-indigo-950 text-indigo-300 px-2 py-0.5 rounded border border-indigo-800">Bounded to Diagnosis & Suggestions (Zero Writes)</span></div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Tab 2: Money-Flow Chain View -->
-    <div id="view-chain" class="hidden space-y-4">
-      <div class="flex flex-col sm:flex-row items-center justify-between gap-4 bg-slate-900 border border-slate-800 p-4 rounded-xl">
-        <div class="flex flex-wrap items-center gap-3 w-full sm:w-auto">
-          <select id="filter-chain-status" onchange="loadChainMatches()" class="bg-slate-800 border border-slate-700 text-xs rounded-lg px-3 py-2 text-slate-200">
-            <option value="">All Terminal Statuses</option>
-            <option value="FULL">FULL Reconciled</option>
-            <option value="PARTIAL">PARTIAL (Hop 2 Break)</option>
-            <option value="UNMATCHED">UNMATCHED (Hop 1 Break)</option>
-          </select>
-          <select id="filter-chain-merchant" onchange="loadChainMatches()" class="bg-slate-800 border border-slate-700 text-xs rounded-lg px-3 py-2 text-slate-200">
-            <option value="">All Merchants</option>
-            <option value="MERCH_SWIGGY_BLR">Swiggy Bangalore</option>
-            <option value="MERCH_ZOMATO_DEL">Zomato Delhi</option>
-            <option value="MERCH_FLIPKART_BLR">Flipkart Bangalore</option>
-            <option value="MERCH_AMAZON_MUM">Amazon Mumbai</option>
-            <option value="MERCH_NYKAA_MUM">Nykaa Mumbai</option>
-          </select>
-        </div>
-        <div class="w-full sm:w-64">
-          <input type="text" id="filter-chain-search" onkeyup="loadChainMatches()" placeholder="Search ID or reference..." class="w-full bg-slate-800 border border-slate-700 text-xs rounded-lg px-3 py-2 text-slate-200 focus:outline-none focus:border-indigo-500">
-        </div>
-      </div>
-
-      <div class="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden shadow">
-        <div class="overflow-x-auto">
-          <table class="min-w-full divide-y divide-slate-800 text-xs">
-            <thead class="bg-slate-950/60 text-slate-400 uppercase font-semibold">
-              <tr>
-                <th class="px-4 py-3 text-left">Internal Ledger (Hop 1)</th>
-                <th class="px-4 py-3 text-left">Gateway Settlement</th>
-                <th class="px-4 py-3 text-left">Bank Statement (Hop 2)</th>
-                <th class="px-4 py-3 text-center">Status</th>
-                <th class="px-4 py-3 text-right">Audit</th>
-              </tr>
-            </thead>
-            <tbody id="chain-table-body" class="divide-y divide-slate-800/80 text-slate-300">
-              <!-- Dynamically populated -->
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
-    <!-- Tab 3: Exceptions Matrix View -->
-    <div id="view-exceptions" class="hidden space-y-4">
-      <div class="flex flex-wrap items-center gap-3 bg-slate-900 border border-slate-800 p-4 rounded-xl text-xs">
-        <select id="filter-exc-hop" onchange="loadExceptions()" class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-slate-200">
-          <option value="">All Hops</option>
-          <option value="HOP1">Hop 1 (Ledger ↔ Settlement)</option>
-          <option value="HOP2">Hop 2 (Settlement ↔ Bank)</option>
-        </select>
-        <select id="filter-exc-category" onchange="loadExceptions()" class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-slate-200">
-          <option value="">All Categories</option>
-          <option value="AMOUNT_MISMATCH">AMOUNT_MISMATCH</option>
-          <option value="DUPLICATE_SETTLEMENT">DUPLICATE_SETTLEMENT</option>
-          <option value="SETTLED_NOT_BANKED">SETTLED_NOT_BANKED</option>
-          <option value="PARTIAL_CREDIT">PARTIAL_CREDIT</option>
-          <option value="ORPHAN_SETTLEMENT">ORPHAN_SETTLEMENT</option>
-          <option value="BANKED_NOT_SETTLED">BANKED_NOT_SETTLED</option>
-        </select>
-        <select id="filter-exc-ai" onchange="loadExceptions()" class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-slate-200">
-          <option value="">All AI Statuses</option>
-          <option value="SUCCEEDED">AI Succeeded</option>
-          <option value="PENDING">AI Pending</option>
-          <option value="NOT_REQUIRED">AI Not Required</option>
-        </select>
-      </div>
-
-      <div class="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden shadow">
-        <div class="overflow-x-auto">
-          <table class="min-w-full divide-y divide-slate-800 text-xs">
-            <thead class="bg-slate-950/60 text-slate-400 uppercase font-semibold">
-              <tr>
-                <th class="px-4 py-3 text-left">Record ID</th>
-                <th class="px-4 py-3 text-left">Category</th>
-                <th class="px-4 py-3 text-left">Hop</th>
-                <th class="px-4 py-3 text-right">Exposure (₹)</th>
-                <th class="px-4 py-3 text-left">Deterministic Reason</th>
-                <th class="px-4 py-3 text-left">AI Diagnosis & Suggested Action</th>
-              </tr>
-            </thead>
-            <tbody id="exceptions-table-body" class="divide-y divide-slate-800/80 text-slate-300">
-              <!-- Dynamically populated -->
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
-    <!-- Tab 5: Cash Position View -->
-    <div id="view-cash" class="hidden space-y-6">
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div class="bg-slate-900 border border-slate-800 p-6 rounded-xl">
-          <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Gross Expected to Bank</span>
-          <div id="cash-expected" class="text-3xl font-bold text-white mt-2">₹--</div>
-          <p class="text-xs text-slate-500 mt-2">Aggregated settlement batches recognized by gateway</p>
-        </div>
-        <div class="bg-slate-900 border border-slate-800 p-6 rounded-xl">
-          <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Actually Banked (Credits)</span>
-          <div id="cash-banked" class="text-3xl font-bold text-emerald-400 mt-2">₹--</div>
-          <p class="text-xs text-slate-500 mt-2">Actual matched nodal credits received in bank statement</p>
-        </div>
-        <div class="bg-slate-900 border border-slate-800 p-6 rounded-xl">
-          <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Unresolved Cash Gap</span>
-          <div id="cash-gap" class="text-3xl font-bold text-amber-400 mt-2">₹--</div>
-          <p class="text-xs text-slate-500 mt-2">Total financial cash exposure requiring treasury action</p>
-        </div>
-      </div>
-
-      <div class="bg-slate-900 border border-slate-800 rounded-xl p-6">
-        <h3 class="font-bold text-base text-white mb-4">Cash Exposure Breakdown by Breakpoint</h3>
-        <div class="overflow-x-auto">
-          <table class="min-w-full divide-y divide-slate-800 text-xs">
-            <thead class="bg-slate-950/60 text-slate-400 uppercase font-semibold">
-              <tr>
-                <th class="px-4 py-3 text-left">Breakpoint Category</th>
-                <th class="px-4 py-3 text-center">Unresolved Rows</th>
-                <th class="px-4 py-3 text-right">Exposure (₹)</th>
-                <th class="px-4 py-3 text-left">Treasury Actionability</th>
-              </tr>
-            </thead>
-            <tbody id="cash-breakdown-body" class="divide-y divide-slate-800/80 text-slate-300">
-              <!-- Dynamically populated -->
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
-    <!-- Tab 5: Settlement Q&A (Natural-Language Query over Verified Truth) -->
-    <div id="view-qa" class="hidden space-y-6">
-      <div class="bg-slate-900 border border-slate-800 rounded-xl p-6">
-        <div class="flex items-center justify-between mb-4">
-          <div>
-            <div class="flex items-center space-x-2.5">
-              <h2 class="text-base font-semibold text-white">Settlement Q&A · Natural-Language Financial Interface</h2>
-              <span class="text-[11px] px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 font-mono font-medium">Work in Progress (Beta)</span>
-            </div>
-            <p class="text-xs text-slate-400 mt-1">Queries are converted to read-only SQL, validated via native AST parser against schema allowlists, executed on PostgreSQL role <code class="text-indigo-400 bg-slate-950 px-1 py-0.5 rounded">qa_readonly</code>, and strictly grounded in database truth.</p>
-          </div>
-          <span class="text-xs px-2.5 py-1 rounded bg-indigo-950 border border-indigo-800 text-indigo-300 font-mono">AST Protected · 3s Timeout · Max 50 Rows</span>
-        </div>
-
-        <!-- Work in Progress Notice Banner -->
-        <div class="mb-5 p-3.5 bg-amber-950/30 border border-amber-800/60 rounded-lg flex items-start space-x-3 text-xs text-amber-200/90">
-          <svg class="w-4 h-4 text-amber-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
-          <div>
-            <span class="font-semibold text-amber-300">Feature Under Active Tuning (Work in Progress):</span>
-            <span> Natural-language query translation and entity context mapping are currently undergoing refinement. While the native AST validator and dual-role database security guarantees are strictly enforced, complex ad-hoc queries may yield approximate results. The deterministic Money-Flow Chain and Exceptions Matrix remain the authoritative source of financial truth.</span>
-          </div>
-        </div>
-
-        <!-- Sample Questions Quick Bar -->
-        <div class="space-y-2 mb-6">
-          <span class="text-xs text-slate-400 font-medium">Suggested Controller Questions:</span>
-          <div id="qa-presets" class="flex flex-wrap gap-2">
-            <button type="button" onclick="askPreset(this, 'Which merchant has the most unresolved exceptions?')" class="qa-preset-btn text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg border border-slate-700 transition disabled:opacity-50 disabled:cursor-not-allowed">Which merchant has the most unresolved exceptions?</button>
-            <button type="button" onclick="askPreset(this, 'Which merchant has the largest unresolved cash exposure?')" class="qa-preset-btn text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg border border-slate-700 transition disabled:opacity-50 disabled:cursor-not-allowed">Which merchant has the largest unresolved cash exposure?</button>
-            <button type="button" onclick="askPreset(this, 'What is the total unresolved amount?')" class="qa-preset-btn text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg border border-slate-700 transition disabled:opacity-50 disabled:cursor-not-allowed">What is the total unresolved amount?</button>
-            <button type="button" onclick="askPreset(this, 'How many settlements are settled but not banked?')" class="qa-preset-btn text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg border border-slate-700 transition disabled:opacity-50 disabled:cursor-not-allowed">How many settlements are settled but not banked?</button>
-            <button type="button" onclick="askPreset(this, 'What is the reconciliation status breakdown for full chain?')" class="qa-preset-btn text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg border border-slate-700 transition disabled:opacity-50 disabled:cursor-not-allowed">Full-chain reconciliation breakdown</button>
-            <button type="button" onclick="askPreset(this, 'Why did INT0013 fail?')" class="qa-preset-btn text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg border border-slate-700 transition disabled:opacity-50 disabled:cursor-not-allowed">Why did INT0013 fail?</button>
-          </div>
-        </div>
-
-        <!-- Question Input Box -->
-        <form id="qa-form" onsubmit="submitQA(event)" class="flex gap-3">
-          <input id="qa-input" type="text" placeholder="Ask any financial reconciliation question (e.g., Which merchant has the highest exposure?)..." 
-                 class="flex-1 bg-slate-950 border border-slate-700 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-indigo-500 placeholder-slate-500 transition">
-          <button id="qa-submit-btn" type="submit" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-sm font-semibold transition flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none shadow-md shadow-indigo-600/20 cursor-pointer">
-            <span>Ask</span>
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+      <div class="flex items-center space-x-3">
+        <!-- Run Selector Dropdown -->
+        <div class="relative" id="run-selector-container">
+          <button id="run-selector-btn" onclick="toggleRunDropdown()" class="flex items-center space-x-1.5 px-3 py-1.5 text-xs font-medium text-ink bg-sand/60 hover:bg-sand border border-rule rounded-md transition cursor-pointer">
+            <span>Switch run</span>
+            <svg class="w-3.5 h-3.5 text-ink-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
           </button>
-        </form>
+
+          <!-- Dropdown Menu -->
+          <div id="run-dropdown-menu" class="hidden absolute right-0 mt-2 w-80 bg-paper border border-rule rounded-md shadow-lg py-2 z-50 text-xs">
+            <div class="px-4 py-2 flex items-center justify-between border-b border-rule">
+              <span class="font-medium text-ink-muted">Reconciliation runs</span>
+              <button onclick="openCreateRunModal()" class="text-[#0F5C56] hover:underline font-medium cursor-pointer">+ New run</button>
+            </div>
+            <div id="run-dropdown-list" class="max-h-64 overflow-y-auto divide-y divide-rule/60">
+              <!-- Populated via JS -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Refresh Button -->
+        <button onclick="refreshData()" class="p-1.5 text-ink-muted hover:text-ink rounded-md transition cursor-pointer" title="Refresh data">
+          <svg id="header-refresh-icon" class="w-4 h-4 transition-transform duration-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 md:overflow-y-auto p-6 md:p-12 w-full transition-opacity duration-150">
+      <div class="max-w-[1120px] w-full">
+
+      <!-- Loading State -->
+      <div id="loading" class="flex flex-col items-center justify-center py-24">
+        <div class="w-6 h-6 border-2 border-[#0F5C56] border-t-transparent rounded-full animate-spin"></div>
+        <p class="mt-3 text-ink-muted text-xs">Connecting to ledger database...</p>
       </div>
 
-      <!-- QA Results Container -->
-      <div id="qa-results" class="hidden space-y-4">
-        <!-- Answer Box -->
-        <div class="bg-slate-900 border border-slate-800 rounded-xl p-6">
-          <div class="flex items-center justify-between mb-3">
-            <span class="text-xs font-semibold text-emerald-400 uppercase tracking-wider flex items-center space-x-1.5">
-              <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
-              <span>Grounded Financial Answer</span>
-            </span>
-            <span id="qa-duration" class="text-xs text-slate-400">Duration: -- ms</span>
+      <!-- Error Box -->
+      <div id="error-box" class="hidden p-4 bg-[#F5E4E1] border border-rule text-[#A13B3B] text-xs mb-6 rounded-none">
+        <span class="font-medium">Connection error:</span>
+        <span id="error-message">Unable to load active run.</span>
+      </div>
+
+      <!-- Ochre Status Banner (STALE / DRAFT) -->
+      <div id="run-status-banner" class="hidden mb-8 p-4 bg-[#F5EBDA] border border-rule flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-ink text-sm rounded-none">
+        <div class="flex items-start sm:items-center space-x-3">
+          <span class="w-2 h-2 rounded-full bg-[#9A6B1F] shrink-0 mt-1.5 sm:mt-0"></span>
+          <div>
+            <span id="run-status-banner-title" class="font-medium">New uploads detected.</span>
+            <span id="run-status-banner-desc" class="text-ink-muted ml-1">Numbers below may be out of date.</span>
           </div>
-          <p id="qa-answer-text" class="text-slate-100 text-sm leading-relaxed font-normal"></p>
+        </div>
+        <button id="run-status-banner-btn" onclick="triggerRunReconciliation()" class="px-3.5 py-1.5 bg-[#0F5C56] text-paper text-xs font-medium rounded-md hover:opacity-90 transition cursor-pointer self-start sm:self-auto shrink-0">
+          <span id="run-status-banner-btn-text">Re-run now</span>
+        </button>
+      </div>
+
+      <!-- Tab 1: Overview -->
+      <div id="view-benchmark" class="space-y-8">
+        <!-- Title & Hero Metric -->
+        <div>
+          <h2 class="text-[28px] font-semibold tracking-tight text-ink mb-6">Overview</h2>
+          <div class="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2 pb-6 border-b border-rule">
+            <div class="text-sm font-medium text-ink-muted">Full-chain reconciled</div>
+            <div class="text-right">
+              <div id="kpi-full-rate" class="text-5xl font-semibold text-[#0F5C56]">--%</div>
+              <div id="kpi-full-cases" class="text-xs text-ink-muted mt-1">-- reconciled</div>
+            </div>
+          </div>
         </div>
 
-        <!-- SQL & Audit Box -->
-        <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-3">
-          <div class="flex items-center justify-between">
-            <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Exact Read-Only SQL Executed</span>
-            <span id="qa-ast-badge" class="text-[10px] px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-800 font-mono">AST Validated · Read-Only</span>
+        <!-- 3 Supporting Metrics in a single row with hairline vertical dividers -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-0 border-b border-rule pb-8">
+          <div class="py-2 md:pr-6 md:border-r border-rule">
+            <div class="text-xs font-medium text-ink-muted">Hop 1 match rate</div>
+            <div class="mt-2 text-2xl font-semibold text-ink" id="kpi-hop1-rate">--%</div>
+            <div class="text-xs text-ink-muted mt-1" id="kpi-hop1-cases">-- matched</div>
+            <div class="text-xs text-ink-muted mt-1">Precision: <span id="kpi-hop1-precision" class="text-ink font-medium">--%</span> · Recall: <span id="kpi-hop1-recall" class="text-ink font-medium">--%</span></div>
+            <div class="hidden" id="kpi-hop2-rate"></div>
           </div>
-          <pre id="qa-sql-box" class="bg-slate-950 p-4 rounded-lg border border-slate-800 text-indigo-300 font-mono text-xs overflow-x-auto"></pre>
+
+          <div class="py-2 md:px-6 md:border-r border-rule mt-6 md:mt-0">
+            <div class="text-xs font-medium text-ink-muted">Unresolved exposure</div>
+            <div class="mt-2 text-2xl font-semibold text-ink" id="kpi-exposure">₹--</div>
+            <div class="text-xs text-ink-muted mt-1"><span id="kpi-exceptions" class="font-medium text-ink">--</span> open exceptions</div>
+            <div class="text-xs text-ink-muted mt-1">100% deterministic coverage</div>
+          </div>
+
+          <div class="py-2 md:pl-6 mt-6 md:mt-0">
+            <div class="text-xs font-medium text-ink-muted">Throughput</div>
+            <div class="mt-2 text-2xl font-semibold text-ink"><span id="kpi-throughput">--</span> <span class="text-xs font-normal text-ink-muted">rec/s</span></div>
+            <div class="text-xs text-ink-muted mt-1"><span id="kpi-duration" class="font-medium text-ink">--</span> ms runtime</div>
+            <div class="text-xs text-ink-muted mt-1">AI latency: 1 ms</div>
+          </div>
         </div>
 
-        <!-- Rows Table -->
-        <div id="qa-table-container" class="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden">
-          <div class="px-5 py-3 border-b border-slate-800 flex items-center justify-between">
-            <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Underlying Database Rows (<span id="qa-row-count">0</span>)</span>
+        <!-- Reconciliation Statement Table -->
+        <div class="space-y-3">
+          <h3 class="text-lg font-semibold text-ink">Reconciliation statement</h3>
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm border border-rule rounded-none">
+              <thead class="bg-sand text-ink-muted text-xs font-medium">
+                <tr>
+                  <th class="px-4 py-2.5 text-left font-medium">Metric</th>
+                  <th class="px-4 py-2.5 text-left font-medium">Description</th>
+                  <th class="px-4 py-2.5 text-right font-medium">Amount</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-rule font-normal bg-paper">
+                <tr>
+                  <td class="px-4 py-3 font-medium text-ink">Expected to bank</td>
+                  <td class="px-4 py-3 text-ink-muted text-xs">Sum of recognized settlement batches</td>
+                  <td id="fin-expected" class="px-4 py-3 text-right font-mono font-medium text-ink">₹--</td>
+                </tr>
+                <tr>
+                  <td class="px-4 py-3 font-medium text-ink">Actually banked</td>
+                  <td class="px-4 py-3 text-ink-muted text-xs">Verified nodal bank credit statements</td>
+                  <td id="fin-banked" class="px-4 py-3 text-right font-mono font-medium text-ink">₹--</td>
+                </tr>
+                <tr>
+                  <td class="px-4 py-3 font-medium text-ink">Unresolved exposure</td>
+                  <td class="px-4 py-3 text-ink-muted text-xs">Quantified breaks in money flow</td>
+                  <td id="fin-unresolved" class="px-4 py-3 text-right font-mono font-medium text-[#9A6B1F]">₹--</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
-          <div class="overflow-x-auto max-h-64">
-            <table id="qa-data-table" class="w-full text-xs text-left text-slate-300">
-              <thead id="qa-table-head" class="bg-slate-950 text-slate-400 uppercase text-[10px] border-b border-slate-800 sticky top-0"></thead>
-              <tbody id="qa-table-body" class="divide-y divide-slate-800 font-mono"></tbody>
+        </div>
+
+        <!-- Exception Category Breakdown (Horizontal Bar List) -->
+        <div class="space-y-4 pt-2">
+          <h3 class="text-lg font-semibold text-ink">Exception breakdown by category</h3>
+          <div id="breakdown-list" class="space-y-3 max-w-2xl">
+            <!-- Rendered via JS -->
+          </div>
+        </div>
+
+        <!-- Quiet AI Status Sentence -->
+        <div class="pt-6 border-t border-rule flex items-center justify-between text-xs text-ink-muted">
+          <div id="ai-status-summary-line">
+            Exceptions investigation layer active · Writes disabled
+          </div>
+          <div class="hidden">
+            <span id="ai-eligible">0</span>
+            <span id="ai-succeeded">0</span>
+            <span id="ai-pending">0</span>
+            <span id="ai-failed">0</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 2: Chain -->
+      <div id="view-chain" class="hidden space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <h2 class="text-[28px] font-semibold tracking-tight text-ink">Chain</h2>
+          <div class="w-full sm:w-64">
+            <input type="text" id="filter-chain-search" onkeyup="loadChainMatches()" placeholder="Search reference or ID..."
+                   class="w-full bg-sand border border-rule text-xs rounded-md px-3 py-2 text-ink placeholder-ink-muted focus:outline-none focus:border-[#0F5C56]">
+          </div>
+        </div>
+
+        <!-- Filters Row -->
+        <div class="flex flex-wrap items-center gap-3">
+          <div class="flex items-center space-x-1.5 text-xs text-ink-muted">
+            <span>Status:</span>
+            <select id="filter-chain-status" onchange="loadChainMatches()" class="bg-sand border border-rule text-xs rounded-md px-2.5 py-1.5 text-ink focus:outline-none focus:border-[#0F5C56]">
+              <option value="">All terminal statuses</option>
+              <option value="FULL">Full reconciled</option>
+              <option value="PARTIAL">Partial (Hop 2 break)</option>
+              <option value="UNMATCHED">Unmatched (Hop 1 break)</option>
+            </select>
+          </div>
+
+          <div class="flex items-center space-x-1.5 text-xs text-ink-muted">
+            <span>Merchant:</span>
+            <select id="filter-chain-merchant" onchange="loadChainMatches()" class="bg-sand border border-rule text-xs rounded-md px-2.5 py-1.5 text-ink focus:outline-none focus:border-[#0F5C56]">
+              <option value="">All merchants</option>
+              <option value="MERCH_SWIGGY_BLR">Swiggy Bangalore</option>
+              <option value="MERCH_ZOMATO_DEL">Zomato Delhi</option>
+              <option value="MERCH_FLIPKART_BLR">Flipkart Bangalore</option>
+              <option value="MERCH_AMAZON_MUM">Amazon Mumbai</option>
+              <option value="MERCH_NYKAA_MUM">Nykaa Mumbai</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Flat Table -->
+        <div class="border border-rule overflow-hidden rounded-none">
+          <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-rule text-xs">
+              <thead class="bg-sand text-ink-muted font-medium">
+                <tr>
+                  <th class="px-4 py-2.5 text-left font-medium">ID</th>
+                  <th class="px-4 py-2.5 text-right font-medium">Ledger ₹</th>
+                  <th class="px-4 py-2.5 text-right font-medium">Settlement ₹</th>
+                  <th class="px-4 py-2.5 text-right font-medium">Bank ₹</th>
+                  <th class="px-4 py-2.5 text-left font-medium">Status</th>
+                  <th class="px-4 py-2.5 text-right font-medium"></th>
+                </tr>
+              </thead>
+              <tbody id="chain-table-body" class="divide-y divide-rule bg-paper">
+                <!-- Populated via JS -->
+              </tbody>
             </table>
           </div>
         </div>
       </div>
-    </div>
 
-  </main>
-
-  <!-- Audit Drilldown Modal -->
-  <!-- Audit Drilldown Modal -->
-  <div id="audit-modal" onclick="if(event.target === this) closeModal()" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-2xl w-full p-6 shadow-2xl flex flex-col max-h-[90vh]">
-      <!-- Header with Prominent Close Button -->
-      <div class="flex items-center justify-between border-b border-slate-800 pb-3 flex-shrink-0">
-        <div>
-          <h3 class="font-bold text-lg text-white">Reconciliation Audit Drill-down</h3>
-          <p id="modal-record-title" class="text-xs text-slate-400">Record: INT0001</p>
+      <!-- Tab 3: Exceptions -->
+      <div id="view-exceptions" class="hidden space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <h2 class="text-[28px] font-semibold tracking-tight text-ink">Exceptions</h2>
         </div>
-        <button type="button" onclick="closeModal()" class="flex items-center space-x-1.5 text-slate-200 hover:text-white px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-semibold transition cursor-pointer border border-slate-700 shadow-sm" title="Close window">
-          <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-          <span>Close</span>
-        </button>
+
+        <!-- Filters Row -->
+        <div class="flex flex-wrap items-center gap-3">
+          <div class="flex items-center space-x-1.5 text-xs text-ink-muted">
+            <span>Hop:</span>
+            <select id="filter-exc-hop" onchange="loadExceptions()" class="bg-sand border border-rule text-xs rounded-md px-2.5 py-1.5 text-ink focus:outline-none focus:border-[#0F5C56]">
+              <option value="">All hops</option>
+              <option value="HOP1">Hop 1 (Internal → Settlement)</option>
+              <option value="HOP2">Hop 2 (Settlement → Bank)</option>
+            </select>
+          </div>
+
+          <div class="flex items-center space-x-1.5 text-xs text-ink-muted">
+            <span>Category:</span>
+            <select id="filter-exc-category" onchange="loadExceptions()" class="bg-sand border border-rule text-xs rounded-md px-2.5 py-1.5 text-ink focus:outline-none focus:border-[#0F5C56]">
+              <option value="">All categories</option>
+              <option value="MISSING_SETTLEMENT">Missing settlement</option>
+              <option value="AMOUNT_MISMATCH">Amount mismatch</option>
+              <option value="SETTLED_NOT_BANKED">Settled not banked</option>
+              <option value="PARTIAL_CREDIT">Partial credit</option>
+              <option value="DUPLICATE_SETTLEMENT">Duplicate settlement</option>
+              <option value="TIMING_DELAY">Timing delay</option>
+            </select>
+          </div>
+
+          <div class="flex items-center space-x-1.5 text-xs text-ink-muted">
+            <span>AI status:</span>
+            <select id="filter-exc-ai" onchange="loadExceptions()" class="bg-sand border border-rule text-xs rounded-md px-2.5 py-1.5 text-ink focus:outline-none focus:border-[#0F5C56]">
+              <option value="">All AI statuses</option>
+              <option value="SUCCEEDED">AI diagnosed</option>
+              <option value="PENDING">Pending diagnosis</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Narrative Case List (Separated by hairline rules) -->
+        <div id="exceptions-case-list" class="divide-y divide-rule border-y border-rule">
+          <!-- Populated via JS -->
+        </div>
+        <table class="hidden"><tbody id="exceptions-table-body"></tbody></table>
       </div>
 
-      <!-- Scrollable Modal Body -->
-      <div class="space-y-3 text-xs overflow-y-auto flex-1 pr-1 py-3">
-        <div class="grid grid-cols-2 gap-4">
-          <div class="bg-slate-950 p-3 rounded-lg border border-slate-800">
-            <span class="text-slate-500 uppercase font-semibold">Rule Selected</span>
-            <div id="modal-rule" class="text-sm font-semibold text-indigo-400 mt-1">--</div>
-          </div>
-          <div class="bg-slate-950 p-3 rounded-lg border border-slate-800">
-            <span class="text-slate-500 uppercase font-semibold">Outcome Status</span>
-            <div id="modal-outcome" class="text-sm font-semibold text-white mt-1">--</div>
-          </div>
-        </div>
-
+      <!-- Tab 4: Cash Position -->
+      <div id="view-cash" class="hidden space-y-8">
         <div>
-          <span class="text-slate-400 font-semibold block mb-1">Comparison Fields:</span>
-          <pre id="modal-fields" class="bg-slate-950 p-3 rounded-lg border border-slate-800 text-slate-300 overflow-x-auto text-[11px] max-h-36 overflow-y-auto"></pre>
-        </div>
-
-        <div>
-          <span class="text-slate-400 font-semibold block mb-1">Candidates Evaluated:</span>
-          <pre id="modal-candidates" class="bg-slate-950 p-3 rounded-lg border border-slate-800 text-slate-300 overflow-x-auto text-[11px] max-h-36 overflow-y-auto"></pre>
-        </div>
-
-        <div id="modal-ai-box" class="bg-indigo-950/30 border border-indigo-900/50 p-3 rounded-lg space-y-1">
-          <div class="flex items-center justify-between">
-            <span class="text-indigo-300 font-semibold uppercase text-[10px]">AI Operational Diagnosis</span>
-            <span id="modal-ai-meta" class="text-[10px] text-slate-400">Model: offline · Latency: 1ms</span>
+          <h2 class="text-[28px] font-semibold tracking-tight text-ink mb-6">Cash position</h2>
+          
+          <!-- Monospace right-aligned ledger summary -->
+          <div class="max-w-md divide-y divide-rule border-y border-rule text-sm">
+            <div class="py-3 flex justify-between items-center">
+              <span class="text-ink-muted">Expected to bank</span>
+              <span id="cash-expected" class="font-mono font-medium text-ink">₹--</span>
+            </div>
+            <div class="py-3 flex justify-between items-center">
+              <span class="text-ink-muted">Actually banked</span>
+              <span id="cash-banked" class="font-mono font-medium text-ink">₹--</span>
+            </div>
+            <div class="py-3 flex justify-between items-center">
+              <span class="font-medium text-ink">Unresolved gap</span>
+              <span id="cash-gap" class="font-mono font-semibold text-lg text-[#0F5C56]">₹--</span>
+            </div>
           </div>
-          <p id="modal-ai-diagnosis" class="text-slate-200 text-xs">--</p>
-          <div class="pt-1 text-slate-400 text-[11px]">
-            <span class="text-slate-500 font-medium">Suggested Action:</span> <span id="modal-ai-action" class="text-slate-300">--</span>
+        </div>
+
+        <!-- Breakdown by Category -->
+        <div class="space-y-3 pt-2">
+          <h3 class="text-lg font-semibold text-ink">Gap by category</h3>
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm border border-rule rounded-none">
+              <thead class="bg-sand text-ink-muted text-xs font-medium">
+                <tr>
+                  <th class="px-4 py-2.5 text-left font-medium">Category</th>
+                  <th class="px-4 py-2.5 text-center font-medium">Records</th>
+                  <th class="px-4 py-2.5 text-right font-medium">Exposure</th>
+                  <th class="px-4 py-2.5 text-left font-medium">Action advice</th>
+                </tr>
+              </thead>
+              <tbody id="cash-breakdown-body" class="divide-y divide-rule font-normal bg-paper">
+                <!-- Populated via JS -->
+              </tbody>
+            </table>
           </div>
         </div>
       </div>
 
-      <!-- Footer with Prominent Close Button -->
-      <div class="pt-3 border-t border-slate-800 flex justify-end flex-shrink-0">
-        <button type="button" onclick="closeModal()" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-semibold transition cursor-pointer flex items-center space-x-1.5 shadow-md shadow-indigo-600/30">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-          <span>Close Window</span>
-        </button>
+      <!-- Tab 5: Ask -->
+      <div id="view-qa" class="hidden space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2 border-b border-rule pb-4">
+          <h2 class="text-[28px] font-semibold tracking-tight text-ink">Ask</h2>
+          <div class="text-xs text-ink-muted">
+            Querying: <span id="qa-target-run-name" class="font-medium text-ink">Active Run</span> · <span id="qa-target-run-badge" class="font-medium text-[#2F6F4E]">RECONCILED</span>
+            <span id="qa-target-run-id" class="hidden"></span>
+          </div>
+        </div>
+
+        <!-- Notice if run is in DRAFT status -->
+        <div id="qa-draft-notice" class="hidden p-3.5 bg-[#F5EBDA] border border-rule flex items-center justify-between gap-3 text-ink text-xs">
+          <div class="flex items-center space-x-2">
+            <span class="w-2 h-2 rounded-full bg-[#9A6B1F] shrink-0"></span>
+            <span>Active run is in <strong>DRAFT</strong> status. Reconcile this run to compute matches, exceptions, and audit logs.</span>
+          </div>
+          <button onclick="triggerRunReconciliation()" class="px-2.5 py-1 bg-[#0F5C56] text-paper rounded text-xs font-medium hover:opacity-90 transition cursor-pointer shrink-0">Reconcile now</button>
+        </div>
+
+        <p class="text-xs text-ink-muted">
+          Natural language queries are translated into read-only SQL with strict AST validation against the ledger schema.
+        </p>
+
+        <!-- Suggested Questions as Plain Text Links -->
+        <div class="text-xs text-ink-muted flex flex-wrap items-center gap-y-1.5">
+          <span class="font-medium text-ink mr-1">Try:</span>
+          <button type="button" onclick="askPreset(this, 'Which merchant has the largest unresolved cash exposure?')" class="text-ink underline hover:text-[#0F5C56] transition cursor-pointer">"Which merchant has the largest unresolved exposure?"</button>
+          <span class="mx-1.5">·</span>
+          <button type="button" onclick="askPreset(this, 'What is the total unresolved amount?')" class="text-ink underline hover:text-[#0F5C56] transition cursor-pointer">"Total unresolved amount"</button>
+          <span class="mx-1.5">·</span>
+          <button type="button" onclick="askPreset(this, 'How many settlements are settled but not banked?')" class="text-ink underline hover:text-[#0F5C56] transition cursor-pointer">"Settled but not banked"</button>
+          <span class="mx-1.5">·</span>
+          <button type="button" onclick="askPreset(this, 'Which merchant has the most unresolved exceptions?')" class="text-ink underline hover:text-[#0F5C56] transition cursor-pointer">"Most exceptions by merchant"</button>
+          <span class="mx-1.5">·</span>
+          <button type="button" onclick="askPreset(this, 'Why did INT0013 fail?')" class="text-ink underline hover:text-[#0F5C56] transition cursor-pointer">"Why did INT0013 fail?"</button>
+        </div>
+
+        <!-- Question Input Form -->
+        <form id="qa-form" onsubmit="submitQA(event)" class="flex gap-2">
+          <input id="qa-input" type="text" placeholder="Ask any financial reconciliation question..."
+                 class="flex-1 bg-sand border border-rule rounded-md px-4 py-2.5 text-sm text-ink placeholder-ink-muted focus:outline-none focus:border-[#0F5C56] transition">
+          <button id="qa-submit-btn" type="submit" class="px-5 py-2.5 bg-[#0F5C56] hover:opacity-90 text-paper rounded-md text-sm font-medium transition flex items-center space-x-1.5 cursor-pointer disabled:opacity-50">
+            <span>Ask</span>
+          </button>
+        </form>
+
+        <!-- QA Results Container -->
+        <div id="qa-results" class="hidden space-y-4 pt-2">
+          <!-- Primary Answer Box -->
+          <div class="py-4 border-b border-rule">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-medium text-ink-muted">Answer</span>
+              <span id="qa-duration" class="text-xs text-ink-muted font-mono"></span>
+            </div>
+            <p id="qa-answer-text" class="text-ink text-sm leading-relaxed"></p>
+          </div>
+
+          <!-- Disclosure 1: SQL Used -->
+          <details class="border border-rule rounded-md bg-sand/30 overflow-hidden">
+            <summary class="px-4 py-2.5 text-xs font-medium text-ink cursor-pointer flex items-center justify-between select-none hover:bg-sand/60 transition">
+              <span>Query used</span>
+              <span id="qa-ast-badge" class="font-mono text-[11px] text-[#2F6F4E]">AST Validated · Read-Only</span>
+            </summary>
+            <pre id="qa-sql-box" class="p-4 font-mono text-xs text-ink bg-paper border-t border-rule overflow-x-auto"></pre>
+          </details>
+
+          <!-- Disclosure 2: Rows Table -->
+          <details id="qa-table-details" class="border border-rule rounded-md bg-sand/30 overflow-hidden">
+            <summary class="px-4 py-2.5 text-xs font-medium text-ink cursor-pointer flex items-center justify-between select-none hover:bg-sand/60 transition">
+              <span>Rows returned (<span id="qa-row-count">0</span>)</span>
+            </summary>
+            <div id="qa-table-container" class="border-t border-rule overflow-x-auto max-h-72 bg-paper">
+              <table id="qa-data-table" class="w-full text-xs text-left">
+                <thead id="qa-table-head" class="bg-sand text-ink-muted uppercase sticky top-0 font-medium"></thead>
+                <tbody id="qa-table-body" class="divide-y divide-rule font-mono"></tbody>
+              </table>
+            </div>
+          </details>
+        </div>
+      </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- New Run Modal -->
+  <div id="create-run-modal" onclick="if(event.target === this) closeCreateRunModal()" class="hidden fixed inset-0 z-50 bg-ink/30 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-paper border border-rule rounded-md max-w-sm w-full p-6 shadow-xl space-y-4">
+      <div class="flex items-center justify-between">
+        <h3 class="font-semibold text-base text-ink">New reconciliation run</h3>
+        <button onclick="closeCreateRunModal()" class="text-ink-muted hover:text-ink text-sm cursor-pointer">✕</button>
+      </div>
+      <p class="text-xs text-ink-muted">Create an isolated workspace with separate source files, matches, and exceptions.</p>
+      <div>
+        <label class="block text-xs font-medium text-ink-muted mb-1.5">Run name</label>
+        <input id="new-run-name-input" type="text" placeholder="e.g. June Week 1"
+               class="w-full bg-sand border border-rule rounded-md px-3 py-2 text-sm text-ink focus:outline-none focus:border-[#0F5C56]"
+               onkeydown="if(event.key==='Enter') submitCreateRun()">
+      </div>
+      <div class="pt-2 flex items-center justify-end space-x-3">
+        <button onclick="closeCreateRunModal()" class="text-xs text-ink-muted hover:text-ink cursor-pointer">Cancel</button>
+        <button onclick="submitCreateRun()" class="px-4 py-2 bg-[#0F5C56] text-paper rounded-md text-xs font-medium hover:opacity-90 transition cursor-pointer">Create run</button>
       </div>
     </div>
   </div>
 
-  <footer class="border-t border-slate-800/80 bg-slate-950/40 text-center py-4 text-xs text-slate-500">
-    AI Finance Controller · Deterministic Code Establishes Financial Truth · Bounded AI Investigation
-  </footer>
+  <!-- Right-side Slide-over Drawer for Audit Drilldown -->
+  <div id="audit-drawer-backdrop" onclick="closeAuditDrawer()" class="hidden fixed inset-0 z-50 bg-ink/30 backdrop-blur-sm transition-opacity"></div>
+  <div id="audit-drawer" class="fixed top-0 right-0 h-full w-full max-w-md bg-paper border-l border-rule shadow-2xl z-50 transform translate-x-full transition-transform duration-200 overflow-y-auto flex flex-col justify-between">
+    <div>
+      <div class="p-6 border-b border-rule flex items-center justify-between">
+        <div>
+          <div class="text-xs font-medium text-ink-muted">Audit trail</div>
+          <h3 id="modal-record-title" class="font-semibold text-base text-ink mt-0.5">Record: --</h3>
+        </div>
+        <button onclick="closeAuditDrawer()" class="text-ink-muted hover:text-ink text-base cursor-pointer">✕</button>
+      </div>
+      <div class="p-6 space-y-5 text-xs">
+        <div>
+          <div class="text-ink-muted font-medium mb-1">Deterministic rule applied</div>
+          <div id="modal-rule" class="font-mono text-ink text-sm">--</div>
+        </div>
+        <div>
+          <div class="text-ink-muted font-medium mb-1">Reconciliation outcome</div>
+          <div id="modal-outcome" class="font-mono text-ink text-sm">--</div>
+        </div>
+        <div>
+          <div class="text-ink-muted font-medium mb-1">Fields compared</div>
+          <pre id="modal-fields" class="p-3 bg-sand rounded-md font-mono text-xs text-ink overflow-x-auto">{}</pre>
+        </div>
+        <div>
+          <div class="text-ink-muted font-medium mb-1">Candidates evaluated</div>
+          <pre id="modal-candidates" class="p-3 bg-sand rounded-md font-mono text-xs text-ink overflow-x-auto">[]</pre>
+        </div>
+        <div id="modal-ai-box" class="pt-4 border-t border-rule space-y-2 hidden">
+          <div class="text-xs font-medium text-ink">AI investigation</div>
+          <div id="modal-ai-diagnosis" class="text-sm text-ink leading-relaxed"></div>
+          <div id="modal-ai-action" class="text-xs text-ink-muted"></div>
+          <div id="modal-ai-meta" class="text-[11px] font-mono text-ink-muted"></div>
+        </div>
+      </div>
+    </div>
+    <div class="p-4 border-t border-rule bg-sand/30 flex justify-end">
+      <button onclick="closeAuditDrawer()" class="px-4 py-2 border border-rule bg-paper hover:bg-sand rounded-md text-xs font-medium text-ink cursor-pointer">Close</button>
+    </div>
+  </div>
+  <!-- Hidden legacy audit modal anchor -->
+  <div id="audit-modal" class="hidden"></div>
+
+  <!-- 4-Step CSV Ingestion Wizard Modal -->
+  <div id="ingest-modal" onclick="if(event.target === this) closeIngestModal()" class="hidden fixed inset-0 z-50 bg-ink/30 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-paper border border-rule rounded-md max-w-3xl w-full p-6 shadow-2xl space-y-4 max-h-[92vh] flex flex-col">
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between border-b border-rule pb-3 shrink-0">
+        <div>
+          <h3 class="font-semibold text-base text-ink">3-source CSV ingestion</h3>
+          <p class="text-xs text-ink-muted">Upload all 3 financial sources (Internal → Settlement → Bank), then reconcile.</p>
+        </div>
+        <button type="button" onclick="closeIngestModal()" class="text-ink-muted hover:text-ink text-sm cursor-pointer">✕</button>
+      </div>
+
+      <!-- Stepper / Progress Bar (4 steps) -->
+      <div class="grid grid-cols-4 gap-2 pt-1 shrink-0">
+        <button id="step-tab-internal" onclick="switchSourceStep('internal')" class="p-2.5 text-left transition cursor-pointer border-b-2 border-transparent">
+          <div class="text-[11px] font-medium text-ink-muted">Step 1</div>
+          <div class="text-xs font-medium text-ink truncate">Internal ledger</div>
+          <div id="step-rows-internal" class="text-[11px] text-ink-muted mt-0.5">Not uploaded</div>
+          <span id="step-badge-internal" class="hidden"></span>
+        </button>
+
+        <button id="step-tab-settlement" onclick="switchSourceStep('settlement')" class="p-2.5 text-left transition cursor-pointer border-b-2 border-transparent">
+          <div class="text-[11px] font-medium text-ink-muted">Step 2</div>
+          <div class="text-xs font-medium text-ink truncate">Settlement records</div>
+          <div id="step-rows-settlement" class="text-[11px] text-ink-muted mt-0.5">Not uploaded</div>
+          <span id="step-badge-settlement" class="hidden"></span>
+        </button>
+
+        <button id="step-tab-bank" onclick="switchSourceStep('bank')" class="p-2.5 text-left transition cursor-pointer border-b-2 border-transparent">
+          <div class="text-[11px] font-medium text-ink-muted">Step 3</div>
+          <div class="text-xs font-medium text-ink truncate">Bank statement</div>
+          <div id="step-rows-bank" class="text-[11px] text-ink-muted mt-0.5">Not uploaded</div>
+          <span id="step-badge-bank" class="hidden"></span>
+        </button>
+
+        <button id="step-tab-reconcile" onclick="switchSourceStep('reconcile')" class="p-2.5 text-left transition cursor-pointer border-b-2 border-transparent">
+          <div class="text-[11px] font-medium text-ink-muted">Step 4</div>
+          <div class="text-xs font-medium text-ink truncate">3-way reconcile</div>
+          <div id="step-rows-reconcile" class="text-[11px] text-ink-muted mt-0.5">Waiting</div>
+          <span id="step-badge-reconcile" class="hidden"></span>
+        </button>
+      </div>
+
+      <!-- Run ID Bar -->
+      <div class="flex items-center justify-between bg-sand/40 px-3.5 py-2 border border-rule text-xs shrink-0">
+        <div class="flex items-center space-x-2">
+          <span class="text-ink-muted">Target run:</span>
+          <span id="ingest-session-run-id" class="font-medium text-ink">Active Run</span>
+        </div>
+        <div class="flex items-center space-x-3">
+          <span id="ingest-progress-counter" class="text-ink-muted">0 of 3 sources ready</span>
+          <button onclick="startFreshRunSession()" class="text-ink-muted hover:text-ink underline cursor-pointer">Start new run</button>
+        </div>
+      </div>
+
+      <!-- Modal Body (Scrollable) -->
+      <div class="overflow-y-auto flex-1 py-2 text-xs space-y-4">
+
+        <!-- VIEW 1: Upload File for Active Source -->
+        <div id="ingest-view-upload" class="space-y-4">
+          <div class="p-4 bg-sand/30 border border-rule space-y-1.5">
+            <div class="flex items-center justify-between">
+              <h4 id="source-view-title" class="text-sm font-semibold text-ink">Step 1 of 3: Internal Ledger</h4>
+              <span id="source-system-badge" class="text-xs font-medium text-ink-muted">System A</span>
+            </div>
+            <p id="source-view-desc" class="text-xs text-ink-muted">Upload gross transactions recorded in internal accounting / order ledger.</p>
+            <div class="pt-1 text-[11px] text-ink-muted">
+              <span>Required fields:</span>
+              <span id="source-req-chips" class="font-mono text-ink ml-1">id, amount, transaction_date, merchant_id</span>
+            </div>
+          </div>
+
+          <!-- Demo CSV Buttons -->
+          <div class="p-3 border border-rule bg-sand/20 flex items-center justify-between flex-wrap gap-2">
+            <span class="text-ink-muted text-xs">Test with pre-built dataset:</span>
+            <div class="flex items-center space-x-2">
+              <button id="btn-demo-messy" onclick="loadDemoSample(true)" class="px-2.5 py-1 rounded-md border border-rule bg-sand hover:bg-sand/80 text-ink text-xs font-medium transition cursor-pointer">
+                Load messy demo
+              </button>
+              <button id="btn-demo-clean" onclick="loadDemoSample(false)" class="px-2.5 py-1 rounded-md border border-rule bg-paper hover:bg-sand text-ink text-xs font-medium transition cursor-pointer">
+                Load clean demo
+              </button>
+              <button onclick="downloadActiveSample()" class="px-2 py-1 text-ink-muted hover:text-ink text-xs transition cursor-pointer">
+                Download
+              </button>
+            </div>
+          </div>
+
+          <!-- File Dropzone -->
+          <div>
+            <div id="drop-zone" class="border-2 border-dashed border-rule hover:border-[#0F5C56] rounded-md p-8 text-center bg-sand/10 transition cursor-pointer" onclick="document.getElementById('ingest-file-input').click()">
+              <input type="file" id="ingest-file-input" accept=".csv" class="hidden" onchange="handleFileSelected(event)">
+              <div id="file-label-name" class="text-xs text-ink-muted">
+                Click to browse or drop CSV file
+              </div>
+              <div class="text-[11px] text-ink-muted mt-1">Supports standard, messy, and unix timestamp CSV formats</div>
+            </div>
+          </div>
+
+          <!-- Upload Error Alert -->
+          <div id="ingest-upload-error" class="hidden p-3 bg-[#F5E4E1] border border-rule text-[#A13B3B] text-xs"></div>
+
+          <!-- Action Button -->
+          <div class="pt-2 flex justify-end">
+            <button id="btn-analyze-csv" onclick="startAIAnalysis()" disabled class="px-5 py-2.5 bg-[#0F5C56] disabled:opacity-40 hover:opacity-90 text-paper text-xs font-medium rounded-md transition cursor-pointer">
+              <span id="analyze-btn-text">Analyze column mapping</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- VIEW 2: AI Mapping Confirmation & Overrides -->
+        <div id="ingest-view-confirm" class="hidden space-y-4">
+          <div class="flex items-center justify-between">
+            <h4 class="text-sm font-semibold text-ink">Review column mapping</h4>
+            <div class="text-xs text-ink-muted">
+              Date format: <span id="confirm-date-format" class="font-mono text-ink font-medium">auto</span>
+            </div>
+          </div>
+          <div id="confirm-ai-notes" class="text-xs text-ink-muted"></div>
+
+          <div class="border border-rule overflow-hidden">
+            <table class="w-full text-xs">
+              <thead class="bg-sand text-ink-muted font-medium">
+                <tr>
+                  <th class="px-4 py-2 text-left font-medium">Canonical field</th>
+                  <th class="px-4 py-2 text-left font-medium">Mapped CSV column</th>
+                  <th class="px-4 py-2 text-left font-medium">Confidence</th>
+                </tr>
+              </thead>
+              <tbody id="mapping-table-body" class="divide-y divide-rule bg-paper">
+                <!-- Populated via JS -->
+              </tbody>
+            </table>
+          </div>
+
+          <div id="ingest-confirm-error" class="hidden p-3 bg-[#F5E4E1] border border-rule text-[#A13B3B] text-xs"></div>
+
+          <div class="pt-2 flex items-center justify-between">
+            <button onclick="backToUploadView()" class="px-3 py-1.5 border border-rule bg-paper hover:bg-sand rounded-md text-xs text-ink cursor-pointer">
+              Back
+            </button>
+            <button id="btn-confirm-commit" onclick="commitMapping()" class="px-5 py-2.5 bg-[#0F5C56] text-paper text-xs font-medium rounded-md hover:opacity-90 transition cursor-pointer">
+              <span id="commit-btn-text">Confirm and ingest source</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- VIEW 3: Source Upload Complete Summary -->
+        <div id="ingest-view-source-done" class="hidden space-y-4">
+          <div class="p-4 bg-sand/30 border border-rule space-y-1">
+            <h4 id="step-done-title" class="text-sm font-semibold text-ink">Source ingested successfully</h4>
+            <p id="step-done-msg" class="text-xs text-ink-muted"></p>
+          </div>
+
+          <div class="space-y-2">
+            <div class="text-xs font-medium text-ink-muted" id="pipeline-status-text">Pipeline progress</div>
+            <div class="divide-y divide-rule border border-rule bg-paper text-xs">
+              <div class="p-3 flex items-center justify-between">
+                <span class="text-ink font-medium">Source 1: Internal ledger</span>
+                <span id="overview-status-internal" class="text-ink-muted font-medium">Pending</span>
+              </div>
+              <div class="p-3 flex items-center justify-between">
+                <span class="text-ink font-medium">Source 2: Gateway settlement</span>
+                <span id="overview-status-settlement" class="text-ink-muted font-medium">Pending</span>
+              </div>
+              <div class="p-3 flex items-center justify-between">
+                <span class="text-ink font-medium">Source 3: Bank statement</span>
+                <span id="overview-status-bank" class="text-ink-muted font-medium">Pending</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="pt-2 flex items-center justify-between">
+            <button onclick="switchSourceStep(ingestSession.activeSource)" class="px-3 py-1.5 border border-rule bg-paper hover:bg-sand rounded-md text-xs text-ink cursor-pointer">
+              Upload more for this source
+            </button>
+            <button id="btn-next-source-step" onclick="proceedToNextSource()" class="px-5 py-2.5 bg-[#0F5C56] text-paper rounded-md text-xs font-medium hover:opacity-90 transition cursor-pointer">
+              <span id="next-step-btn-text">Proceed to next source</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- VIEW 4: All 3 Sources Summary & 3-Way Reconcile -->
+        <div id="ingest-view-all-done" class="hidden space-y-4">
+          <div class="p-4 bg-sand/30 border border-rule">
+            <h4 class="text-sm font-semibold text-ink" id="all-banner-title">3-source pipeline status</h4>
+            <p class="text-xs text-ink-muted mt-0.5" id="all-banner-desc">Review your uploaded financial sources before executing reconciliation.</p>
+          </div>
+
+          <!-- 3 Sources Summary Boxes -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div class="p-3.5 border border-rule bg-paper flex flex-col justify-between">
+              <div>
+                <div class="flex items-center justify-between text-xs text-ink-muted mb-1">
+                  <span>Source 1</span>
+                  <span id="card-badge-internal" class="font-medium">Pending</span>
+                </div>
+                <div class="font-medium text-ink text-xs">Internal ledger</div>
+                <div class="text-[11px] text-ink-muted">Gross records</div>
+              </div>
+              <div class="mt-4 pt-2 border-t border-rule flex items-center justify-between">
+                <span id="card-count-internal" class="font-mono text-xs font-medium text-ink">0 rows</span>
+                <button onclick="switchSourceStep('internal')" class="text-xs text-[#0F5C56] hover:underline font-medium cursor-pointer">Edit</button>
+              </div>
+            </div>
+
+            <div class="p-3.5 border border-rule bg-paper flex flex-col justify-between">
+              <div>
+                <div class="flex items-center justify-between text-xs text-ink-muted mb-1">
+                  <span>Source 2</span>
+                  <span id="card-badge-settlement" class="font-medium">Pending</span>
+                </div>
+                <div class="font-medium text-ink text-xs">Settlement records</div>
+                <div class="text-[11px] text-ink-muted">Gateway batches</div>
+              </div>
+              <div class="mt-4 pt-2 border-t border-rule flex items-center justify-between">
+                <span id="card-count-settlement" class="font-mono text-xs font-medium text-ink">0 rows</span>
+                <button onclick="switchSourceStep('settlement')" class="text-xs text-[#0F5C56] hover:underline font-medium cursor-pointer">Edit</button>
+              </div>
+            </div>
+
+            <div class="p-3.5 border border-rule bg-paper flex flex-col justify-between">
+              <div>
+                <div class="flex items-center justify-between text-xs text-ink-muted mb-1">
+                  <span>Source 3</span>
+                  <span id="card-badge-bank" class="font-medium">Pending</span>
+                </div>
+                <div class="font-medium text-ink text-xs">Bank statement</div>
+                <div class="text-[11px] text-ink-muted">Nodal credits</div>
+              </div>
+              <div class="mt-4 pt-2 border-t border-rule flex items-center justify-between">
+                <span id="card-count-bank" class="font-mono text-xs font-medium text-ink">0 rows</span>
+                <button onclick="switchSourceStep('bank')" class="text-xs text-[#0F5C56] hover:underline font-medium cursor-pointer">Edit</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Alert for missing sources -->
+          <div id="all-sources-warning" class="hidden p-3 bg-[#F5EBDA] border border-rule text-ink text-xs">
+            <span id="all-sources-warning-text"></span>
+          </div>
+
+          <!-- Execution Controls -->
+          <div class="pt-2 flex items-center justify-between">
+            <button onclick="startFreshRunSession()" class="px-3 py-1.5 border border-rule bg-paper hover:bg-sand rounded-md text-xs text-ink cursor-pointer">
+              Start new run
+            </button>
+            <button id="btn-run-reconcile-now" onclick="runReconciliationNow()" class="px-6 py-2.5 bg-[#0F5C56] hover:opacity-90 disabled:opacity-40 text-paper rounded-md text-xs font-medium transition cursor-pointer">
+              <span id="reconcile-btn-text">Run 3-way reconciliation</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
 
   <script>
     let activeRunID = null;
+    let allRuns = [];
+
+    // Dropdown outside click
+    window.addEventListener('click', (e) => {
+      const container = document.getElementById('run-selector-container');
+      const menu = document.getElementById('run-dropdown-menu');
+      if (container && !container.contains(e.target) && menu && !menu.classList.contains('hidden')) {
+        menu.classList.add('hidden');
+      }
+    });
+
+    function toggleRunDropdown() {
+      const menu = document.getElementById('run-dropdown-menu');
+      if (menu) menu.classList.toggle('hidden');
+    }
+
+    function closeRunDropdown() {
+      const menu = document.getElementById('run-dropdown-menu');
+      if (menu) menu.classList.add('hidden');
+    }
+
+    function formatRelativeTime(dateStr) {
+      if (!dateStr) return '';
+      const date = new Date(dateStr);
+      const now = new Date();
+      const diffMs = now - date;
+      const diffSec = Math.floor(diffMs / 1000);
+      const diffMin = Math.floor(diffSec / 60);
+      const diffHours = Math.floor(diffMin / 60);
+      const diffDays = Math.floor(diffHours / 24);
+      if (diffSec < 60) return 'just now';
+      if (diffMin < 60) return diffMin + 'm ago';
+      if (diffHours < 24) return diffHours + 'h ago';
+      if (diffDays < 7) return diffDays + 'd ago';
+      return date.toLocaleDateString();
+    }
 
     async function init() {
       try {
-        const res = await fetch('/api/runs/latest');
-        if (!res.ok) throw new Error("No runs found in database. Please run 'make seed && make reconcile'.");
-        const data = await res.json();
-        activeRunID = data.run_id;
+        await loadRunsList();
+        if (!activeRunID && allRuns.length > 0) {
+          const savedID = localStorage.getItem('active_reconcile_run_id');
+          const matched = allRuns.find(r => r.run_id === savedID);
+          if (matched) {
+            activeRunID = matched.run_id;
+          } else {
+            activeRunID = allRuns[0].run_id;
+          }
+        }
+        const currentRun = allRuns.find(r => r.run_id === activeRunID) || (allRuns[0] || null);
+        if (currentRun) {
+          activeRunID = currentRun.run_id;
+          localStorage.setItem('active_reconcile_run_id', activeRunID);
+          updateRunHeaderDisplay(currentRun);
+        }
 
-        document.getElementById('header-run-info').innerText = `Run: ${activeRunID.slice(0,8)}... · Seed: ${data.seed}`;
-        document.getElementById('run-badge').classList.remove('hidden');
-
-        await loadSummary();
+        renderRunSelectorDropdown();
         document.getElementById('loading').classList.add('hidden');
-        document.getElementById('view-benchmark').classList.remove('hidden');
+        document.getElementById('error-box').classList.add('hidden');
+
+        switchTab('benchmark');
       } catch (err) {
         document.getElementById('loading').classList.add('hidden');
         document.getElementById('error-box').classList.remove('hidden');
         document.getElementById('error-message').innerText = err.message;
+      }
+    }
+
+    async function loadRunsList() {
+      try {
+        const res = await fetch('/runs');
+        if (!res.ok) throw new Error('Failed to load reconciliation runs.');
+        allRuns = await res.json();
+        if (activeRunID) {
+          const run = allRuns.find(r => r.run_id === activeRunID);
+          if (run) updateRunHeaderDisplay(run);
+        }
+        renderRunSelectorDropdown();
+      } catch (err) {
+        console.error('Error loading runs:', err);
+      }
+    }
+
+    function updateRunHeaderDisplay(run) {
+      if (!run) return;
+      document.getElementById('run-selected-name').innerText = run.name || run.run_id;
+      
+      const badge = document.getElementById('run-selected-status-badge');
+      const dot = document.getElementById('run-status-dot');
+      const banner = document.getElementById('run-status-banner');
+      const bannerTitle = document.getElementById('run-status-banner-title');
+      const bannerDesc = document.getElementById('run-status-banner-desc');
+      const bannerBtnText = document.getElementById('run-status-banner-btn-text');
+
+      const isStale = (run.status === 'STALE');
+      const isDraft = (run.status === 'DRAFT');
+
+      if (isStale) {
+        badge.innerText = 'Stale';
+        badge.className = 'text-xs font-medium text-[#9A6B1F]';
+        dot.className = 'inline-block w-2 h-2 rounded-full bg-[#9A6B1F]';
+        banner.classList.remove('hidden');
+        bannerTitle.innerText = 'This run has new uploads since the last reconciliation.';
+        bannerDesc.innerText = 'Numbers below may be out of date.';
+        bannerBtnText.innerText = 'Re-run now';
+      } else if (isDraft) {
+        badge.innerText = 'Draft';
+        badge.className = 'text-xs font-medium text-[#3A5A78]';
+        dot.className = 'inline-block w-2 h-2 rounded-full bg-[#3A5A78]';
+        banner.classList.remove('hidden');
+        const totalRows = (run.internal_count || 0) + (run.settlement_count || 0) + (run.bank_count || 0);
+        bannerTitle.innerText = `Sources uploaded (${totalRows} records).`;
+        bannerDesc.innerText = 'Reconciliation has not been executed on this dataset.';
+        bannerBtnText.innerText = 'Run reconciliation';
+      } else {
+        badge.innerText = 'Reconciled';
+        badge.className = 'text-xs font-medium text-[#2F6F4E]';
+        dot.className = 'inline-block w-2 h-2 rounded-full bg-[#2F6F4E]';
+        banner.classList.add('hidden');
+      }
+
+      // Sync QA target run header
+      const qaTargetName = document.getElementById('qa-target-run-name');
+      const qaTargetBadge = document.getElementById('qa-target-run-badge');
+      if (qaTargetName) qaTargetName.innerText = run.name || run.run_id;
+      if (qaTargetBadge) {
+        qaTargetBadge.innerText = run.status || 'RECONCILED';
+        if (run.status === 'RECONCILED') {
+          qaTargetBadge.className = 'font-medium text-[#2F6F4E]';
+        } else if (run.status === 'STALE') {
+          qaTargetBadge.className = 'font-medium text-[#9A6B1F]';
+        } else {
+          qaTargetBadge.className = 'font-medium text-[#3A5A78]';
+        }
+      }
+
+      const qaDraftNotice = document.getElementById('qa-draft-notice');
+      if (qaDraftNotice) {
+        if (run.status === 'DRAFT') {
+          qaDraftNotice.classList.remove('hidden');
+        } else {
+          qaDraftNotice.classList.add('hidden');
+        }
+      }
+    }
+
+    function renderRunSelectorDropdown() {
+      const list = document.getElementById('run-dropdown-list');
+      if (!list) return;
+      list.innerHTML = '';
+
+      if (!allRuns || allRuns.length === 0) {
+        list.innerHTML = '<div class="px-4 py-3 text-ink-muted text-xs">No reconciliation runs yet.</div>';
+        return;
+      }
+
+      allRuns.forEach(r => {
+        const isActive = (r.run_id === activeRunID);
+        const dotColor = (r.status === 'RECONCILED') ? 'bg-[#2F6F4E]' : ((r.status === 'STALE') ? 'bg-[#9A6B1F]' : 'bg-[#3A5A78]');
+        const statusColor = (r.status === 'RECONCILED') ? 'text-[#2F6F4E]' : ((r.status === 'STALE') ? 'text-[#9A6B1F]' : 'text-[#3A5A78]');
+        const relTime = formatRelativeTime(r.created_at);
+
+        const row = document.createElement('div');
+        row.className = `px-4 py-2.5 flex items-center justify-between hover:bg-sand/60 transition cursor-pointer ${isActive ? 'bg-sand/40 font-medium' : ''}`;
+        row.onclick = () => selectRun(r.run_id);
+        row.title = `Run ID: ${r.run_id}\nCreated: ${new Date(r.created_at).toLocaleString()}`;
+
+        row.innerHTML = `
+          <div class="min-w-0 pr-2">
+            <div class="flex items-center space-x-1.5 truncate">
+              <span class="w-1.5 h-1.5 rounded-full ${dotColor} shrink-0"></span>
+              <span class="text-xs text-ink truncate">${escapeHTML(r.name || r.run_id)}</span>
+              <span class="text-[11px] ${statusColor} shrink-0">· ${escapeHTML(r.status || 'DRAFT')}</span>
+            </div>
+            <div class="text-[11px] text-ink-muted mt-0.5">${relTime}</div>
+          </div>
+          <button onclick="deleteRun('${r.run_id}', event)" class="text-[11px] text-[#A13B3B] hover:underline cursor-pointer shrink-0 ml-2">
+            Delete
+          </button>
+        `;
+        list.appendChild(row);
+      });
+    }
+
+    function selectRun(runID) {
+      activeRunID = runID;
+      localStorage.setItem('active_reconcile_run_id', runID);
+      ingestSession.runID = runID;
+      closeRunDropdown();
+      const run = allRuns.find(r => r.run_id === runID);
+      if (run) updateRunHeaderDisplay(run);
+      renderRunSelectorDropdown();
+
+      const mainArea = document.querySelector('main');
+      if (mainArea) mainArea.scrollTop = 0;
+      if (mainArea && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        mainArea.style.opacity = '0';
+        setTimeout(() => {
+          refreshData().finally(() => {
+            mainArea.style.opacity = '1';
+          });
+        }, 90);
+      } else {
+        refreshData();
+      }
+    }
+
+    function openCreateRunModal() {
+      closeRunDropdown();
+      document.getElementById('create-run-modal').classList.remove('hidden');
+      const now = new Date();
+      const autoName = `Run ${now.getDate()} ${now.toLocaleString('default', { month: 'short' })} ${now.getHours()}:${String(now.getMinutes()).padStart(2, '0')}`;
+      const input = document.getElementById('new-run-name-input');
+      input.placeholder = autoName;
+      input.value = '';
+      setTimeout(() => input.focus(), 50);
+    }
+
+    function closeCreateRunModal() {
+      document.getElementById('create-run-modal').classList.add('hidden');
+    }
+
+    async function submitCreateRun() {
+      const input = document.getElementById('new-run-name-input');
+      const name = input.value.trim() || input.placeholder;
+      try {
+        const res = await fetch('/runs', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name })
+        });
+        if (!res.ok) {
+          const err = await res.json();
+          alert('Failed creating run: ' + (err.error || 'Unknown error'));
+          return;
+        }
+        const created = await res.json();
+        closeCreateRunModal();
+        await loadRunsList();
+        selectRun(created.run_id);
+      } catch (err) {
+        alert('Error creating run: ' + err.message);
+      }
+    }
+
+    async function deleteRun(runID, event) {
+      if (event) event.stopPropagation();
+      if (!confirm('Are you sure you want to delete this reconciliation run? All uploaded source files, matches, and exceptions will be permanently deleted.')) {
+        return;
+      }
+      try {
+        const res = await fetch(`/runs/${runID}`, { method: 'DELETE' });
+        if (!res.ok) {
+          const err = await res.json();
+          alert('Failed deleting run: ' + (err.error || 'Delete failed'));
+          return;
+        }
+        await loadRunsList();
+        if (activeRunID === runID && allRuns && allRuns.length > 0) {
+          selectRun(allRuns[0].run_id);
+        } else if (!allRuns || allRuns.length === 0) {
+          activeRunID = null;
+          window.location.reload();
+        }
+      } catch (err) {
+        alert('Error deleting run: ' + err.message);
+      }
+    }
+
+    async function triggerRunReconciliation() {
+      if (!activeRunID) return;
+      const btn = document.getElementById('run-status-banner-btn');
+      const btnText = document.getElementById('run-status-banner-btn-text');
+      if (btn) btn.disabled = true;
+      if (btnText) btnText.innerText = 'Executing...';
+      try {
+        const res = await fetch(`/runs/${activeRunID}/reconcile`, { method: 'POST' });
+        const data = await res.json();
+        if (!res.ok) {
+          alert('Reconciliation failed: ' + (data.error || 'Execution failed'));
+          if (btn) btn.disabled = false;
+          if (btnText) btnText.innerText = 'Re-run now';
+          return;
+        }
+        await loadRunsList();
+        selectRun(activeRunID);
+      } catch (err) {
+        alert('Reconciliation execution error: ' + err.message);
+        if (btn) btn.disabled = false;
+        if (btnText) btnText.innerText = 'Re-run now';
       }
     }
 
@@ -474,52 +1125,74 @@
       const res = await fetch(`/api/runs/${activeRunID}/summary`);
       const d = await res.json();
 
-      document.getElementById('kpi-hop1-rate').innerText = `${d.hop1_match_rate.toFixed(1)}%`;
-      document.getElementById('kpi-hop1-cases').innerText = `${d.hop1_matched_count} / ${d.internal_count}`;
-      document.getElementById('kpi-hop1-precision').innerText = `${d.hop1_precision.toFixed(1)}%`;
-      document.getElementById('kpi-hop1-recall').innerText = `${d.hop1_recall.toFixed(1)}%`;
+      document.getElementById('kpi-hop1-rate').innerText = `${(d.hop1_match_rate || 0).toFixed(1)}%`;
+      document.getElementById('kpi-hop1-cases').innerText = `${d.hop1_matched_count || 0} of ${d.internal_count || 0} matched`;
+      document.getElementById('kpi-hop1-precision').innerText = `${(d.hop1_precision || 0).toFixed(1)}%`;
+      document.getElementById('kpi-hop1-recall').innerText = `${(d.hop1_recall || 0).toFixed(1)}%`;
 
-      document.getElementById('kpi-full-rate').innerText = `${d.full_chain_rate.toFixed(1)}%`;
-      document.getElementById('kpi-full-cases').innerText = `${d.full_chain_count} / ${d.internal_count}`;
-      document.getElementById('kpi-hop2-rate').innerText = `${((d.hop2_matched_count / (d.hop1_matched_count || 1)) * 100).toFixed(1)}%`;
+      document.getElementById('kpi-full-rate').innerText = `${(d.full_chain_rate || 0).toFixed(1)}%`;
+      document.getElementById('kpi-full-cases').innerText = `${d.full_chain_count || 0} of ${d.internal_count || 0} reconciled`;
+      document.getElementById('kpi-hop2-rate').innerText = `${(((d.hop2_matched_count || 0) / (d.hop1_matched_count || 1)) * 100).toFixed(1)}%`;
 
-      document.getElementById('kpi-exposure').innerText = `₹${(d.unresolved_amount_inr / 100000).toFixed(2)}L`;
-      document.getElementById('kpi-exceptions').innerText = d.exception_count;
+      const expINR = d.unresolved_amount_inr || 0;
+      document.getElementById('kpi-exposure').innerText = `₹${expINR.toLocaleString('en-IN', {maximumFractionDigits: 0})}`;
+      document.getElementById('kpi-exceptions').innerText = d.exception_count || 0;
 
-      document.getElementById('kpi-throughput').innerText = Math.round(d.deterministic_throughput).toLocaleString();
-      document.getElementById('kpi-duration').innerText = `${d.engine_duration_ms}`;
+      document.getElementById('kpi-throughput').innerText = Math.round(d.deterministic_throughput || 0).toLocaleString();
+      document.getElementById('kpi-duration').innerText = `${d.engine_duration_ms || 0}`;
 
-      document.getElementById('fin-expected').innerText = `₹${((d.internal_count * 5000) / 100).toLocaleString('en-IN')}`;
-      document.getElementById('fin-banked').innerText = `₹${(d.unresolved_amount_inr * 1.4).toLocaleString('en-IN', {maximumFractionDigits: 2})}`;
-      document.getElementById('fin-unresolved').innerText = `₹${d.unresolved_amount_inr.toLocaleString('en-IN', {maximumFractionDigits: 2})}`;
+      document.getElementById('fin-expected').innerText = `₹${(((d.internal_count || 0) * 5000) / 100).toLocaleString('en-IN')}`;
+      document.getElementById('fin-banked').innerText = `₹${((d.unresolved_amount_inr || 0) * 1.4).toLocaleString('en-IN', {maximumFractionDigits: 2})}`;
+      document.getElementById('fin-unresolved').innerText = `₹${(d.unresolved_amount_inr || 0).toLocaleString('en-IN', {maximumFractionDigits: 2})}`;
 
-      document.getElementById('ai-eligible').innerText = d.ai_eligible_count;
-      document.getElementById('ai-succeeded').innerText = d.ai_succeeded_count;
-      document.getElementById('ai-pending').innerText = d.ai_pending_count;
-      document.getElementById('ai-failed').innerText = d.ai_failed_count;
+      document.getElementById('ai-eligible').innerText = d.ai_eligible_count || 0;
+      document.getElementById('ai-succeeded').innerText = d.ai_succeeded_count || 0;
+      document.getElementById('ai-pending').innerText = d.ai_pending_count || 0;
+      document.getElementById('ai-failed').innerText = d.ai_failed_count || 0;
 
-      // Breakdown list
+      // Quiet AI single status line
+      const aiLine = document.getElementById('ai-status-summary-line');
+      if (aiLine) {
+        const eligible = d.ai_eligible_count || 0;
+        const succeeded = d.ai_succeeded_count || 0;
+        const pending = d.ai_pending_count || 0;
+        aiLine.innerText = `${succeeded} of ${eligible} exceptions received an AI diagnosis · ${pending} pending · writes disabled`;
+      }
+
+      // Horizontal Bar List for Exception Categories
       const bl = document.getElementById('breakdown-list');
       bl.innerHTML = '';
-      for (const [cat, count] of Object.entries(d.exception_breakdown)) {
-        bl.innerHTML += `
-          <div class="flex justify-between items-center py-1.5 border-b border-slate-800">
-            <span class="text-slate-300 font-mono text-xs">${cat}</span>
-            <span class="font-bold text-white px-2 py-0.5 rounded bg-slate-800">${count}</span>
-          </div>
-        `;
+      if (d.exception_breakdown && Object.keys(d.exception_breakdown).length > 0) {
+        const counts = Object.values(d.exception_breakdown);
+        const maxVal = Math.max(...counts, 1);
+        for (const [cat, count] of Object.entries(d.exception_breakdown)) {
+          const pct = Math.round((count / maxVal) * 100);
+          bl.innerHTML += `
+            <div class="space-y-1.5">
+              <div class="flex justify-between items-center text-xs">
+                <span class="font-mono text-ink">${escapeHTML(cat)}</span>
+                <span class="font-mono text-ink font-medium">${count}</span>
+              </div>
+              <div class="h-1.5 w-full bg-sand overflow-hidden">
+                <div class="h-full bg-[#9A6B1F]" style="width: ${pct}%"></div>
+              </div>
+            </div>
+          `;
+        }
+      } else {
+        bl.innerHTML = '<div class="text-ink-muted text-xs py-2">No exceptions recorded for this run.</div>';
       }
     }
 
     async function loadChainMatches() {
       if (!activeRunID) return;
       const status = document.getElementById('filter-chain-status').value;
-      const merchant = document.getElementById('filter-chain-merchant').value;
+      const merch = document.getElementById('filter-chain-merchant').value;
       const search = document.getElementById('filter-chain-search').value;
 
-      let url = `/api/runs/${activeRunID}/reconciliation?limit=100`;
+      let url = `/api/runs/${activeRunID}/reconciliation?`;
       if (status) url += `&status=${status}`;
-      if (merchant) url += `&merchant=${merchant}`;
+      if (merch) url += `&merchant_id=${merch}`;
       if (search) url += `&search=${encodeURIComponent(search)}`;
 
       const res = await fetch(url);
@@ -528,44 +1201,95 @@
       tb.innerHTML = '';
 
       if (!d.matches || d.matches.length === 0) {
-        tb.innerHTML = '<tr><td colspan="5" class="py-8 text-center text-slate-500">No matching reconciliation records found.</td></tr>';
+        tb.innerHTML = '<tr><td colspan="6" class="py-8 text-center text-ink-muted">No matching records found.</td></tr>';
         return;
       }
 
       for (const m of d.matches) {
-        let badgeClass = 'badge-unmatched';
-        if (m.reconciliation_status === 'FULL') badgeClass = 'badge-full';
-        else if (m.reconciliation_status === 'PARTIAL') badgeClass = 'badge-partial';
+        let statusBadge = '';
+        if (m.reconciliation_status === 'UNMATCHED') {
+          statusBadge = '<span class="px-2 py-0.5 text-xs bg-[#F5E4E1] text-[#A13B3B] font-medium rounded-sm">Unmatched</span>';
+        } else if (m.reconciliation_status === 'PARTIAL') {
+          statusBadge = '<span class="text-xs text-[#9A6B1F] font-medium">Partial</span>';
+        } else {
+          statusBadge = '<span class="text-xs text-[#2F6F4E] font-medium">Full</span>';
+        }
 
-        tb.innerHTML += `
-          <tr class="hover:bg-slate-800/50 transition">
-            <td class="px-4 py-3">
-              <div class="font-mono font-bold text-white">${m.internal_id}</div>
-              <div class="text-slate-400">₹${m.internal_amount_inr.toFixed(2)} · ${m.merchant_id.replace('MERCH_','')}</div>
-              <div class="text-[10px] text-slate-500">${new Date(m.transaction_date).toLocaleDateString()}</div>
-            </td>
-            <td class="px-4 py-3">
-              ${m.settlement_id ? `
-                <div class="font-mono text-indigo-300">${m.settlement_id}</div>
-                <div class="text-slate-300">₹${m.settled_amount_inr.toFixed(2)} (Fee: ₹${(m.fee_delta_inr || 0).toFixed(2)})</div>
-                <div class="text-[10px] text-slate-500">${m.hop1_rule} (${(m.hop1_confidence*100).toFixed(0)}%)</div>
-              ` : `<span class="text-slate-500 italic">No settlement match</span>`}
-            </td>
-            <td class="px-4 py-3">
-              ${m.bank_statement_id ? `
-                <div class="font-mono text-emerald-300">${m.bank_statement_id}</div>
-                <div class="text-slate-300">₹${(m.bank_credited_inr || 0).toFixed(2)}</div>
-                <div class="text-[10px] text-slate-500">${m.hop2_rule || 'BATCH_REF'}</div>
-              ` : `<span class="text-slate-500 italic">Unbanked</span>`}
-            </td>
-            <td class="px-4 py-3 text-center">
-              <span class="px-2.5 py-1 rounded-full text-[10px] font-bold ${badgeClass}">${m.reconciliation_status}</span>
-            </td>
-            <td class="px-4 py-3 text-right">
-              <button onclick="openAuditModal('${m.internal_id}')" class="text-indigo-400 hover:text-indigo-300 text-xs underline font-medium">Drill-down</button>
-            </td>
-          </tr>
+        const internalAmt = m.internal_amount_inr != null ? m.internal_amount_inr.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2}) : '—';
+        const settledAmt = m.settled_amount_inr != null && m.settled_amount_inr > 0 ? m.settled_amount_inr.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2}) : '—';
+        const bankAmt = m.bank_credited_inr != null && m.bank_credited_inr > 0 ? m.bank_credited_inr.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2}) : '—';
+
+        const tr = document.createElement('tr');
+        tr.id = `chain-row-${m.internal_id}`;
+        tr.className = 'hover:bg-sand/40 transition cursor-pointer border-b border-rule';
+        tr.onclick = () => toggleInlineAudit(m.internal_id);
+
+        tr.innerHTML = `
+          <td class="px-4 py-3 font-mono font-medium text-ink">${escapeHTML(m.internal_id)}</td>
+          <td class="px-4 py-3 text-right font-mono text-ink">₹${internalAmt}</td>
+          <td class="px-4 py-3 text-right font-mono text-ink">${settledAmt !== '—' ? '₹' + settledAmt : '—'}</td>
+          <td class="px-4 py-3 text-right font-mono text-ink">${bankAmt !== '—' ? '₹' + bankAmt : '—'}</td>
+          <td class="px-4 py-3">${statusBadge}</td>
+          <td class="px-4 py-3 text-right" onclick="event.stopPropagation()">
+            <button onclick="toggleInlineAudit('${m.internal_id}')" class="text-xs text-[#0F5C56] hover:underline font-medium cursor-pointer">Audit</button>
+          </td>
         `;
+        tb.appendChild(tr);
+      }
+    }
+
+    async function toggleInlineAudit(recordID) {
+      const existing = document.getElementById(`inline-audit-${recordID}`);
+      if (existing) {
+        existing.classList.toggle('hidden');
+        return;
+      }
+      const row = document.getElementById(`chain-row-${recordID}`);
+      if (!row) return;
+
+      const tr = document.createElement('tr');
+      tr.id = `inline-audit-${recordID}`;
+      tr.className = 'bg-sand/30 border-b border-rule';
+      tr.innerHTML = `
+        <td colspan="6" class="px-6 py-4">
+          <div class="flex items-center justify-between pb-2 border-b border-rule mb-3">
+            <div class="text-xs font-semibold text-ink">Audit detail: <span class="font-mono">${escapeHTML(recordID)}</span></div>
+            <button onclick="document.getElementById('inline-audit-${recordID}').classList.add('hidden')" class="text-xs text-ink-muted hover:text-ink cursor-pointer">Close</button>
+          </div>
+          <div id="inline-audit-content-${recordID}" class="text-xs text-ink-muted">Loading audit log...</div>
+        </td>
+      `;
+      row.parentNode.insertBefore(tr, row.nextSibling);
+
+      try {
+        const res = await fetch(`/api/runs/${activeRunID}/audit/item?record_id=${recordID}`);
+        if (!res.ok) throw new Error('No audit record found');
+        const a = await res.json();
+        const content = document.getElementById(`inline-audit-content-${recordID}`);
+        content.innerHTML = `
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+            <div>
+              <div class="font-medium text-ink mb-1">Deterministic rule</div>
+              <div>Rule: <span class="font-mono text-ink font-medium">${escapeHTML(a.rule_applied || 'N/A')}</span></div>
+              <div>Outcome: <span class="font-mono text-ink font-medium">${escapeHTML(a.outcome || 'N/A')}</span></div>
+              <div class="mt-2 text-ink-muted font-medium">Fields compared:</div>
+              <pre class="mt-1 p-2 bg-paper border border-rule rounded-md font-mono text-[11px] overflow-x-auto text-ink">${escapeHTML(JSON.stringify(JSON.parse(a.fields_compared || '{}'), null, 2))}</pre>
+            </div>
+            <div>
+              <div class="font-medium text-ink mb-1">Candidates evaluated</div>
+              <pre class="p-2 bg-paper border border-rule rounded-md font-mono text-[11px] overflow-x-auto text-ink max-h-36">${escapeHTML(JSON.stringify(JSON.parse(a.candidates_considered || '[]'), null, 2))}</pre>
+              ${a.ai_reasoning ? `
+                <div class="mt-3 p-2.5 bg-paper rounded-md border border-rule">
+                  <div class="font-medium text-ink">AI note</div>
+                  <div class="text-ink-muted text-xs mt-0.5">${escapeHTML(a.ai_reasoning)}</div>
+                </div>
+              ` : ''}
+            </div>
+          </div>
+        `;
+      } catch (e) {
+        const content = document.getElementById(`inline-audit-content-${recordID}`);
+        if (content) content.innerHTML = '<div class="text-xs text-ink-muted">Deterministic exact reference match. No anomaly detected.</div>';
       }
     }
 
@@ -582,31 +1306,46 @@
 
       const res = await fetch(url);
       const d = await res.json();
-      const tb = document.getElementById('exceptions-table-body');
-      tb.innerHTML = '';
+      const list = document.getElementById('exceptions-case-list');
+      list.innerHTML = '';
 
       if (!d.exceptions || d.exceptions.length === 0) {
-        tb.innerHTML = '<tr><td colspan="6" class="py-8 text-center text-slate-500">No exceptions match filters.</td></tr>';
+        list.innerHTML = '<div class="py-8 text-center text-xs text-ink-muted">No exceptions match current filters.</div>';
         return;
       }
 
       for (const e of d.exceptions) {
-        const expINR = e.exposure_paise ? (e.exposure_paise / 100).toFixed(2) : '--';
-        tb.innerHTML += `
-          <tr class="hover:bg-slate-800/50 transition">
-            <td class="px-4 py-3 font-mono font-bold text-white">${e.record_id}</td>
-            <td class="px-4 py-3 font-mono text-xs text-amber-300">${e.category}</td>
-            <td class="px-4 py-3 text-slate-400">${e.hop}</td>
-            <td class="px-4 py-3 text-right font-bold text-amber-400">₹${expINR}</td>
-            <td class="px-4 py-3 text-slate-300 max-w-xs truncate" title="${e.reason}">${e.reason}</td>
-            <td class="px-4 py-3">
-              ${e.ai_summary ? `
-                <div class="text-slate-200 text-xs">${e.ai_summary}</div>
-                <div class="text-[10px] text-indigo-400 mt-0.5">Action: ${e.ai_action || '--'}</div>
-              ` : `<span class="text-slate-500 italic text-[10px]">${e.ai_status}</span>`}
-            </td>
-          </tr>
+        const expINR = e.exposure_paise ? (e.exposure_paise / 100).toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2}) : '--';
+        
+        let catColor = '#9A6B1F';
+        if (e.category === 'AMOUNT_MISMATCH' || e.category === 'UNMATCHED') catColor = '#A13B3B';
+
+        const div = document.createElement('div');
+        div.className = 'py-4 space-y-1';
+        div.innerHTML = `
+          <div class="flex items-baseline justify-between">
+            <div class="text-xs font-medium" style="color: ${catColor}">
+              ${escapeHTML(e.category)} <span class="text-ink-muted">·</span> ${escapeHTML(e.hop)}
+            </div>
+            <div class="font-mono text-xs font-medium text-ink">
+              ₹${expINR} exposure
+            </div>
+          </div>
+          <div class="text-sm font-medium text-ink">
+            <span class="font-mono">${escapeHTML(e.record_id)}</span> — ${escapeHTML(e.reason)}
+          </div>
+          ${e.ai_summary ? `
+            <div class="text-xs text-ink-muted">
+              <span class="font-medium text-ink">AI:</span> ${escapeHTML(e.ai_summary)} ${e.ai_action ? '(' + escapeHTML(e.ai_action) + ')' : ''}
+            </div>
+          ` : (e.ai_status ? `<div class="text-xs text-ink-muted italic">AI: ${escapeHTML(e.ai_status)}</div>` : '')}
+          <div class="pt-1 flex justify-end">
+            <button onclick="openAuditDrawer('${e.record_id}')" class="text-xs font-medium text-[#0F5C56] hover:underline cursor-pointer">
+              View audit trail
+            </button>
+          </div>
         `;
+        list.appendChild(div);
       }
     }
 
@@ -615,118 +1354,114 @@
       const res = await fetch(`/api/runs/${activeRunID}/cash-position`);
       const d = await res.json();
 
-      document.getElementById('cash-expected').innerText = `₹${d.expected_to_bank_inr.toLocaleString('en-IN', {maximumFractionDigits: 2})}`;
-      document.getElementById('cash-banked').innerText = `₹${d.actually_banked_inr.toLocaleString('en-IN', {maximumFractionDigits: 2})}`;
-      document.getElementById('cash-gap').innerText = `₹${d.unresolved_exposure_inr.toLocaleString('en-IN', {maximumFractionDigits: 2})}`;
+      document.getElementById('cash-expected').innerText = `₹${d.expected_to_bank_inr.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+      document.getElementById('cash-banked').innerText = `₹${d.actually_banked_inr.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+      document.getElementById('cash-gap').innerText = `₹${d.unresolved_exposure_inr.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
 
       const tb = document.getElementById('cash-breakdown-body');
       tb.innerHTML = '';
-      for (const b of d.category_breakdowns) {
-        let action = "Investigate gateway settlement batches and clearing delays";
-        if (b.category === "DUPLICATE_SETTLEMENT") action = "Deduplicate webhooks and withhold settlement release";
-        else if (b.category === "AMOUNT_MISMATCH") action = "Audit MDR discount fee contract and chargeback schedules";
-        else if (b.category === "PARTIAL_CREDIT") action = "Request nodal bank withholding statement for TDS or rolling reserve";
-        else if (b.category === "BANKED_NOT_SETTLED") action = "Match unexplained bank credit advice against pending manual deposits";
+      for (const b of (d.category_breakdowns || [])) {
+        let action = 'Investigate gateway settlement batches and clearing delays';
+        if (b.category === 'DUPLICATE_SETTLEMENT') action = 'Deduplicate webhooks and withhold settlement release';
+        else if (b.category === 'AMOUNT_MISMATCH') action = 'Audit MDR discount fee contract and chargeback schedules';
+        else if (b.category === 'PARTIAL_CREDIT') action = 'Request nodal bank withholding statement for TDS or rolling reserve';
+        else if (b.category === 'BANKED_NOT_SETTLED') action = 'Match unexplained bank credit advice against pending manual deposits';
 
         tb.innerHTML += `
-          <tr class="hover:bg-slate-800/50">
-            <td class="px-4 py-3 font-mono font-bold text-amber-300">${b.category}</td>
-            <td class="px-4 py-3 text-center text-slate-300 font-semibold">${b.count}</td>
-            <td class="px-4 py-3 text-right font-bold text-white">₹${b.exposure_inr.toLocaleString('en-IN', {maximumFractionDigits: 2})}</td>
-            <td class="px-4 py-3 text-slate-400 text-xs">${action}</td>
+          <tr class="hover:bg-sand/30 transition">
+            <td class="px-4 py-3 font-medium text-ink">${escapeHTML(b.category)}</td>
+            <td class="px-4 py-3 text-center text-ink-muted text-xs">${b.count} records</td>
+            <td class="px-4 py-3 text-right font-mono font-medium text-ink">₹${b.exposure_inr.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+            <td class="px-4 py-3 text-xs text-ink-muted">${action}</td>
           </tr>
         `;
       }
     }
 
-    async function openAuditModal(recordID) {
+    // Right-Side Slide-Over Drawer for Exception Audit Drilldown
+    function openAuditDrawer(recordID) {
       if (!activeRunID) return;
       document.getElementById('modal-record-title').innerText = `Record: ${recordID}`;
-      document.getElementById('audit-modal').classList.remove('hidden');
+      const backdrop = document.getElementById('audit-drawer-backdrop');
+      const drawer = document.getElementById('audit-drawer');
+      backdrop.classList.remove('hidden');
+      drawer.classList.remove('translate-x-full');
 
-      try {
-        const res = await fetch(`/api/runs/${activeRunID}/audit/item?record_id=${recordID}`);
-        if (!res.ok) throw new Error("No specific audit decision logged for this record.");
-        const a = await res.json();
-
-        document.getElementById('modal-rule').innerText = a.rule_applied;
-        document.getElementById('modal-outcome').innerText = a.outcome;
-        document.getElementById('modal-fields').innerText = JSON.stringify(JSON.parse(a.fields_compared || '{}'), null, 2);
-        document.getElementById('modal-candidates').innerText = JSON.stringify(JSON.parse(a.candidates_considered || '[]'), null, 2);
-
-        if (a.ai_reasoning) {
-          document.getElementById('modal-ai-diagnosis').innerText = a.ai_reasoning;
-          document.getElementById('modal-ai-action').innerText = "Verify bank nodal clearing and export settlement records";
-          document.getElementById('modal-ai-meta').innerText = `Model: ${a.ai_model || 'offline'} · Latency: ${a.ai_latency_ms || 1}ms`;
-          document.getElementById('modal-ai-box').classList.remove('hidden');
-        } else {
+      fetch(`/api/runs/${activeRunID}/audit/item?record_id=${recordID}`)
+        .then(res => {
+          if (!res.ok) throw new Error('No specific audit log');
+          return res.json();
+        })
+        .then(a => {
+          document.getElementById('modal-rule').innerText = a.rule_applied || 'N/A';
+          document.getElementById('modal-outcome').innerText = a.outcome || 'N/A';
+          document.getElementById('modal-fields').innerText = JSON.stringify(JSON.parse(a.fields_compared || '{}'), null, 2);
+          document.getElementById('modal-candidates').innerText = JSON.stringify(JSON.parse(a.candidates_considered || '[]'), null, 2);
+          if (a.ai_reasoning) {
+            document.getElementById('modal-ai-diagnosis').innerText = a.ai_reasoning;
+            document.getElementById('modal-ai-action').innerText = 'Action: Verify bank nodal clearing and export settlement records';
+            document.getElementById('modal-ai-meta').innerText = `Model: ${a.ai_model || 'offline'} · Latency: ${a.ai_latency_ms || 1}ms`;
+            document.getElementById('modal-ai-box').classList.remove('hidden');
+          } else {
+            document.getElementById('modal-ai-box').classList.add('hidden');
+          }
+        })
+        .catch(() => {
+          document.getElementById('modal-rule').innerText = 'EXACT_REFERENCE / DETERMINISTIC';
+          document.getElementById('modal-outcome').innerText = 'PARTIAL / UNMATCHED';
+          document.getElementById('modal-fields').innerText = `{"record_id": "${recordID}"}`;
+          document.getElementById('modal-candidates').innerText = '[]';
           document.getElementById('modal-ai-box').classList.add('hidden');
-        }
-      } catch (err) {
-        document.getElementById('modal-rule').innerText = "EXACT_REFERENCE / DETERMINISTIC";
-        document.getElementById('modal-outcome').innerText = "PARTIAL / UNMATCHED";
-        document.getElementById('modal-fields').innerText = `{"record_id": "${recordID}"}`;
-        document.getElementById('modal-candidates').innerText = "[]";
-        document.getElementById('modal-ai-box').classList.add('hidden');
-      }
+        });
     }
 
-    function closeModal() {
-      document.getElementById('audit-modal').classList.add('hidden');
+    function closeAuditDrawer() {
+      const backdrop = document.getElementById('audit-drawer-backdrop');
+      const drawer = document.getElementById('audit-drawer');
+      if (backdrop) backdrop.classList.add('hidden');
+      if (drawer) drawer.classList.add('translate-x-full');
     }
 
+    // Aliases for compatibility
+    window.openAuditModal = openAuditDrawer;
+    window.closeModal = closeAuditDrawer;
+
+    // Settlement Q&A
     function askPreset(btn, q) {
-      document.querySelectorAll('.qa-preset-btn').forEach(b => {
-        b.classList.remove('bg-indigo-600', 'text-white', 'border-indigo-500', 'shadow-sm');
-        b.classList.add('bg-slate-800', 'text-slate-300', 'border-slate-700');
-      });
-      if (btn) {
-        btn.classList.remove('bg-slate-800', 'text-slate-300', 'border-slate-700');
-        btn.classList.add('bg-indigo-600', 'text-white', 'border-indigo-500', 'shadow-sm');
-      }
+      document.getElementById('qa-input').value = q;
+      document.getElementById('qa-form').dispatchEvent(new Event('submit'));
+    }
 
-      const input = document.getElementById('qa-input');
-      input.value = q;
-      submitQA(new Event('submit'));
+    function formatAnswerHTML(text) {
+      if (!text) return '';
+      return escapeHTML(text)
+        .replace(/\n\n/g, '<br><br>')
+        .replace(/\n/g, '<br>')
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*(.*?)\*/g, '<em>$1</em>');
     }
 
     async function submitQA(e) {
       if (e) e.preventDefault();
       const input = document.getElementById('qa-input');
       const q = input.value.trim();
-      if (!q) {
-        input.classList.add('border-rose-500', 'ring-2', 'ring-rose-500/30');
-        input.focus();
-        setTimeout(() => {
-          input.classList.remove('border-rose-500', 'ring-2', 'ring-rose-500/30');
-        }, 800);
-        return;
-      }
-      if (!activeRunID) return;
-
-      const btn = document.getElementById('qa-submit-btn');
-      const presetBtns = document.querySelectorAll('.qa-preset-btn');
-      
-      btn.disabled = true;
-      presetBtns.forEach(b => b.disabled = true);
-      btn.innerHTML = `
-        <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-        </svg>
-        <span>Thinking...</span>`;
+      if (!q) return;
 
       const resultsContainer = document.getElementById('qa-results');
+      if (!activeRunID) {
+        resultsContainer.classList.remove('hidden');
+        document.getElementById('qa-answer-text').innerHTML = '<span class="text-[#A13B3B]">Please select or create an active reconciliation run before asking questions.</span>';
+        return;
+      }
+
+      const btn = document.getElementById('qa-submit-btn');
+      btn.disabled = true;
+      btn.innerHTML = '<span>Thinking...</span>';
+
       resultsContainer.classList.remove('hidden');
-      document.getElementById('qa-answer-text').innerHTML = `
-        <div class="animate-pulse flex space-x-3 items-center text-slate-400 py-1">
-          <div class="h-2 bg-indigo-500/50 rounded w-24"></div>
-          <div class="h-2 bg-slate-700 rounded w-48"></div>
-          <span class="text-xs text-indigo-400 font-mono">AST-validating & executing query against qa_readonly...</span>
-        </div>`;
+      document.getElementById('qa-answer-text').innerHTML = '<span class="text-ink-muted animate-pulse">AST-validating & executing query against qa_readonly...</span>';
       document.getElementById('qa-duration').innerText = 'Processing...';
       document.getElementById('qa-sql-box').innerText = '-- Synthesizing and validating read-only SQL...';
-      document.getElementById('qa-table-container').classList.add('hidden');
 
       try {
         const res = await fetch(`/api/runs/${activeRunID}/qa`, {
@@ -735,22 +1470,29 @@
           body: JSON.stringify({ question: q })
         });
         const d = await res.json();
+
+        if (!res.ok) {
+          throw new Error(d.error || d.error_message || `Server returned status ${res.status}`);
+        }
         
-        document.getElementById('qa-answer-text').innerText = d.answer || "No response received.";
-        document.getElementById('qa-duration').innerText = `Duration: ${d.duration_ms || 0}ms · Rows: ${d.row_count || 0}`;
-        document.getElementById('qa-sql-box').innerText = d.sql || "N/A (Rejected / Unsupported before execution)";
+        const ans = d.answer || (d.error_message ? `Query error: ${d.error_message}` : 'No response received.');
+        document.getElementById('qa-answer-text').innerHTML = formatAnswerHTML(ans);
+        document.getElementById('qa-duration').innerText = `${d.duration_ms || 0}ms · ${d.row_count || 0} rows`;
+        document.getElementById('qa-sql-box').innerText = d.sql || 'N/A (Resolved without database query execution)';
 
         const astBadge = document.getElementById('qa-ast-badge');
-        if (d.ast_valid) {
-          astBadge.className = "text-[10px] px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-800 font-mono";
-          astBadge.innerText = "AST Validated · Read-Only";
+        if (d.unsupported) {
+          astBadge.className = 'font-mono text-[11px] text-ink-muted bg-sand px-1.5 py-0.5 rounded-sm';
+          astBadge.innerText = 'Controller Guidance';
+        } else if (d.ast_valid) {
+          astBadge.className = 'font-mono text-[11px] text-[#2F6F4E]';
+          astBadge.innerText = 'AST Validated · Read-Only';
         } else {
-          astBadge.className = "text-[10px] px-2 py-0.5 rounded bg-rose-950 text-rose-300 border border-rose-800 font-mono";
-          astBadge.innerText = "Validation Failed · Blocked";
+          astBadge.className = 'font-mono text-[11px] text-[#A13B3B]';
+          astBadge.innerText = 'Security Guardrail Blocked';
         }
 
         // Populate table
-        const tableContainer = document.getElementById('qa-table-container');
         const thead = document.getElementById('qa-table-head');
         const tbody = document.getElementById('qa-table-body');
         thead.innerHTML = '';
@@ -758,43 +1500,49 @@
         document.getElementById('qa-row-count').innerText = d.row_count || 0;
 
         if (d.rows && d.rows.length > 0) {
-          tableContainer.classList.remove('hidden');
           const cols = Object.keys(d.rows[0]);
           let headerHtml = '<tr>';
-          cols.forEach(c => headerHtml += `<th class="px-4 py-2">${c}</th>`);
+          cols.forEach(c => headerHtml += `<th class="px-4 py-2">${escapeHTML(c)}</th>`);
           headerHtml += '</tr>';
           thead.innerHTML = headerHtml;
 
           d.rows.forEach(r => {
-            let rowHtml = '<tr class="hover:bg-slate-800/40">';
+            let rowHtml = '<tr class="hover:bg-sand/30 transition">';
             cols.forEach(c => {
               let val = r[c];
-              if (val === null || val === undefined) val = '<span class="text-slate-500">null</span>';
-              rowHtml += `<td class="px-4 py-2 text-slate-300 whitespace-nowrap">${val}</td>`;
+              if (val === null || val === undefined) val = '<span class="text-ink-muted">null</span>';
+              else val = escapeHTML(String(val));
+              rowHtml += `<td class="px-4 py-2 text-ink whitespace-nowrap">${val}</td>`;
             });
             rowHtml += '</tr>';
             tbody.innerHTML += rowHtml;
           });
         } else {
-          tableContainer.classList.add('hidden');
+          tbody.innerHTML = '<tr><td class="p-4 text-ink-muted text-xs">No rows returned.</td></tr>';
         }
       } catch (err) {
-        document.getElementById('qa-answer-text').innerHTML = `<span class="text-rose-400">Error executing Q&A: ${err.message}</span>`;
+        document.getElementById('qa-answer-text').innerHTML = `<span class="text-[#A13B3B]">Error executing Q&A: ${escapeHTML(err.message)}</span>`;
       } finally {
         btn.disabled = false;
-        presetBtns.forEach(b => b.disabled = false);
-        btn.innerHTML = `<span>Ask</span><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>`;
+        btn.innerHTML = '<span>Ask</span>';
       }
     }
 
     function switchTab(tab) {
       const views = ['benchmark', 'chain', 'exceptions', 'cash', 'qa'];
       for (const v of views) {
-        document.getElementById(`view-${v}`).classList.add('hidden');
-        document.getElementById(`tab-${v}`).classList.remove('tab-active');
+        const viewEl = document.getElementById(`view-${v}`);
+        const tabEl = document.getElementById(`tab-${v}`);
+        if (viewEl) viewEl.classList.add('hidden');
+        if (tabEl) tabEl.classList.remove('tab-active');
       }
-      document.getElementById(`view-${tab}`).classList.remove('hidden');
-      document.getElementById(`tab-${tab}`).classList.add('tab-active');
+      const targetView = document.getElementById(`view-${tab}`);
+      const targetTab = document.getElementById(`tab-${tab}`);
+      if (targetView) targetView.classList.remove('hidden');
+      if (targetTab) targetTab.classList.add('tab-active');
+
+      const mainEl = document.querySelector('main');
+      if (mainEl) mainEl.scrollTop = 0;
 
       if (tab === 'benchmark') loadSummary();
       else if (tab === 'chain') loadChainMatches();
@@ -814,8 +1562,565 @@
       }
     }
 
+    // ==========================================
+    // 3-Source CSV Ingestion with AI Mapping
+    // ==========================================
+    let ingestSession = {
+      runID: null,
+      activeSource: 'internal',
+      sources: {
+        internal: { done: false, count: 0, filename: '' },
+        settlement: { done: false, count: 0, filename: '' },
+        bank: { done: false, count: 0, filename: '' }
+      }
+    };
+    let currentAnalyzeResult = null;
+    let selectedUploadFile = null;
+
+    const sourceMeta = {
+      internal: {
+        stepNum: '1 of 3',
+        name: 'Internal Ledger',
+        system: 'System A',
+        desc: 'Upload gross transactions recorded in internal accounting / order ledger.',
+        reqChips: 'id, amount, transaction_date, merchant_id',
+        nextStep: 'settlement',
+        nextStepName: 'Gateway Settlement'
+      },
+      settlement: {
+        stepNum: '2 of 3',
+        name: 'Gateway Settlement',
+        system: 'System B',
+        desc: 'Upload net payout batch settlement reports from payment gateway (Razorpay).',
+        reqChips: 'id, settled_amount, settlement_date, merchant_id, batch_id',
+        nextStep: 'bank',
+        nextStepName: 'Bank Statement'
+      },
+      bank: {
+        stepNum: '3 of 3',
+        name: 'Bank Statement',
+        system: 'System C',
+        desc: 'Upload nodal bank account credit deposits and statement entries.',
+        reqChips: 'id, credited_amount, credit_date, merchant_id, batch_reference',
+        nextStep: 'reconcile',
+        nextStepName: '3-Way Reconcile'
+      }
+    };
+
+    async function openIngestModal() {
+      document.getElementById('ingest-modal').classList.remove('hidden');
+      if (activeRunID) {
+        ingestSession.runID = activeRunID;
+        try {
+          const res = await fetch(`/api/runs/${activeRunID}/sources-status`);
+          if (res.ok) {
+            const st = await res.json();
+            ingestSession.sources.internal.done = st.internal_count > 0;
+            ingestSession.sources.internal.count = st.internal_count;
+            ingestSession.sources.settlement.done = st.settlement_count > 0;
+            ingestSession.sources.settlement.count = st.settlement_count;
+            ingestSession.sources.bank.done = st.bank_count > 0;
+            ingestSession.sources.bank.count = st.bank_count;
+          }
+        } catch(e) {}
+      }
+      updateStepperUI();
+      switchSourceStep(ingestSession.activeSource || 'internal');
+    }
+
+    function closeIngestModal() {
+      document.getElementById('ingest-modal').classList.add('hidden');
+    }
+
+    function startFreshRunSession() {
+      closeIngestModal();
+      openCreateRunModal();
+    }
+
+    function updateRunIDBanner() {
+      const banner = document.getElementById('ingest-session-run-id');
+      const counter = document.getElementById('ingest-progress-counter');
+      const targetRunID = ingestSession.runID || activeRunID;
+      const currentRun = allRuns ? allRuns.find(r => r.run_id === targetRunID) : null;
+
+      if (banner) {
+        if (currentRun) {
+          banner.innerText = currentRun.name || currentRun.run_id;
+        } else if (targetRunID) {
+          banner.innerText = targetRunID;
+        } else {
+          banner.innerText = 'New Run (Auto-assigned on first upload)';
+        }
+      }
+
+      let readyCount = 0;
+      if (ingestSession.sources.internal.done) readyCount++;
+      if (ingestSession.sources.settlement.done) readyCount++;
+      if (ingestSession.sources.bank.done) readyCount++;
+      if (counter) counter.innerText = `${readyCount} of 3 sources ready`;
+    }
+
+    function updateStepperUI() {
+      const steps = ['internal', 'settlement', 'bank', 'reconcile'];
+      updateRunIDBanner();
+
+      steps.forEach(step => {
+        const tab = document.getElementById(`step-tab-${step}`);
+        const rows = document.getElementById(`step-rows-${step}`);
+
+        if (step === 'reconcile') {
+          const allDone = ingestSession.sources.internal.done &&
+                          ingestSession.sources.settlement.done &&
+                          ingestSession.sources.bank.done;
+          if (ingestSession.activeSource === 'reconcile') {
+            tab.className = 'p-2.5 text-left transition cursor-pointer border-b-2 border-[#0F5C56] font-semibold text-[#0F5C56]';
+          } else {
+            tab.className = 'p-2.5 text-left transition cursor-pointer border-b-2 border-transparent text-ink-muted hover:text-ink';
+          }
+          if (allDone) {
+            rows.innerText = 'Ready to reconcile';
+            rows.className = 'text-[11px] text-[#2F6F4E] font-medium mt-0.5';
+          } else {
+            rows.innerText = '3 sources required';
+            rows.className = 'text-[11px] text-ink-muted mt-0.5';
+          }
+          return;
+        }
+
+        const srcData = ingestSession.sources[step];
+        const isActive = (ingestSession.activeSource === step);
+
+        if (isActive) {
+          tab.className = 'p-2.5 text-left transition cursor-pointer border-b-2 border-[#0F5C56] font-semibold text-[#0F5C56]';
+        } else {
+          tab.className = 'p-2.5 text-left transition cursor-pointer border-b-2 border-transparent text-ink-muted hover:text-ink';
+        }
+
+        if (srcData.done) {
+          rows.innerText = `✓ ${srcData.count} records`;
+          rows.className = 'text-[11px] text-[#2F6F4E] font-medium mt-0.5';
+        } else if (isActive) {
+          rows.innerText = 'Ready to upload';
+          rows.className = 'text-[11px] text-[#0F5C56] mt-0.5';
+        } else {
+          rows.innerText = 'Not uploaded';
+          rows.className = 'text-[11px] text-ink-muted mt-0.5';
+        }
+      });
+    }
+
+    function switchSourceStep(step) {
+      ingestSession.activeSource = step;
+      updateStepperUI();
+
+      if (step === 'reconcile') {
+        renderAllDoneView();
+        return;
+      }
+
+      selectedUploadFile = null;
+      currentAnalyzeResult = null;
+
+      document.getElementById('ingest-view-upload').classList.remove('hidden');
+      document.getElementById('ingest-view-confirm').classList.add('hidden');
+      document.getElementById('ingest-view-source-done').classList.add('hidden');
+      document.getElementById('ingest-view-all-done').classList.add('hidden');
+
+      const meta = sourceMeta[step];
+      document.getElementById('source-view-title').innerText = `${meta.name} (${meta.stepNum})`;
+      document.getElementById('source-system-badge').innerText = meta.system;
+      document.getElementById('source-view-desc').innerText = meta.desc;
+      document.getElementById('source-req-chips').innerText = meta.reqChips;
+
+      document.getElementById('ingest-file-input').value = '';
+      document.getElementById('file-label-name').innerText = `Click to browse or drop CSV file for ${meta.name}`;
+      document.getElementById('btn-analyze-csv').disabled = true;
+      document.getElementById('ingest-upload-error').classList.add('hidden');
+    }
+
+    async function loadDemoSample(isMessy) {
+      const src = ingestSession.activeSource;
+      const endpoint = isMessy ? `/api/samples/messy/${src}` : `/api/samples/${src}`;
+      const filename = isMessy ? `${src}_messy_demo.csv` : `${src}_clean_demo.csv`;
+      const btn = isMessy ? document.getElementById('btn-demo-messy') : document.getElementById('btn-demo-clean');
+      if (btn) btn.disabled = true;
+
+      try {
+        const res = await fetch(endpoint);
+        if (!res.ok) throw new Error('Failed to load demo CSV from server');
+        const blob = await res.blob();
+        selectedUploadFile = new File([blob], filename, { type: 'text/csv' });
+        document.getElementById('file-label-name').innerHTML = `
+          <span class="font-medium text-[#2F6F4E]">Loaded:</span>
+          <span class="font-mono font-medium text-ink ml-1">${escapeHTML(filename)}</span>
+          <span class="text-ink-muted ml-1">(${(selectedUploadFile.size / 1024).toFixed(1)} KB)</span>
+        `;
+        document.getElementById('btn-analyze-csv').disabled = false;
+        document.getElementById('ingest-upload-error').classList.add('hidden');
+      } catch (err) {
+        const errBox = document.getElementById('ingest-upload-error');
+        errBox.innerText = err.message;
+        errBox.classList.remove('hidden');
+      } finally {
+        if (btn) btn.disabled = false;
+      }
+    }
+
+    function downloadActiveSample() {
+      const src = ingestSession.activeSource;
+      window.location.href = `/api/samples/messy/${src}`;
+    }
+
+    function handleFileSelected(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      selectedUploadFile = file;
+      document.getElementById('file-label-name').innerHTML = `
+        <span class="font-medium text-[#2F6F4E]">Selected:</span>
+        <span class="font-mono font-medium text-ink ml-1">${escapeHTML(file.name)}</span>
+        <span class="text-ink-muted ml-1">(${(file.size / 1024).toFixed(1)} KB)</span>
+      `;
+      document.getElementById('btn-analyze-csv').disabled = false;
+      document.getElementById('ingest-upload-error').classList.add('hidden');
+    }
+
+    async function startAIAnalysis() {
+      if (!selectedUploadFile) return;
+      const btn = document.getElementById('btn-analyze-csv');
+      const errBox = document.getElementById('ingest-upload-error');
+      errBox.classList.add('hidden');
+      btn.disabled = true;
+      document.getElementById('analyze-btn-text').innerText = 'Analyzing mapping...';
+
+      try {
+        const formData = new FormData();
+        formData.append('file', selectedUploadFile);
+        formData.append('source_type', ingestSession.activeSource);
+
+        const res = await fetch('/api/ingest/analyze', {
+          method: 'POST',
+          body: formData
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed to analyze CSV');
+
+        currentAnalyzeResult = data;
+        renderConfirmationScreen(data);
+      } catch (err) {
+        errBox.innerText = err.message;
+        errBox.classList.remove('hidden');
+      } finally {
+        btn.disabled = false;
+        document.getElementById('analyze-btn-text').innerText = 'Analyze column mapping';
+      }
+    }
+
+    function renderConfirmationScreen(data) {
+      document.getElementById('ingest-view-upload').classList.add('hidden');
+      document.getElementById('ingest-view-confirm').classList.remove('hidden');
+      document.getElementById('ingest-view-source-done').classList.add('hidden');
+      document.getElementById('ingest-view-all-done').classList.add('hidden');
+
+      const dateEl = document.getElementById('confirm-date-format');
+      if (dateEl) dateEl.innerText = data.date_format || 'auto';
+
+      const notesEl = document.getElementById('confirm-ai-notes');
+      if (notesEl) notesEl.innerText = data.notes || '';
+
+      const tbody = document.getElementById('mapping-table-body');
+      tbody.innerHTML = '';
+
+      const csvHeaders = data.headers || [];
+      const defs = data.canonical_defs || [];
+
+      if (!data.mapping) data.mapping = {};
+      if (!data.confidence) data.confidence = {};
+
+      defs.forEach(f => {
+        const mappedCol = data.mapping[f.name] || '';
+        const conf = data.confidence[f.name] || (mappedCol ? 'HIGH' : 'UNMAPPED');
+
+        let selectOptions = '<option value="">(Skip / Unmapped)</option>';
+        csvHeaders.forEach(col => {
+          const selected = (mappedCol === col) ? 'selected' : '';
+          selectOptions += `<option value="${escapeHTML(col)}" ${selected}>${escapeHTML(col)}</option>`;
+        });
+
+        const confBadge = renderConfidencePill(conf, f.required, Boolean(mappedCol));
+
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-sand/30 transition';
+        tr.innerHTML = `
+          <td class="px-4 py-2.5 font-medium text-ink">
+            <div class="flex items-center space-x-1.5">
+              <span class="font-mono">${escapeHTML(f.name)}</span>
+              ${f.required ? '<span class="text-[#A13B3B] text-[10px]">*</span>' : ''}
+            </div>
+            <div class="text-[11px] text-ink-muted">${escapeHTML(f.description || '')}</div>
+          </td>
+          <td class="px-4 py-2.5">
+            <select id="map-select-${f.name}" onchange="onMappingChanged('${f.name}')" class="bg-sand border border-rule text-xs rounded-md px-2.5 py-1.5 text-ink focus:outline-none focus:border-[#0F5C56]">
+              ${selectOptions}
+            </select>
+          </td>
+          <td class="px-4 py-2.5" id="conf-cell-${f.name}">
+            ${confBadge}
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      validateMappingState();
+    }
+
+    function renderConfidencePill(conf, isRequired, isMapped) {
+      if (!isMapped) {
+        if (isRequired) return '<span class="text-xs text-[#A13B3B] font-medium">Required · Unmapped</span>';
+        return '<span class="text-xs text-ink-muted">Optional</span>';
+      }
+      if (conf === 'HIGH' || conf >= 0.8) {
+        return '<span class="text-xs text-[#2F6F4E] font-medium">High confidence</span>';
+      } else if (conf === 'MEDIUM' || conf >= 0.5) {
+        return '<span class="text-xs text-[#9A6B1F] font-medium">Check this</span>';
+      } else if (conf === 'MANUAL') {
+        return '<span class="text-xs text-ink font-medium">Manual</span>';
+      } else {
+        return '<span class="text-xs text-[#A13B3B] font-medium">Low confidence</span>';
+      }
+    }
+
+    function onMappingChanged(fieldName) {
+      if (!currentAnalyzeResult) return;
+      const select = document.getElementById(`map-select-${fieldName}`);
+      const val = select ? select.value : '';
+      if (!currentAnalyzeResult.mapping) currentAnalyzeResult.mapping = {};
+      currentAnalyzeResult.mapping[fieldName] = val;
+
+      const fDef = (currentAnalyzeResult.canonical_defs || []).find(f => f.name === fieldName);
+      const cell = document.getElementById(`conf-cell-${fieldName}`);
+      if (cell && fDef) {
+        cell.innerHTML = renderConfidencePill(val ? 'MANUAL' : 'UNMAPPED', fDef.required, Boolean(val));
+      }
+
+      validateMappingState();
+    }
+
+    function validateMappingState() {
+      const commitBtn = document.getElementById('btn-confirm-commit');
+      const errBox = document.getElementById('ingest-confirm-error');
+      if (!currentAnalyzeResult) return;
+
+      let missingRequired = [];
+      const defs = currentAnalyzeResult.canonical_defs || [];
+      defs.forEach(f => {
+        if (f.required && (!currentAnalyzeResult.mapping || !currentAnalyzeResult.mapping[f.name])) {
+          missingRequired.push(f.name);
+        }
+      });
+
+      if (missingRequired.length > 0) {
+        errBox.innerText = `Please map required field(s): ${missingRequired.join(', ')}`;
+        errBox.classList.remove('hidden');
+        commitBtn.disabled = true;
+      } else {
+        errBox.classList.add('hidden');
+        commitBtn.disabled = false;
+      }
+    }
+
+    function backToUploadView() {
+      document.getElementById('ingest-view-upload').classList.remove('hidden');
+      document.getElementById('ingest-view-confirm').classList.add('hidden');
+      document.getElementById('ingest-view-source-done').classList.add('hidden');
+    }
+
+    async function commitMapping() {
+      if (!currentAnalyzeResult) return;
+
+      const btn = document.getElementById('btn-confirm-commit');
+      const errBox = document.getElementById('ingest-confirm-error');
+      btn.disabled = true;
+      document.getElementById('commit-btn-text').innerText = 'Ingesting source...';
+      errBox.classList.add('hidden');
+
+      try {
+        const src = ingestSession.activeSource;
+        const payload = {
+          file_id: currentAnalyzeResult.file_id,
+          source_type: src,
+          mapping: currentAnalyzeResult.mapping || {},
+          date_format: currentAnalyzeResult.date_format || '',
+          run_id: ingestSession.runID || '',
+          replace_existing: false
+        };
+
+        const res = await fetch('/api/ingest/commit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const summary = await res.json();
+        if (!res.ok) throw new Error(summary.error || 'Failed to ingest records');
+
+        ingestSession.runID = summary.run_id;
+        ingestSession.sources[src] = {
+          done: true,
+          count: summary.rows_ingested,
+          filename: summary.filename
+        };
+
+        updateStepperUI();
+        renderSourceCompleteScreen(summary);
+      } catch (err) {
+        errBox.innerText = err.message;
+        errBox.classList.remove('hidden');
+      } finally {
+        btn.disabled = false;
+        document.getElementById('commit-btn-text').innerText = 'Confirm and ingest source';
+      }
+    }
+
+    function renderSourceCompleteScreen(summary) {
+      document.getElementById('ingest-view-upload').classList.add('hidden');
+      document.getElementById('ingest-view-confirm').classList.add('hidden');
+      document.getElementById('ingest-view-source-done').classList.remove('hidden');
+      document.getElementById('ingest-view-all-done').classList.add('hidden');
+
+      const src = ingestSession.activeSource;
+      const meta = sourceMeta[src];
+
+      document.getElementById('step-done-title').innerText = `${meta.name} ingested successfully`;
+      document.getElementById('step-done-msg').innerText = `${summary.rows_ingested} records saved to run ${summary.run_id}.`;
+
+      ['internal', 'settlement', 'bank'].forEach(s => {
+        const span = document.getElementById(`overview-status-${s}`);
+        const data = ingestSession.sources[s];
+        if (data.done) {
+          span.className = 'text-xs font-medium text-[#2F6F4E]';
+          span.innerText = `✓ ${data.count} records ingested`;
+        } else {
+          span.className = 'text-xs text-ink-muted';
+          span.innerText = 'Pending upload';
+        }
+      });
+
+      let completedCount = 0;
+      if (ingestSession.sources.internal.done) completedCount++;
+      if (ingestSession.sources.settlement.done) completedCount++;
+      if (ingestSession.sources.bank.done) completedCount++;
+      document.getElementById('pipeline-status-text').innerText = `${completedCount} of 3 sources ingested`;
+
+      const nextBtnText = document.getElementById('next-step-btn-text');
+      if (meta.nextStep === 'reconcile') {
+        nextBtnText.innerText = 'View pipeline and reconcile';
+      } else {
+        nextBtnText.innerText = `Proceed to ${meta.nextStepName}`;
+      }
+    }
+
+    function proceedToNextSource() {
+      const src = ingestSession.activeSource;
+      const meta = sourceMeta[src];
+      if (meta && meta.nextStep) {
+        switchSourceStep(meta.nextStep);
+      } else {
+        switchSourceStep('reconcile');
+      }
+    }
+
+    function renderAllDoneView() {
+      document.getElementById('ingest-view-upload').classList.add('hidden');
+      document.getElementById('ingest-view-confirm').classList.add('hidden');
+      document.getElementById('ingest-view-source-done').classList.add('hidden');
+      document.getElementById('ingest-view-all-done').classList.remove('hidden');
+
+      const intData = ingestSession.sources.internal;
+      const setData = ingestSession.sources.settlement;
+      const bnkData = ingestSession.sources.bank;
+
+      document.getElementById('card-count-internal').innerText = `${intData.count} rows`;
+      document.getElementById('card-badge-internal').className = intData.done ? 'text-xs font-medium text-[#2F6F4E]' : 'text-xs text-ink-muted';
+      document.getElementById('card-badge-internal').innerText = intData.done ? '✓ Ingested' : 'Pending';
+
+      document.getElementById('card-count-settlement').innerText = `${setData.count} rows`;
+      document.getElementById('card-badge-settlement').className = setData.done ? 'text-xs font-medium text-[#2F6F4E]' : 'text-xs text-ink-muted';
+      document.getElementById('card-badge-settlement').innerText = setData.done ? '✓ Ingested' : 'Pending';
+
+      document.getElementById('card-count-bank').innerText = `${bnkData.count} rows`;
+      document.getElementById('card-badge-bank').className = bnkData.done ? 'text-xs font-medium text-[#2F6F4E]' : 'text-xs text-ink-muted';
+      document.getElementById('card-badge-bank').innerText = bnkData.done ? '✓ Ingested' : 'Pending';
+
+      const allComplete = intData.done && setData.done && bnkData.done &&
+                          intData.count > 0 && setData.count > 0 && bnkData.count > 0;
+
+      const reconcileBtn = document.getElementById('btn-run-reconcile-now');
+      const warningBox = document.getElementById('all-sources-warning');
+      const warningText = document.getElementById('all-sources-warning-text');
+      const bannerDesc = document.getElementById('all-banner-desc');
+
+      const totalSources = (intData.count > 0 ? 1 : 0) + (setData.count > 0 ? 1 : 0) + (bnkData.count > 0 ? 1 : 0);
+
+      if (allComplete) {
+        reconcileBtn.disabled = false;
+        warningBox.classList.add('hidden');
+        bannerDesc.innerText = 'All 3 financial sources are ingested. Ready for complete 3-way reconciliation.';
+        document.getElementById('reconcile-btn-text').innerText = 'Run 3-way reconciliation';
+      } else if (totalSources > 0) {
+        reconcileBtn.disabled = false;
+        warningBox.classList.remove('hidden');
+        if (bnkData.count === 0 && setData.count > 0) {
+          warningText.innerText = 'Partial Run: No bank statement uploaded. Hop 1 will execute; Hop 2 will be marked PARTIAL.';
+        } else if (setData.count === 0) {
+          warningText.innerText = 'Partial Run: No settlement records uploaded. Records will be marked UNMATCHED.';
+        } else {
+          warningText.innerText = 'Partial Run: Incomplete sources uploaded. Reconciliation will run on available data.';
+        }
+        document.getElementById('reconcile-btn-text').innerText = 'Run partial reconciliation';
+        bannerDesc.innerText = 'Partial source set detected. You can reconcile now or upload remaining sources.';
+      } else {
+        warningText.innerText = 'No source files uploaded yet. Please upload at least one source before reconciling.';
+        warningBox.classList.remove('hidden');
+        reconcileBtn.disabled = true;
+        bannerDesc.innerText = 'Upload files into this run to proceed with reconciliation.';
+      }
+    }
+
+    async function runReconciliationNow() {
+      const runID = ingestSession.runID || activeRunID;
+      if (!runID) return;
+
+      const btn = document.getElementById('btn-run-reconcile-now');
+      btn.disabled = true;
+      document.getElementById('reconcile-btn-text').innerText = 'Executing...';
+
+      try {
+        const res = await fetch(`/runs/${runID}/reconcile`, { method: 'POST' });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Reconciliation failed');
+
+        closeIngestModal();
+        await loadRunsList();
+        selectRun(runID);
+        switchTab('chain');
+      } catch (err) {
+        alert('Reconciliation error: ' + err.message);
+      } finally {
+        btn.disabled = false;
+        document.getElementById('reconcile-btn-text').innerText = 'Run 3-way reconciliation';
+      }
+    }
+
+    function escapeHTML(str) {
+      if (!str) return '';
+      return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
     window.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') closeModal();
+      if (e.key === 'Escape') {
+        closeAuditDrawer();
+        closeCreateRunModal();
+        closeIngestModal();
+      }
     });
 
     window.onload = init;

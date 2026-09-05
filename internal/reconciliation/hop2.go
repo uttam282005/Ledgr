@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"math"
 	"sort"
+	"strings"
 	"time"
 
 	"github.com/razorpay-hack/ai-finance-controller/internal/models"
@@ -20,11 +21,28 @@ const (
 type SettlementBatch struct {
 	BatchID                string
 	MerchantID             string
+	Merchants              map[string]bool
+	Currency               string
 	SettlementCount        int
 	SettlementIDs          []string
 	TotalAmountPaise       int64
 	EarliestSettlementDate time.Time
 	LatestSettlementDate   time.Time
+}
+
+// HasMerchant checks if a merchant ID is associated with this batch.
+func (b *SettlementBatch) HasMerchant(mID string) bool {
+	if b == nil {
+		return false
+	}
+	m := strings.TrimSpace(mID)
+	if m == "" || m == "MERCH_MULTI" {
+		return true
+	}
+	if b.Merchants == nil {
+		return b.MerchantID == m
+	}
+	return b.Merchants[m]
 }
 
 // BankCandidateEvaluation records evaluation of a candidate bank credit for a batch.
@@ -80,17 +98,25 @@ func AggregateSettlementBatches(settlements []models.SettlementRecord) map[strin
 	batches := make(map[string]*SettlementBatch)
 
 	for _, s := range settlements {
-		b, exists := batches[s.BatchID]
+		batchKey := strings.TrimSpace(s.BatchID)
+		if batchKey == "" {
+			batchKey = fmt.Sprintf("__UNBATCHED_%s", s.ID)
+		}
+
+		b, exists := batches[batchKey]
 		if !exists {
 			b = &SettlementBatch{
-				BatchID:                s.BatchID,
+				BatchID:                batchKey,
 				MerchantID:             s.MerchantID,
+				Merchants:              make(map[string]bool),
+				Currency:               s.Currency,
 				EarliestSettlementDate: s.SettlementDate,
 				LatestSettlementDate:   s.SettlementDate,
 			}
-			batches[s.BatchID] = b
+			batches[batchKey] = b
 		}
 
+		b.Merchants[s.MerchantID] = true
 		b.SettlementCount++
 		b.SettlementIDs = append(b.SettlementIDs, s.ID)
 		b.TotalAmountPaise += s.SettledAmountPaise
@@ -120,42 +146,29 @@ func ReconcileHop2(
 	}
 	sort.Strings(batchIDs)
 
-	// Index bank statements by merchant and by batch_reference
+	// Index bank statements by merchant and by batch_reference (normalized)
 	bankByRef := make(map[string][]*models.BankStatement)
 	bankByMerchant := make(map[string][]*models.BankStatement)
 
 	for i := range bankStatements {
 		bs := &bankStatements[i]
 		bankByMerchant[bs.MerchantID] = append(bankByMerchant[bs.MerchantID], bs)
-		if bs.BatchReference != nil && *bs.BatchReference != "" {
-			bankByRef[*bs.BatchReference] = append(bankByRef[*bs.BatchReference], bs)
+		if bs.BatchReference != nil {
+			ref := strings.TrimSpace(*bs.BatchReference)
+			if ref != "" {
+				bankByRef[ref] = append(bankByRef[ref], bs)
+			}
 		}
 	}
 
 	consumedBankStatements := make(map[string]string) // bankID -> batchID
 	batchResults := make(map[string]*Hop2BatchResult)
 
+	// Step 1: Rule 1 — Batch Reference Rule across all batches
 	for _, bID := range batchIDs {
 		batch := batches[bID]
-		fieldsCompared := map[string]interface{}{
-			"batch_id":             batch.BatchID,
-			"merchant_id":          batch.MerchantID,
-			"settlement_count":     batch.SettlementCount,
-			"expected_total_paise": batch.TotalAmountPaise,
-			"latest_date":          batch.LatestSettlementDate.Format(time.RFC3339),
-		}
-
-		res := &Hop2BatchResult{
-			BatchID:             batch.BatchID,
-			ExpectedAmountPaise: batch.TotalAmountPaise,
-			FieldsCompared:      fieldsCompared,
-		}
-
-		// Candidate evaluations
-		var evaluations []BankCandidateEvaluation
-
-		// Step 1: Check Batch Reference Rule (Rule 1)
-		refCandidates := bankByRef[batch.BatchID]
+		refKey := strings.TrimSpace(batch.BatchID)
+		refCandidates := bankByRef[refKey]
 		var availableRefCandidates []*models.BankStatement
 		for _, bc := range refCandidates {
 			if consumedBy, consumed := consumedBankStatements[bc.ID]; !consumed || consumedBy == batch.BatchID {
@@ -163,18 +176,67 @@ func ReconcileHop2(
 			}
 		}
 
-		if len(availableRefCandidates) > 1 {
-			// Multiple bank credits claim the exact same batch reference -> AMBIGUOUS_BANK_CREDIT
-			cat := models.CategoryAmbiguousBankCredit
-			res.Matched = false
-			res.Rule = RuleBatchReference
-			res.ExceptionCategory = &cat
-			res.ExceptionReason = fmt.Sprintf("Multiple bank statement credits (%d candidates) reference batch %s", len(availableRefCandidates), batch.BatchID)
-			batchResults[batch.BatchID] = res
-			continue
-		}
+		if len(availableRefCandidates) >= 1 {
+			fieldsCompared := map[string]interface{}{
+				"batch_id":             batch.BatchID,
+				"merchant_id":          batch.MerchantID,
+				"settlement_count":     batch.SettlementCount,
+				"expected_total_paise": batch.TotalAmountPaise,
+				"latest_date":          batch.LatestSettlementDate.Format(time.RFC3339),
+			}
 
-		if len(availableRefCandidates) == 1 {
+			res := &Hop2BatchResult{
+				BatchID:             batch.BatchID,
+				ExpectedAmountPaise: batch.TotalAmountPaise,
+				FieldsCompared:      fieldsCompared,
+			}
+
+			// If multiple bank credits claim the same batch reference, rank them deterministically:
+			// 1. Merchant match
+			// 2. Currency match
+			// 3. Exact amount match (delta == 0)
+			// 4. Smaller absolute delta
+			// 5. Closeness in time to latest settlement
+			// 6. Deterministic tie-breaker on bank ID
+			if len(availableRefCandidates) > 1 {
+				sort.SliceStable(availableRefCandidates, func(i, j int) bool {
+					ci := availableRefCandidates[i]
+					cj := availableRefCandidates[j]
+
+					mMatchI := batch.HasMerchant(ci.MerchantID)
+					mMatchJ := batch.HasMerchant(cj.MerchantID)
+					if mMatchI != mMatchJ {
+						return mMatchI
+					}
+
+					cMatchI := (batch.Currency == "" || ci.Currency == "" || strings.EqualFold(ci.Currency, batch.Currency))
+					cMatchJ := (batch.Currency == "" || cj.Currency == "" || strings.EqualFold(cj.Currency, batch.Currency))
+					if cMatchI != cMatchJ {
+						return cMatchI
+					}
+
+					exactI := (ci.CreditedAmountPaise == batch.TotalAmountPaise)
+					exactJ := (cj.CreditedAmountPaise == batch.TotalAmountPaise)
+					if exactI != exactJ {
+						return exactI
+					}
+
+					deltaI := int64(math.Abs(float64(ci.CreditedAmountPaise - batch.TotalAmountPaise)))
+					deltaJ := int64(math.Abs(float64(cj.CreditedAmountPaise - batch.TotalAmountPaise)))
+					if deltaI != deltaJ {
+						return deltaI < deltaJ
+					}
+
+					daysI := math.Abs(ci.CreditDate.Sub(batch.LatestSettlementDate).Hours())
+					daysJ := math.Abs(cj.CreditDate.Sub(batch.LatestSettlementDate).Hours())
+					if daysI != daysJ {
+						return daysI < daysJ
+					}
+
+					return ci.ID < cj.ID
+				})
+			}
+
 			bc := availableRefCandidates[0]
 			diffDays := bc.CreditDate.Sub(batch.LatestSettlementDate).Hours() / 24.0
 			delta := bc.CreditedAmountPaise - batch.TotalAmountPaise
@@ -188,16 +250,40 @@ func ReconcileHop2(
 				Accepted:            false,
 			}
 
-			// Validate currency and merchant
-			if bc.MerchantID != batch.MerchantID {
-				eval.RejectionReason = fmt.Sprintf("Merchant mismatch: %s vs %s", bc.MerchantID, batch.MerchantID)
-				evaluations = append(evaluations, eval)
-				res.CandidatesConsidered = evaluations
+			// Validate merchant
+			if !batch.HasMerchant(bc.MerchantID) {
+				eval.RejectionReason = fmt.Sprintf("Merchant mismatch: %s not in batch merchants", bc.MerchantID)
+				res.CandidatesConsidered = []BankCandidateEvaluation{eval}
 				cat := models.CategorySettledNotBanked
 				res.ExceptionCategory = &cat
 				res.ExceptionReason = eval.RejectionReason
 				batchResults[batch.BatchID] = res
 				continue
+			}
+
+			// Validate currency
+			if batch.Currency != "" && bc.Currency != "" && !strings.EqualFold(bc.Currency, batch.Currency) {
+				eval.RejectionReason = fmt.Sprintf("Currency mismatch: %s vs %s", bc.Currency, batch.Currency)
+				res.CandidatesConsidered = []BankCandidateEvaluation{eval}
+				cat := models.CategorySettledNotBanked
+				res.ExceptionCategory = &cat
+				res.ExceptionReason = eval.RejectionReason
+				batchResults[batch.BatchID] = res
+				continue
+			}
+
+			var evaluations []BankCandidateEvaluation
+			// Record candidate evaluations for any leftover duplicate candidates
+			for _, dup := range availableRefCandidates[1:] {
+				evaluations = append(evaluations, BankCandidateEvaluation{
+					BankStatementID:     dup.ID,
+					BatchReferenceMatch: true,
+					CreditedAmountPaise: dup.CreditedAmountPaise,
+					AmountDeltaPaise:    dup.CreditedAmountPaise - batch.TotalAmountPaise,
+					DaysDifference:      dup.CreditDate.Sub(batch.LatestSettlementDate).Hours() / 24.0,
+					Accepted:            false,
+					RejectionReason:     "Duplicate batch reference; candidate not selected",
+				})
 			}
 
 			// Evaluate amounts
@@ -209,7 +295,7 @@ func ReconcileHop2(
 			if delta == 0 {
 				// Perfect match on batch reference
 				eval.Accepted = true
-				evaluations = append(evaluations, eval)
+				evaluations = append([]BankCandidateEvaluation{eval}, evaluations...)
 				res.CandidatesConsidered = evaluations
 				res.Matched = true
 				res.Rule = RuleBatchReference
@@ -223,7 +309,7 @@ func ReconcileHop2(
 				res.ShortfallPaise = &shortfall
 				res.ExposurePaise = &shortfall
 				eval.Accepted = true // Candidate recognized, but flagged with shortfall
-				evaluations = append(evaluations, eval)
+				evaluations = append([]BankCandidateEvaluation{eval}, evaluations...)
 				res.CandidatesConsidered = evaluations
 				res.Matched = false
 				res.Rule = RuleBatchReference
@@ -240,7 +326,7 @@ func ReconcileHop2(
 				absDelta := delta
 				res.ExposurePaise = &absDelta
 				eval.Accepted = true
-				evaluations = append(evaluations, eval)
+				evaluations = append([]BankCandidateEvaluation{eval}, evaluations...)
 				res.CandidatesConsidered = evaluations
 				res.Matched = false
 				res.Rule = RuleBatchReference
@@ -254,13 +340,84 @@ func ReconcileHop2(
 				continue
 			}
 		}
+	}
 
-		// Step 2: Rule 2 — Aggregated amount matching (no batch reference)
-		merchantBankCredits := bankByMerchant[batch.MerchantID]
+	// Step 2: Rule 2 — Aggregated amount matching (no batch reference)
+	for _, bID := range batchIDs {
+		if _, evaluated := batchResults[bID]; evaluated {
+			continue
+		}
+		batch := batches[bID]
+		fieldsCompared := map[string]interface{}{
+			"batch_id":             batch.BatchID,
+			"merchant_id":          batch.MerchantID,
+			"settlement_count":     batch.SettlementCount,
+			"expected_total_paise": batch.TotalAmountPaise,
+			"latest_date":          batch.LatestSettlementDate.Format(time.RFC3339),
+		}
+
+		res := &Hop2BatchResult{
+			BatchID:             batch.BatchID,
+			ExpectedAmountPaise: batch.TotalAmountPaise,
+			FieldsCompared:      fieldsCompared,
+		}
+
+		var evaluations []BankCandidateEvaluation
+		var candidateBankCredits []*models.BankStatement
+		if len(batch.Merchants) > 0 {
+			seenBankIDs := make(map[string]bool)
+			for m := range batch.Merchants {
+				for _, bc := range bankByMerchant[m] {
+					if !seenBankIDs[bc.ID] {
+						seenBankIDs[bc.ID] = true
+						candidateBankCredits = append(candidateBankCredits, bc)
+					}
+				}
+			}
+		} else {
+			candidateBankCredits = bankByMerchant[batch.MerchantID]
+		}
+		sort.SliceStable(candidateBankCredits, func(i, j int) bool {
+			return candidateBankCredits[i].ID < candidateBankCredits[j].ID
+		})
+
 		var amountCandidates []*models.BankStatement
 
-		for _, bc := range merchantBankCredits {
+		for _, bc := range candidateBankCredits {
 			if _, consumed := consumedBankStatements[bc.ID]; consumed {
+				continue
+			}
+
+			// If bank credit has an explicit batch reference to another batch, do not steal it
+			if bc.BatchReference != nil {
+				ref := strings.ToUpper(strings.TrimSpace(*bc.BatchReference))
+				if ref != "" && ref != strings.ToUpper(strings.TrimSpace(batch.BatchID)) {
+					eval := BankCandidateEvaluation{
+						BankStatementID:     bc.ID,
+						BatchReferenceMatch: false,
+						CreditedAmountPaise: bc.CreditedAmountPaise,
+						AmountDeltaPaise:    bc.CreditedAmountPaise - batch.TotalAmountPaise,
+						DaysDifference:      math.Abs(bc.CreditDate.Sub(batch.LatestSettlementDate).Hours() / 24.0),
+						Accepted:            false,
+						RejectionReason:     fmt.Sprintf("Bank credit has explicit reference (%s) to a different batch", *bc.BatchReference),
+					}
+					evaluations = append(evaluations, eval)
+					continue
+				}
+			}
+
+			// Validate currency
+			if batch.Currency != "" && bc.Currency != "" && !strings.EqualFold(batch.Currency, bc.Currency) {
+				eval := BankCandidateEvaluation{
+					BankStatementID:     bc.ID,
+					BatchReferenceMatch: false,
+					CreditedAmountPaise: bc.CreditedAmountPaise,
+					AmountDeltaPaise:    bc.CreditedAmountPaise - batch.TotalAmountPaise,
+					DaysDifference:      math.Abs(bc.CreditDate.Sub(batch.LatestSettlementDate).Hours() / 24.0),
+					Accepted:            false,
+					RejectionReason:     fmt.Sprintf("Currency mismatch: %s vs %s", bc.Currency, batch.Currency),
+				}
+				evaluations = append(evaluations, eval)
 				continue
 			}
 
@@ -308,17 +465,35 @@ func ReconcileHop2(
 			batchResults[batch.BatchID] = res
 			continue
 		}
+	}
 
-		// Step 3: No matching bank credit found -> SETTLED_NOT_BANKED
+	// Step 3: No matching bank credit found for remaining batches -> SETTLED_NOT_BANKED
+	for _, bID := range batchIDs {
+		if _, evaluated := batchResults[bID]; evaluated {
+			continue
+		}
+		batch := batches[bID]
+		fieldsCompared := map[string]interface{}{
+			"batch_id":             batch.BatchID,
+			"merchant_id":          batch.MerchantID,
+			"settlement_count":     batch.SettlementCount,
+			"expected_total_paise": batch.TotalAmountPaise,
+			"latest_date":          batch.LatestSettlementDate.Format(time.RFC3339),
+		}
 		cat := models.CategorySettledNotBanked
 		exposure := batch.TotalAmountPaise
-		res.Matched = false
-		res.Rule = RuleBatchReference
-		res.Confidence = 0.0
-		res.ExceptionCategory = &cat
-		res.ExposurePaise = &exposure
-		res.ExceptionReason = fmt.Sprintf("Settlement batch %s total ₹%.2f has no corresponding bank credit statement",
-			batch.BatchID, float64(batch.TotalAmountPaise)/100.0)
+		res := &Hop2BatchResult{
+			BatchID:             batch.BatchID,
+			ExpectedAmountPaise: batch.TotalAmountPaise,
+			FieldsCompared:      fieldsCompared,
+			Matched:             false,
+			Rule:                RuleBatchReference,
+			Confidence:          0.0,
+			ExceptionCategory:   &cat,
+			ExposurePaise:       &exposure,
+			ExceptionReason: fmt.Sprintf("Settlement batch %s total ₹%.2f has no corresponding bank credit statement",
+				batch.BatchID, float64(batch.TotalAmountPaise)/100.0),
+		}
 		batchResults[batch.BatchID] = res
 	}
 

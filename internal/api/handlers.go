@@ -1,28 +1,45 @@
 package api
 
 import (
+	"context"
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
 	"github.com/lib/pq"
+	"github.com/razorpay-hack/ai-finance-controller/internal/ai"
+	"github.com/razorpay-hack/ai-finance-controller/internal/config"
 	"github.com/razorpay-hack/ai-finance-controller/internal/generator"
+	"github.com/razorpay-hack/ai-finance-controller/internal/ingestion"
 	"github.com/razorpay-hack/ai-finance-controller/internal/metrics"
 	"github.com/razorpay-hack/ai-finance-controller/internal/models"
 	"github.com/razorpay-hack/ai-finance-controller/internal/qa"
+	"github.com/razorpay-hack/ai-finance-controller/internal/reconciliation"
+	"github.com/razorpay-hack/ai-finance-controller/internal/repository"
 )
 
 type Handlers struct {
-	db        *sql.DB
-	qaService *qa.QAService
+	db         *sql.DB
+	qaService  *qa.QAService
+	csvService *ingestion.CSVService
+	cfg        *config.Config
+	repo       *repository.Repository
 }
 
-func NewHandlers(db *sql.DB, qaService *qa.QAService) *Handlers {
-	return &Handlers{db: db, qaService: qaService}
+func NewHandlers(db *sql.DB, qaService *qa.QAService, csvService *ingestion.CSVService, cfg *config.Config) *Handlers {
+	return &Handlers{
+		db:         db,
+		qaService:  qaService,
+		csvService: csvService,
+		cfg:        cfg,
+		repo:       repository.NewRepository(db),
+	}
 }
 
 func respondJSON(w http.ResponseWriter, status int, data interface{}) {
@@ -33,6 +50,130 @@ func respondJSON(w http.ResponseWriter, status int, data interface{}) {
 
 func respondError(w http.ResponseWriter, status int, msg string) {
 	respondJSON(w, status, map[string]string{"error": msg})
+}
+
+// HandleCreateRun creates a new isolated reconciliation workspace run.
+func (h *Handlers) HandleCreateRun(w http.ResponseWriter, r *http.Request) {
+	var req struct {
+		Name string `json:"name"`
+	}
+	_ = json.NewDecoder(r.Body).Decode(&req)
+
+	run, err := h.repo.CreateRun(r.Context(), req.Name)
+	if err != nil {
+		respondError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	respondJSON(w, http.StatusCreated, run)
+}
+
+// HandleListRuns returns all runs with status, upload counts, and metrics.
+func (h *Handlers) HandleListRuns(w http.ResponseWriter, r *http.Request) {
+	runs, err := h.repo.ListRuns(r.Context())
+	if err != nil {
+		respondError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+	if runs == nil {
+		runs = []repository.RunListItem{}
+	}
+	respondJSON(w, http.StatusOK, runs)
+}
+
+// HandleGetRunDetail returns detailed run metrics and list of uploaded files.
+func (h *Handlers) HandleGetRunDetail(w http.ResponseWriter, r *http.Request) {
+	runIDStr := r.PathValue("runID")
+	runID, err := uuid.Parse(runIDStr)
+	if err != nil {
+		respondError(w, http.StatusBadRequest, "invalid runID")
+		return
+	}
+
+	detail, err := h.repo.GetRunDetail(r.Context(), runID)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			respondError(w, http.StatusNotFound, "run not found")
+			return
+		}
+		respondError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	respondJSON(w, http.StatusOK, detail)
+}
+
+// HandleDeleteRun deletes a run and cascades to all its associated tables.
+func (h *Handlers) HandleDeleteRun(w http.ResponseWriter, r *http.Request) {
+	runIDStr := r.PathValue("runID")
+	runID, err := uuid.Parse(runIDStr)
+	if err != nil {
+		respondError(w, http.StatusBadRequest, "invalid runID")
+		return
+	}
+
+	if err := h.repo.DeleteRun(r.Context(), runID); err != nil {
+		respondError(w, http.StatusNotFound, err.Error())
+		return
+	}
+
+	respondJSON(w, http.StatusOK, map[string]interface{}{
+		"status": "deleted",
+		"run_id": runID,
+	})
+}
+
+// HandleUploadToRun handles single-shot multipart CSV upload into a specific run.
+func (h *Handlers) HandleUploadToRun(w http.ResponseWriter, r *http.Request) {
+	runIDStr := r.PathValue("runID")
+	runID, err := uuid.Parse(runIDStr)
+	if err != nil {
+		respondError(w, http.StatusBadRequest, "invalid runID")
+		return
+	}
+
+	if h.csvService == nil {
+		respondError(w, http.StatusServiceUnavailable, "CSV service not configured")
+		return
+	}
+
+	// Limit to 50MB
+	r.Body = http.MaxBytesReader(w, r.Body, 50<<20)
+	if err := r.ParseMultipartForm(50 << 20); err != nil {
+		respondError(w, http.StatusBadRequest, fmt.Sprintf("failed parsing multipart form: %v", err))
+		return
+	}
+
+	file, header, err := r.FormFile("file")
+	if err != nil {
+		respondError(w, http.StatusBadRequest, "missing 'file' in upload form")
+		return
+	}
+	defer file.Close()
+
+	sourceType := strings.ToLower(strings.TrimSpace(r.FormValue("source_type")))
+	if sourceType == "" {
+		sourceType = ingestion.SourceInternal
+	}
+
+	data, err := io.ReadAll(file)
+	if err != nil {
+		respondError(w, http.StatusInternalServerError, fmt.Sprintf("failed reading uploaded file: %v", err))
+		return
+	}
+
+	summary, err := h.csvService.UploadCSV(r.Context(), runID, sourceType, header.Filename, data)
+	if err != nil {
+		respondError(w, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	respondJSON(w, http.StatusOK, summary)
+}
+
+// HandleGetMatches delegates to GetReconciliationMatches for GET /runs/{runID}/matches.
+func (h *Handlers) HandleGetMatches(w http.ResponseWriter, r *http.Request) {
+	h.GetReconciliationMatches(w, r)
 }
 
 // GetLatestRun returns the most recent reconciliation run metadata.
@@ -652,9 +793,15 @@ func (h *Handlers) HandleQA(w http.ResponseWriter, r *http.Request) {
 
 	var req struct {
 		Question string `json:"question"`
+		Query    string `json:"query"`
 	}
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil || req.Question == "" {
-		respondError(w, http.StatusBadRequest, "missing or invalid question in request body")
+	_ = json.NewDecoder(r.Body).Decode(&req)
+	q := strings.TrimSpace(req.Question)
+	if q == "" {
+		q = strings.TrimSpace(req.Query)
+	}
+	if q == "" {
+		respondError(w, http.StatusBadRequest, "missing or invalid question/query in request body")
 		return
 	}
 
@@ -663,7 +810,7 @@ func (h *Handlers) HandleQA(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	resp, err := h.qaService.Ask(r.Context(), runIDStr, req.Question)
+	resp, err := h.qaService.Ask(r.Context(), runIDStr, q)
 	if err != nil {
 		respondError(w, http.StatusInternalServerError, err.Error())
 		return
@@ -671,3 +818,179 @@ func (h *Handlers) HandleQA(w http.ResponseWriter, r *http.Request) {
 
 	respondJSON(w, http.StatusOK, resp)
 }
+
+// HandleAnalyzeCSV processes raw CSV, inspects structure, runs AI column inference, and caches file.
+func (h *Handlers) HandleAnalyzeCSV(w http.ResponseWriter, r *http.Request) {
+	if h.csvService == nil {
+		respondError(w, http.StatusServiceUnavailable, "CSV service not configured")
+		return
+	}
+
+	// Limit to 50MB
+	r.Body = http.MaxBytesReader(w, r.Body, 50<<20)
+	if err := r.ParseMultipartForm(50 << 20); err != nil {
+		respondError(w, http.StatusBadRequest, fmt.Sprintf("failed parsing multipart form: %v", err))
+		return
+	}
+
+	file, header, err := r.FormFile("file")
+	if err != nil {
+		respondError(w, http.StatusBadRequest, "missing 'file' in upload form")
+		return
+	}
+	defer file.Close()
+
+	sourceType := strings.ToLower(strings.TrimSpace(r.FormValue("source_type")))
+	if sourceType == "" {
+		sourceType = ingestion.SourceInternal
+	}
+
+	data, err := io.ReadAll(file)
+	if err != nil {
+		respondError(w, http.StatusInternalServerError, fmt.Sprintf("failed reading uploaded file: %v", err))
+		return
+	}
+
+	result, err := h.csvService.AnalyzeCSV(r.Context(), sourceType, header.Filename, data)
+	if err != nil {
+		respondError(w, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	respondJSON(w, http.StatusOK, result)
+}
+
+// HandleCommitCSV applies confirmed column mappings and batch upserts into PostgreSQL.
+func (h *Handlers) HandleCommitCSV(w http.ResponseWriter, r *http.Request) {
+	if h.csvService == nil {
+		respondError(w, http.StatusServiceUnavailable, "CSV service not configured")
+		return
+	}
+
+	var req ingestion.CommitRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		respondError(w, http.StatusBadRequest, fmt.Sprintf("invalid commit payload: %v", err))
+		return
+	}
+
+	summary, err := h.csvService.CommitCSV(r.Context(), req)
+	if err != nil {
+		respondError(w, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	respondJSON(w, http.StatusOK, summary)
+}
+
+// HandleReconcileRun executes deterministic reconciliation on source data of the given runID.
+func (h *Handlers) HandleReconcileRun(w http.ResponseWriter, r *http.Request) {
+	runIDStr := r.PathValue("runID")
+	runID, err := uuid.Parse(runIDStr)
+	if err != nil {
+		respondError(w, http.StatusBadRequest, "invalid runID")
+		return
+	}
+
+	discountPct := 2.5
+	if q := r.URL.Query().Get("discount_pct"); q != "" {
+		if val, err := strconv.ParseFloat(q, 64); err == nil && val > 0 {
+			discountPct = val
+		}
+	}
+
+	internals, settlements, bankStatements, err := h.repo.LoadSourceData(r.Context(), runID)
+	if err != nil {
+		respondError(w, http.StatusInternalServerError, fmt.Sprintf("failed loading source data: %v", err))
+		return
+	}
+
+	if len(internals) == 0 && len(settlements) == 0 && len(bankStatements) == 0 {
+		respondError(w, http.StatusBadRequest, "no source records found for this run; upload CSVs first")
+		return
+	}
+
+	output := reconciliation.ReconcileRun(runID, internals, settlements, bankStatements, discountPct)
+	if err := h.repo.SaveReconciliationResults(r.Context(), output); err != nil {
+		respondError(w, http.StatusInternalServerError, fmt.Sprintf("failed saving reconciliation results: %v", err))
+		return
+	}
+
+	// Trigger asynchronous AI investigation for ambiguous exceptions
+	go func(rID uuid.UUID) {
+		var aiClient ai.Client
+		if h.cfg != nil && h.cfg.NvidiaAPIKey != "" {
+			aiClient = ai.NewNIMClient(h.cfg.NvidiaAPIKey, h.cfg.NvidiaNIMBaseURL, h.cfg.NvidiaNIMModel)
+		} else {
+			aiClient = ai.NewOfflineClient()
+		}
+		inv := ai.NewInvestigator(aiClient, h.db)
+		bgCtx, cancel := context.WithTimeout(context.Background(), 3*time.Minute)
+		defer cancel()
+		_, _ = inv.InvestigatePendingExceptions(bgCtx, rID)
+	}(runID)
+
+	respondJSON(w, http.StatusOK, map[string]interface{}{
+		"status":                     "success",
+		"run_id":                     runID,
+		"internal_count":             len(internals),
+		"settlement_count":           len(settlements),
+		"bank_count":                 len(bankStatements),
+		"hop1_matched_count":         output.Hop1MatchedCount,
+		"hop2_matched_count":         output.Hop2MatchedCount,
+		"full_chain_count":           output.FullChainCount,
+		"exception_count":            output.ExceptionCount,
+		"unresolved_amount_paise":    output.UnresolvedExposure,
+		"unresolved_amount_inr":      float64(output.UnresolvedExposure) / 100.0,
+		"engine_duration_ms":         output.EngineDurationMs,
+		"throughput_records_per_sec": output.ThroughputPerSecond,
+	})
+}
+
+// HandleSampleCSV serves standard clean CSV files for testing.
+func (h *Handlers) HandleSampleCSV(w http.ResponseWriter, r *http.Request) {
+	source := r.PathValue("source")
+	data, err := ingestion.GenerateSampleCSV(source)
+	if err != nil {
+		respondError(w, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	w.Header().Set("Content-Type", "text/csv; charset=utf-8")
+	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=\"sample_%s.csv\"", source))
+	w.WriteHeader(http.StatusOK)
+	_, _ = w.Write(data)
+}
+
+// HandleMessySampleCSV serves intentionally messy CSV files for testing AI mapping.
+func (h *Handlers) HandleMessySampleCSV(w http.ResponseWriter, r *http.Request) {
+	source := r.PathValue("source")
+	data, err := ingestion.GenerateMessySampleCSV(source)
+	if err != nil {
+		respondError(w, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	w.Header().Set("Content-Type", "text/csv; charset=utf-8")
+	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=\"messy_%s.csv\"", source))
+	w.WriteHeader(http.StatusOK)
+	_, _ = w.Write(data)
+}
+
+// HandleGetRunSourcesStatus returns the count and status of the 3 sources for the given runID.
+func (h *Handlers) HandleGetRunSourcesStatus(w http.ResponseWriter, r *http.Request) {
+	runIDStr := r.PathValue("runID")
+	runID, err := uuid.Parse(runIDStr)
+	if err != nil {
+		respondError(w, http.StatusBadRequest, "invalid runID")
+		return
+	}
+
+	status, err := h.csvService.GetSourcesStatus(r.Context(), runID)
+	if err != nil {
+		respondError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	respondJSON(w, http.StatusOK, status)
+}
+
